@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Takeaway - Единен Информационен Портал</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF7A00',
+                            orangeLight: '#FFA142',
+                            dark: '#111827',
+                            grayDark: '#1F2937',
+                            slate: '#4B5563',
+                            lightBg: '#F9FAFB'
+                        }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #FF7A00; border-radius: 10px; }
+        .leaflet-container { font-family: 'Inter', sans-serif; z-index: 1 !important; }
+        .tooltip-content { display: none; opacity: 0; transition: opacity 0.3s; }
+        .tooltip-container:hover .tooltip-content, .tooltip-container:focus-within .tooltip-content { display: block; opacity: 1; }
+        .search-input:focus { box-shadow: 0 0 0 4px rgba(255, 122, 0, 0.15); }
+        .result-card { animation: slideDown 0.3s ease-out forwards; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse-orange { 0% { box-shadow: 0 0 0 0 rgba(255, 122, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 122, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 122, 0, 0); } }
+        .pulse-marker { box-shadow: 0 0 0 0 rgba(255, 122, 0, 0.7); animation: pulse-orange 2s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .animate-blink { animation: blink 1.5s ease-in-out infinite; }
+        .tab-section, .global-page { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-[#F3F4F6] text-gray-800 font-sans antialiased min-h-screen relative selection:bg-brand-orange selection:text-white">
+
+    <header id="main-header" class="sticky top-4 z-[100] mx-auto px-4 max-w-2xl transition-all duration-500 ease-in-out transform origin-top">
+        <div class="bg-white/60 backdrop-blur-md rounded-full p-1.5 shadow-lg border border-white/50 flex justify-between items-center gap-2 transition-all duration-300">
+            
+            <div class="flex items-center bg-gray-500/10 p-1 rounded-full w-full sm:w-auto">
+                <button id="nav-home" onclick="switchGlobalPage('home')" class="flex-1 sm:flex-none px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer bg-white text-brand-orange shadow-sm border border-gray-100/50">
+                    <i class="fa-solid fa-house"></i> <span data-i18n="nav_home">🏠 Начало</span>
+                </button>
+                <button id="nav-cars" onclick="switchGlobalPage('cars')" class="flex-1 sm:flex-none px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-gray-600 hover:text-brand-dark">
+                    <i class="fa-solid fa-car"></i> <span data-i18n="nav_cars">🚗 Служебни коли</span>
+                </button>
+            </div>
+
+            <div class="relative shrink-0">
+                <button type="button" id="lang-btn" onclick="toggleLangMenu()" class="flex items-center gap-2 bg-white/90 border border-gray-200/50 px-4 py-2.5 rounded-full text-sm font-bold text-brand-dark shadow-sm hover:border-brand-orange transition-all duration-300 cursor-pointer">
+                    <i class="fa-solid fa-globe text-brand-orange"></i>
+                    <span id="current-lang" class="hidden sm:inline">БГ | Български</span>
+                    <span id="current-lang-short" class="sm:hidden">БГ</span>
+                    <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+                </button>
+                <div id="lang-menu" class="absolute right-0 mt-2 w-44 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 hidden transition-all duration-200 overflow-hidden z-50">
+                    <ul class="py-2 text-sm font-semibold text-brand-dark list-none m-0 p-0">
+                        <li><button type="button" onclick="setLang('bg')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">БГ | Български</button></li>
+                        <li><button type="button" onclick="setLang('en')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">EN | English</button></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        
+        <div id="page-home" class="global-page space-y-10 sm:space-y-12 block">
+            <section class="bg-white border border-gray-200 rounded-[2rem] p-6 sm:p-10 shadow-sm relative overflow-hidden">
+                <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-orange opacity-10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute right-8 top-8 hidden lg:block text-brand-orange opacity-10 pointer-events-none"><i class="fa-solid fa-motorcycle text-[160px]"></i></div>
+                <div class="relative z-10 max-w-2xl space-y-4">
+                    <span data-i18n="hero_badge" class="bg-brand-orange/10 text-brand-orange text-xs sm:text-sm font-extrabold px-3 py-1.5 rounded-md uppercase tracking-wider border border-brand-orange/20 inline-block">АКТУАЛЕН НАРЪЧНИК 2026</span>
+                    <h2 data-i18n="hero_title" class="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark leading-tight">Всичко за твоя успешен старт в Takeaway</h2>
+                    <p data-i18n="hero_desc" class="text-brand-slate text-base sm:text-lg leading-relaxed">Добре дошли в нашия портал! Тук сме събрали актуалната информация за стартовите точки, методологията на плащане и директни контакти към ключовите отдели.</p>
+                </div>
+            </section>
+
+            <section id="zones" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8">
+                <div class="space-y-2 border-b border-gray-100 pb-6">
+                    <h3 data-i18n="map_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">1. Стартови точки (София)</h3>
+                    <p data-i18n="map_desc" class="text-brand-slate text-base sm:text-lg max-w-3xl">Интерактивна GPS карта с разпределение на официалните четири стартови зони в столицата.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                    <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
+                        <div class="space-y-4">
+                            <h4 class="text-lg sm:text-xl font-bold text-brand-dark flex items-center gap-2"><i class="fa-solid fa-location-dot text-brand-orange"></i> <span data-i18n="map_subtitle">Ключови райони</span></h4>
+                            <p data-i18n="map_text" class="text-base text-brand-slate leading-relaxed">Официалните стартови точки са съобразени с гъстотата на поръчките и гарантират бърз старт на работния ви ден.</p>
+                            <div class="bg-brand-lightBg p-5 rounded-2xl border border-gray-200 space-y-3 shadow-inner">
+                                <h5 data-i18n="map_list_title" class="text-sm font-bold text-brand-orange uppercase tracking-wide">Основни стартови точки:</h5>
+                                <ul class="text-sm sm:text-base text-brand-dark font-bold space-y-3 list-none p-0 m-0">
+                                    <li class="flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-blue-600 block shadow-sm"></span> <span data-i18n="zone_1">1 — Зона Център</span></li>
+                                    <li class="flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-purple-600 block shadow-sm"></span> <span data-i18n="zone_2">2 — Зона Лозенец</span></li>
+                                    <li class="flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-green-600 block shadow-sm"></span> <span data-i18n="zone_3">3 — Зона Борово</span></li>
+                                    <li class="flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-red-600 block shadow-sm"></span> <span data-i18n="zone_4">4 — Зона Дървеница</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="bg-brand-orange/10 border border-brand-orange/20 p-4 rounded-xl flex items-start gap-3">
+                            <i class="fa-solid fa-bolt text-brand-orange mt-0.5"></i>
+                            <p data-i18n="map_start_info" class="text-sm text-brand-dark font-medium leading-snug">Винаги активирайте смяната си <strong>вътре в границите</strong> на вашата назначена стартова точка в приложението Scoober.</p>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-7 flex flex-col space-y-3">
+                        <div class="text-center sm:text-right"><span data-i18n="map_interactive" class="text-xs sm:text-sm font-black text-brand-orange uppercase tracking-widest bg-white py-1 px-3 rounded-lg border border-gray-100 shadow-sm inline-block">Интерактивна GPS Карта</span></div>
+                        <div class="relative w-full h-[350px] sm:h-[450px] rounded-2xl border border-gray-200 shadow-sm overflow-hidden bg-gray-100">
+                            <div id="main-map" class="absolute inset-0 w-full h-full z-10"></div>
+                        </div>
+                        <p data-i18n="map_footer_info" class="text-xs sm:text-sm text-center text-gray-500 italic px-2">Това са official-ните стартови точки за пускане (започване на смяна), а не зони за каране.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-6">
+                <div class="space-y-2 border-b border-gray-100 pb-6">
+                    <h4 data-i18n="pay_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">2. График на плащанията</h4>
+                    <p data-i18n="pay_desc" class="text-brand-slate text-base sm:text-lg">Възнаграждението се разпределя в два транша всеки месец:</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-[#FFF8F3] p-6 sm:p-8 rounded-2xl border border-brand-orange/20 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between border-b border-brand-orange/10 pb-3 mb-4">
+                            <h5 data-i18n="pay_30_title" class="text-xl sm:text-2xl font-black text-brand-orange">30-то число</h5>
+                            <i class="fa-solid fa-sack-dollar text-brand-orange text-2xl opacity-50"></i>
+                        </div>
+                        <ul class="space-y-3 text-brand-dark text-base list-none p-0 m-0">
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-brand-orange mt-1"></i> <span data-i18n="pay_30_bul1">Часове (1-ва половина на текущ месец).</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-brand-orange mt-1"></i> <span data-i18n="pay_30_bul2">Амортизация (1-ва половина на текущ месец).</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-[#FFF8F3] p-6 sm:p-8 rounded-2xl border border-brand-orange/20 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between border-b border-brand-orange/10 pb-3 mb-4">
+                            <h5 data-i18n="pay_15_title" class="text-xl sm:text-2xl font-black text-brand-orange">15-то число</h5>
+                            <i class="fa-solid fa-money-bill-trend-up text-brand-orange text-2xl opacity-50"></i>
+                        </div>
+                        <ul class="space-y-3 text-brand-dark text-base list-none p-0 m-0">
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-brand-orange mt-1"></i> <span data-i18n="pay_15_bul1">Остатък часове (2-ра половина на предходен месец).</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-brand-orange mt-1"></i> <span data-i18n="pay_15_bul2">Амортизация (2-ра половина на предходен месец).</span></li>
+                            <li class="flex items-start gap-2 bg-brand-orange/10 p-2 rounded-lg mt-2 font-bold"><i class="fa-solid fa-gift text-brand-orange mt-0.5"></i> <span data-i18n="pay_15_bul3">Бонус поръчки за целия месец.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8 relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-64 h-64 bg-blue-500 opacity-5 rounded-full blur-3xl z-0 pointer-events-none"></div>
+                <div class="space-y-2 border-b border-gray-100 pb-6 relative z-10">
+                    <h4 data-i18n="schedule_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">3. Plan-иране на смените</h4>
+                    <p data-i18n="schedule_subtitle" class="text-blue-600 text-sm font-bold tracking-widest uppercase mt-2">ГРАФИЦИ И КОРЕКЦИИ</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+                    <div class="lg:col-span-5 space-y-6">
+                        <div class="bg-blue-50 border border-blue-100 p-5 rounded-2xl flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 text-xl shadow-sm mt-1"><i class="fa-solid fa-calendar-check"></i></div>
+                            <div>
+                                <h5 data-i18n="schedule_important_title" class="font-bold text-brand-dark text-lg mb-1">Краен срок за подаване</h5>
+                                <p data-i18n="schedule_important_desc" class="text-brand-slate leading-snug">Всеки куриер Update графика си <strong>най-късно до Вторник 23:59 ч.</strong></p>
+                            </div>
+                        </div>
+                        <div class="bg-orange-50 border border-brand-orange/20 p-5 rounded-2xl flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full bg-brand-orange text-white flex items-center justify-center shrink-0 text-xl shadow-sm mt-1"><i class="fa-solid fa-pen-to-square"></i></div>
+                            <div>
+                                <h5 data-i18n="schedule_edit_title" class="font-bold text-brand-dark text-lg mb-1">Корекции след Вторник</h5>
+                                <p data-i18n="schedule_edit_desc" class="text-brand-slate leading-snug">Корекции могат да се правят <strong>до Пятък най-късно</strong>, и то <strong>само след изрично разрешение</strong> и връзка с отдел PAS. След публикуване на графика в петък, промени не са възможни.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-7 bg-brand-lightBg p-6 sm:p-8 rounded-[2rem] border border-gray-200 shadow-inner">
+                        <h5 data-i18n="schedule_how" class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Как се подава график в приложението:</h5>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                                <span class="w-8 h-8 rounded-full bg-gray-100 text-brand-dark text-sm font-black flex items-center justify-center shrink-0">1</span>
+                                <p data-i18n="schedule_step1" class="text-base text-brand-dark font-medium">Отворете <strong>менюто вляво</strong> в приложението Scoober.</p>
+                            </div>
+                            <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                                <span class="w-8 h-8 rounded-full bg-gray-100 text-brand-dark text-sm font-black flex items-center justify-center shrink-0">2</span>
+                                <p data-i18n="schedule_step2" class="text-base text-brand-dark font-medium">Изберете секция <strong>Планиране на график (Schedule)</strong>.</p>
+                            </div>
+                            <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                                <span class="w-8 h-8 rounded-full bg-gray-100 text-brand-dark text-sm font-black flex items-center justify-center shrink-0">3</span>
+                                <p data-i18n="schedule_step3" class="text-base text-brand-dark font-medium">Маркирайте часовете, в които сте на разположение за новата седмица.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="methodology" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8">
+                <div class="space-y-2 border-b border-gray-100 pb-6">
+                    <h3 data-i18n="matrix_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">4. Доходи и Бонусна схема</h3>
+                    <p data-i18n="matrix_info_desc" class="text-brand-slate text-base sm:text-lg mt-2">Бонусът се трупа на месечна база. Посочените суми са брутни.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div class="lg:col-span-8 space-y-6">
+                        <div class="bg-gray-100 p-1.5 rounded-2xl inline-flex shadow-inner border border-gray-200 w-full sm:w-auto overflow-x-auto custom-scrollbar">
+                            <button id="tab-personal" onclick="switchVehicleTab('personal')" class="px-6 py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 bg-white text-brand-orange shadow-md border border-gray-100 whitespace-nowrap"><i class="fa-solid fa-car-side mr-2"></i><span data-i18n="tab_personal">С лична кола</span></button>
+                            <button id="tab-company" onclick="switchVehicleTab('company')" class="px-6 py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 text-gray-500 hover:text-gray-700 whitespace-nowrap"><i class="fa-solid fa-car mr-2"></i><span data-i18n="tab_company">Със служебна</span></button>
+                        </div>
+                        <div id="contracts-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                            <div id="card-8h" class="bg-brand-lightBg border border-gray-200 hover:border-brand-orange hover:shadow-md transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between space-y-5">
+                                <div>
+                                    <div data-i18n="contract_8h" class="bg-brand-orange/10 border border-brand-orange/20 text-brand-orange font-black text-sm px-3 py-3 rounded-xl text-center uppercase tracking-widest mb-5">8-Hour (8ч)</div>
+                                    <div class="space-y-3 text-sm">
+                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-500">Base (0-100)</span><span class="font-black text-brand-dark">€0.25</span></div>
+                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-600">Mid (101-200)</span><span class="font-black text-brand-dark">€1.00</span></div>
+                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-700">High (201-300)</span><span class="font-black text-brand-dark">€1.50</span></div>
+                                        <div class="flex justify-between pb-1"><span class="font-black text-brand-orange">Super (301+)</span><span class="font-black text-brand-orange">€3.00</span></div>
+                                    </div>
+                                </div>
+                                <div class="pt-5 border-t-2 border-gray-200 text-center">
+                                    <div data-i18n="avg_net_title" class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Средно Нето Месечно*</div>
+                                    <div id="avg-8h" class="text-2xl font-black text-brand-orange">1110 - 1300 €</div>
+                                </div>
+                            </div>
+                            <div id="card-6h" class="bg-white border border-gray-200 hover:border-brand-orange hover:shadow-md transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between space-y-5">
+                                <div>
+                                    <div data-i18n="contract_6h" class="bg-gray-100 border border-gray-200 text-gray-700 font-black text-sm px-3 py-3 rounded-xl text-center uppercase tracking-widest mb-5">6-Hour (6ч)</div>
+                                    <div class="space-y-3 text-sm">
+                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-500">Base (0-75)</span><span class="font-black text-brand-dark">€0.25</span></div>
+                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-600">Mid (76-150)</span><span class="font-black text-brand-dark">€1.00</span></div>
+                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-700">High (151-225)</span><span class="font-black text-brand-dark">€1.50</span></div>
+                                        <div class="flex justify-between pb-1"><span class="font-black text-brand-orange">Super (226+)</span><span class="font-black text-brand-orange">€3.00</span></div>
+                                    </div>
+                                </div>
+                                <div class="pt-5 border-t-2 border-gray-200 text-center">
+                                    <div data-i18n="avg_net_title_2" class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Средно Нето Месечно*</div>
+                                    <div id="avg-6h" class="text-2xl font-black text-brand-dark">800 - 900 €</div>
+                                </div>
+                            </div>
+                            <div id="card-4h" class="bg-white border border-gray-200 hover:border-brand-orange hover:shadow-md transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between space-y-5">
+                                <div>
+                                    <div data-i18n="contract_4h" class="bg-gray-100 border border-gray-200 text-gray-700 font-black text-sm px-3 py-3 rounded-xl text-center uppercase tracking-widest mb-5">4-Hour (4ч)</div>
+                                    <div class="space-y-3 text-sm">
+                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-500">Base (0-50)</span><span class="font-black text-brand-dark">€0.25</span></div>
+                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-600">Mid (51-100)</span><span class="font-black text-brand-dark">€1.00</span></div>
+                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-700">High (101-150)</span><span class="font-black text-brand-dark">€1.50</span></div>
+                                        <div class="flex justify-between pb-1"><span class="font-black text-brand-orange">Super (151+)</span><span class="font-black text-brand-orange">€3.00</span></div>
+                                    </div>
+                                </div>
+                                <div class="pt-5 border-t-2 border-gray-200 text-center">
+                                    <div data-i18n="avg_net_title_3" class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Средно Нето Месечно*</div>
+                                    <div id="avg-4h" class="text-2xl font-black text-brand-dark">510 - 620 €</div>
+                                </div>
+                            </div>
+                            <div id="card-2h" class="bg-white border border-gray-200 hover:border-brand-orange hover:shadow-md transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between space-y-5">
+                                <div>
+                                    <div data-i18n="contract_2h" class="bg-gray-100 border border-gray-200 text-gray-700 font-black text-sm px-3 py-3 rounded-xl text-center uppercase tracking-widest mb-5">2-Hour (2ч)</div>
+                                    <div class="space-y-3 text-sm">
+                                        <div class="flex justify-between border-b border-gray-100 pb-2"><span class="font-bold text-gray-500">Base (0-25)</span><span class="font-black text-brand-dark">€0.25</span></div>
+                                        <div class="flex justify-between border-b border-gray-100 pb-2"><span class="font-bold text-gray-600">Mid (26-50)</span><span class="font-black text-brand-dark">€1.00</span></div>
+                                        <div class="flex justify-between border-b border-gray-100 pb-2"><span class="font-bold text-gray-700">High (51-75)</span><span class="font-black text-brand-dark">€1.50</span></div>
+                                        <div class="flex justify-between pb-1"><span class="font-black text-brand-orange">Super (76+)</span><span class="font-black text-brand-orange">€3.00</span></div>
+                                    </div>
+                                </div>
+                                <div class="pt-5 border-t-2 border-gray-200 text-center">
+                                    <div data-i18n="avg_net_title_4" class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Средно Нето Месечно*</div>
+                                    <div id="avg-2h" class="text-2xl font-black text-brand-dark">~260 €</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-4 bg-[#FFF8F3] rounded-[2rem] p-6 shadow-sm border border-brand-orange/20 flex flex-col relative overflow-hidden">
+                        <div class="space-y-2 border-b border-brand-orange/10 pb-5 mb-5 relative z-10">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-brand-orange text-white rounded-xl flex items-center justify-center text-lg font-black shadow-md"><i class="fa-solid fa-calculator"></i></div>
+                                <h4 data-i18n="sim_title" class="text-xl font-black text-brand-dark">Симулатор</h4>
+                            </div>
+                            <p data-i18n="sim_desc" class="text-brand-slate text-sm">Симулирай заплатата си спрямо очакваното представяне.</p>
+                        </div>
+                        <div class="space-y-4 relative z-10 flex-grow">
+                            <div class="space-y-1">
+                                <label data-i18n="calc_contract_lbl" class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Договор</label>
+                                <select id="contract" onchange="updateUI()" class="w-full p-3 bg-white border border-brand-orange/30 rounded-xl text-brand-dark font-bold text-sm outline-none focus:border-brand-orange shadow-sm cursor-pointer"></select>
+                            </div>
+                            <div class="space-y-1">
+                                <label data-i18n="calc_vehicle_lbl" class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Превозно</label>
+                                <select id="vehicle" onchange="updateUI()" class="w-full p-3 bg-white border border-brand-orange/30 rounded-xl text-brand-dark font-bold text-sm outline-none focus:border-brand-orange shadow-sm cursor-pointer"></select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="space-y-1">
+                                    <label data-i18n="calc_days_lbl" class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1 truncate">Раб. дни</label>
+                                    <input id="days" type="number" placeholder="0" oninput="updateUI()" class="w-full p-3 bg-white border border-brand-orange/30 rounded-xl text-brand-dark font-bold text-sm text-center shadow-sm outline-none focus:border-brand-orange">
+                                </div>
+                                <div class="relative tooltip-container space-y-1">
+                                    <label class="flex items-center text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1 cursor-pointer truncate"><span data-i18n="calc_eff_lbl">Ефект. (ч)</span><i class="fa-solid fa-circle-info text-brand-orange ml-1 text-xs"></i></label>
+                                    <div id="eff-tooltip-box" class="tooltip-content absolute z-20 right-0 bottom-full mb-2 w-48 bg-gray-800 text-white text-[10px] p-2.5 rounded-lg shadow-xl pointer-events-none">Average number of orders you deliver per hour.</div>
+                                    <input id="eff" type="number" step="0.1" placeholder="0.0" oninput="updateUI()" class="w-full p-3 bg-white border border-brand-orange/30 rounded-xl text-brand-dark font-bold text-sm text-center shadow-sm outline-none focus:border-brand-orange">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 bg-white rounded-2xl p-5 border border-brand-orange/20 shadow-sm relative z-10 flex flex-col justify-center">
+                            <div class="flex justify-between items-end mb-4 border-b border-gray-100 pb-3">
+                                <div>
+                                    <div data-i18n="sim_net" class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Очаквано Нето</div>
+                                    <div id="outNet" class="text-3xl font-black text-brand-orange leading-none">0.00 €</div>
+                                </div>
+                                <div class="text-right">
+                                    <div data-i18n="sim_gross" class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Бруто</div>
+                                    <div id="outGross" class="text-lg font-bold text-brand-dark">0.00 €</div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 text-center">
+                                <div class="bg-gray-50 p-2 rounded-lg border border-gray-100">
+                                    <span data-i18n="sim_orders" class="block text-[10px] text-gray-400 font-bold uppercase">Поръчки</span>
+                                    <span id="outOrders" class="block font-bold text-brand-dark">0</span>
+                                </div>
+                                <div class="bg-gray-50 p-2 rounded-lg border border-gray-100">
+                                    <span data-i18n="sim_hours" class="block text-[10px] text-gray-400 font-bold uppercase">Часове</span>
+                                    <span id="outMonthlyHours" class="block font-bold text-brand-dark">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="smart-contact-helper" class="bg-white rounded-[2rem] shadow-sm border border-gray-200 overflow-hidden relative">
+                <div class="p-6 sm:p-10 relative z-10">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-brand-orange/10 text-brand-orange rounded-full flex items-center justify-center text-3xl mx-auto mb-4 border border-brand-orange/20 shadow-sm"><i class="fa-solid fa-magnifying-glass-location"></i></div>
+                        <h2 data-i18n="helper_title" class="text-2xl sm:text-3xl font-black text-brand-dark mb-2">5. Намери бързо това, което търсиш</h2>
+                        <p data-i18n="helper_desc" class="text-brand-slate text-sm sm:text-base max-w-2xl mx-auto">Не сте сигурни към кого да се обърнете? Напишете какво ви трябва по-долу и ние ще ви покажем точното място в приложението Scoober.</p>
+                    </div>
+                    <div class="relative max-w-3xl mx-auto mb-8">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none"><i class="fa-solid fa-magnifying-glass text-gray-400 text-xl"></i></div>
+                        <input type="text" id="searchInput" autocomplete="off" class="search-input block w-full pl-14 pr-12 py-4 sm:py-5 text-base sm:text-lg border-2 border-gray-200 rounded-2xl text-brand-dark bg-gray-50 focus:bg-white transition-all duration-300 shadow-sm">
+                        <button id="clearBtn" class="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-400 hover:text-brand-orange hidden transition-colors"><i class="fa-solid fa-circle-xmark text-2xl"></i></button>
+                    </div>
+                    <div id="resultsArea" class="max-w-3xl mx-auto hidden space-y-4"></div>
+                    <div id="quickCategories" class="max-w-4xl mx-auto text-center transition-all duration-300 mt-6">
+                        <p data-i18n="helper_quick" class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Бързи търсения (Кликни)</p>
+                        <div id="quickLinksContainer" class="flex flex-wrap justify-center gap-2 sm:gap-3"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                <div class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-6 flex flex-col justify-between hover:border-brand-orange/50 transition-colors">
+                    <div class="space-y-4 border-b border-gray-100 pb-5">
+                        <div class="w-14 h-14 bg-brand-orange/10 text-brand-orange rounded-2xl flex items-center justify-center text-2xl border border-brand-orange/20"><i class="fa-solid fa-headset"></i></div>
+                        <div>
+                            <h4 data-i18n="contact_disp_title" class="text-xl sm:text-2xl font-black text-brand-dark">6. Връзка с Диспечери</h4>
+                            <p data-i18n="contact_disp_subtitle" class="text-xs sm:text-sm text-brand-orange font-bold tracking-widest uppercase mt-1">ПО ВРЕМЕ НА АКТИВНА СМЯНА</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 pt-2">
+                        <h5 data-i18n="contact_how_title" class="text-sm font-bold text-gray-500 uppercase tracking-widest">Как да се свържете:</h5>
+                        <div class="p-5 bg-brand-lightBg rounded-xl border border-gray-200 space-y-4 shadow-inner">
+                            <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-brand-orange text-white text-xs font-black flex items-center justify-center shrink-0 shadow-sm mt-0.5">1</span><p data-i18n="contact_step1" class="text-sm sm:text-base text-gray-700">Отворете приложението <strong>Scoober</strong>.</p></div>
+                            <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-brand-orange text-white text-xs font-black flex items-center justify-center shrink-0 shadow-sm mt-0.5">2</span><p data-i18n="contact_step2" class="text-sm sm:text-base text-gray-700">Кликнете на <strong>иконата за чат</strong> в горния десен ъгъл.</p></div>
+                            <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-brand-orange text-white text-xs font-black flex items-center justify-center shrink-0 shadow-sm mt-0.5">3</span><p data-i18n="contact_step3" class="text-sm sm:text-base text-gray-700">Опишете ясно казуса си в чата.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-6 flex flex-col justify-between hover:border-gray-300 transition-colors">
+                    <div class="space-y-4 border-b border-gray-100 pb-5">
+                        <div class="w-14 h-14 bg-gray-100 text-gray-600 rounded-2xl flex items-center justify-center text-2xl border border-gray-200"><i class="fa-solid fa-file-contract"></i></div>
+                        <div>
+                            <h4 data-i18n="contact_admin_title" class="text-xl sm:text-2xl font-black text-brand-dark">7. Директна Администрация</h4>
+                            <p data-i18n="contact_admin_subtitle" class="text-xs sm:text-sm text-gray-500 font-bold tracking-widest uppercase mt-1">ИЗВЪН АКТИВНА СМЯНА</p>
+                        </div>
+                        <div data-i18n="contact_admin_important" class="p-3 bg-blue-50 border border-blue-100 rounded-xl text-sm text-brand-dark font-medium inline-block w-full">Отговор до следващия работен ден.</div>
+                    </div>
+                    <div class="space-y-4 pt-2">
+                        <h5 data-i18n="contact_admin_how" class="text-sm font-bold text-gray-500 uppercase tracking-widest">Къде е контактната форма:</h5>
+                        <div class="p-5 bg-brand-lightBg rounded-xl border border-gray-200 space-y-4 shadow-inner">
+                            <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-gray-300 text-gray-700 text-xs font-black flex items-center justify-center shrink-0 shadow-sm mt-0.5">1</span><p data-i18n="admin_step1" class="text-sm sm:text-base text-gray-700">Отворете <strong>менюто вляво</strong> в Scoober.</p></div>
+                            <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-gray-300 text-gray-700 text-xs font-black flex items-center justify-center shrink-0 shadow-sm mt-0.5">2</span><p data-i18n="admin_step2" class="text-sm sm:text-base text-gray-700">Изберете секция <strong>Профил (Profile)</strong>.</p></div>
+                            <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-gray-300 text-gray-700 text-xs font-black flex items-center justify-center shrink-0 shadow-sm mt-0.5">3</span><p data-i18n="admin_step3" class="text-sm sm:text-base text-gray-700">Изберете <strong>Contact Form</strong>.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="page-cars" class="global-page space-y-10 sm:space-y-12 hidden">
+            <section class="bg-white border border-gray-200 rounded-[2rem] p-6 sm:p-10 shadow-sm relative overflow-hidden">
+                <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-orange opacity-10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute right-8 top-8 hidden lg:block text-brand-orange opacity-10 pointer-events-none"><i class="fa-solid fa-car-side text-[160px]"></i></div>
+                <div class="relative z-10 max-w-2xl space-y-4">
+                    <span data-i18n="car_hero_badge" class="bg-brand-orange/10 text-brand-orange text-xs sm:text-sm font-extrabold px-3 py-1.5 rounded-md uppercase tracking-wider border border-brand-orange/20 inline-block">СЛУЖЕБНИ АВТОМОБИЛИ 2026</span>
+                    <h2 data-i18n="car_hero_title" class="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark leading-tight">Твоят служебен автомобил</h2>
+                    <p data-i18n="car_hero_desc" class="text-brand-slate text-base sm:text-lg leading-relaxed">Пълен наръчник за експлоатация: локации на паркинга, правила за поддръжка, правилно зареждане с гориво и протоколи за действие при аварии.</p>
+                </div>
+            </section>
+
+            <nav class="bg-white rounded-2xl p-2 shadow-sm border border-gray-200 overflow-x-auto custom-scrollbar">
+                <div class="flex items-center min-w-max gap-2">
+                    <button id="btn-car-map" onclick="openCarTab('car-map')" class="car-tab-btn flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all shadow-sm"><i class="fa-solid fa-map-location-dot"></i> <span data-i18n="car_tab_map">1. Карта & Старт</span></button>
+                    <button id="btn-car-maint" onclick="openCarTab('car-maint')" class="car-tab-btn flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all"><i class="fa-solid fa-wrench"></i> <span data-i18n="car_tab_maint">2. Поддръжка</span></button>
+                    <button id="btn-car-sos" onclick="openCarTab('car-sos')" class="car-tab-btn flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all"><i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="car_tab_sos">3. Аварии & ПТП</span></button>
+                    <button id="btn-car-contacts" onclick="openCarTab('car-contacts')" class="car-tab-btn flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all"><i class="fa-solid fa-address-book"></i> <span data-i18n="car_tab_contacts">4. Указател</span></button>
+                </div>
+            </nav>
+
+            <div class="relative">
+                <section id="sec-car-map" class="car-tab-section bg-white rounded-[2rem] p-5 sm:p-8 border border-gray-200 space-y-6 block">
+                    <div class="space-y-2 border-b border-gray-100 pb-5">
+                        <h3 data-i18n="car_map_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">1. Паркинг и Стартова зона</h3>
+                        <p data-i18n="car_map_desc" class="text-brand-slate text-sm sm:text-base">Локация на служебния паркинг и вашата задължителна стартова точка (Зона Център).</p>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                        <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
+                            <div class="space-y-4">
+                                <h4 class="text-base sm:text-lg font-bold text-brand-dark flex items-center gap-2"><i class="fa-solid fa-route text-brand-orange"></i> <span data-i18n="car_map_subtitle">Ключови локации</span></h4>
+                                <p data-i18n="car_map_text" class="text-sm text-brand-slate leading-relaxed">За куриерите със служебни автомобили процесът започва от фирмения паркинг, но смяната стартира официално едва когато достигнете определената зона.</p>
+                                <div class="space-y-4 mt-4">
+                                    <div class="bg-brand-lightBg p-4 rounded-2xl border border-gray-200">
+                                        <div class="flex items-center gap-3 mb-1">
+                                            <div class="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-square-parking text-sm"></i></div>
+                                            <h5 data-i18n="car_loc_parking_title" class="font-bold text-brand-dark text-sm">Паркинг Западен Парк</h5>
+                                        </div>
+                                        <p data-i18n="car_loc_parking_desc" class="text-xs text-brand-slate ml-11">От тук взимате и тук връщате служебния автомобил. (бул. Сливница / Суходолска река)</p>
+                                    </div>
+                                    <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                                        <div class="flex items-center gap-3 mb-1">
+                                            <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-location-crosshairs text-sm"></i></div>
+                                            <h5 data-i18n="car_loc_zone_title" class="font-bold text-brand-dark text-sm">Стартова Зона (Център)</h5>
+                                        </div>
+                                        <p data-i18n="car_loc_zone_desc" class="text-xs text-brand-slate ml-11">Единствената стартова точка за служебни автомобили. Тук се очаква най-голям брой поръчки.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-brand-orange/5 border border-brand-orange/20 rounded-xl flex items-start gap-3">
+                                <i class="fa-solid fa-triangle-exclamation text-brand-orange mt-0.5"></i>
+                                <p data-i18n="car_map_start_info" class="text-xs text-brand-dark font-medium leading-snug"><strong>Внимание:</strong> Активирайте смяната си в приложението <strong>САМО</strong> след като физически навлезете в границите на Зона Център.</p>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-7 bg-brand-lightBg border border-gray-200 rounded-[2rem] p-3 shadow-inner relative flex flex-col min-h-[350px]">
+                            <div class="flex-1 rounded-2xl overflow-hidden relative shadow-sm border border-gray-300">
+                                <div id="company-map" class="w-full h-full absolute inset-0 z-10"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="sec-car-maint" class="car-tab-section bg-white rounded-[2rem] p-5 sm:p-8 border border-gray-200 space-y-6 hidden">
+                    <div class="space-y-2 border-b border-gray-100 pb-5">
+                        <h3 data-i18n="car_maint_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">2. Експлоатация и Поддръжка</h3>
+                        <p data-i18n="car_maint_desc" class="text-brand-slate text-sm sm:text-base">Основни правила за грижа към служебния автомобил.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 flex flex-col items-center text-center space-y-3 hover:border-brand-orange transition-colors">
+                            <div class="w-14 h-14 bg-brand-orange/10 text-brand-orange rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-gas-pump"></i></div>
+                            <h4 data-i18n="car_maint_fuel_title" class="font-bold text-brand-dark">Зареждане с гориво</h4>
+                            <p data-i18n="car_maint_fuel_desc" class="text-xs text-gray-500">Зареждаме само на бензиностанции <strong>Лукойл</strong>. Фирмената карта е в жабката на колата, а ПИН кодът е написан на самата нея.</p>
+                        </div>
+                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 flex flex-col items-center text-center space-y-3 hover:border-blue-500 transition-colors">
+                            <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-shower"></i></div>
+                            <h4 data-i18n="car_maint_wash_title" class="font-bold text-brand-dark">Служебна Автомивка</h4>
+                            <p data-i18n="car_maint_wash_desc" class="text-xs text-gray-500">Колата трябва да се предава чиста. Използвайте партньорската автомивка на адрес: [Адрес на мивката].</p>
+                        </div>
+                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 flex flex-col items-center text-center space-y-3 hover:border-green-500 transition-colors">
+                            <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-check"></i></div>
+                            <h4 data-i18n="car_maint_clean_title" class="font-bold text-brand-dark">Правила за автомобила</h4>
+                            <p data-i18n="car_maint_clean_desc" class="text-xs text-gray-500">В колата <strong>не се пуши, не се яде</strong> и не се пият напитки без капачка. Забранено е возенето на други лица! Предавайте колата чиста и по възможност заредена.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="sec-car-sos" class="car-tab-section bg-white rounded-[2rem] p-5 sm:p-8 border border-gray-200 space-y-6 hidden">
+                    <div class="space-y-2 border-b border-gray-100 pb-5">
+                        <h3 data-i18n="car_sos_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">3. Действия при ПТП или Авария</h3>
+                        <p data-i18n="car_sos_desc" class="text-brand-slate text-sm sm:text-base">Задължителни стъпки при инцидент на пътя или повреда на автомобила.</p>
+                    </div>
+                    <div class="bg-red-50 border border-red-200 rounded-[2rem] p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <div class="space-y-2">
+                                <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">1</div>
+                                <h4 data-i18n="car_sos_step1_title" class="font-bold text-red-900 text-sm">Осигурете района</h4>
+                                <p data-i18n="car_sos_step1_desc" class="text-xs text-red-800">Сложете светлоотразителна жилетка и триъгълник. Ако има пострадали, веднага позвънете на <strong>112</strong>.</p>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">2</div>
+                                <h4 data-i18n="car_sos_step2_title" class="font-bold text-red-900 text-sm">Протокол от КАТ</h4>
+                                <p data-i18n="car_sos_step2_desc" class="text-xs text-red-800">При ПТП е задължително да извикате полиция (на 112) за съставяне на протокол, дори щетите да са леки.</p>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">3</div>
+                                <h4 data-i18n="car_sos_step3_title" class="font-bold text-red-900 text-sm">Уведомете ни</h4>
+                                <p data-i18n="car_sos_step3_desc" class="text-xs text-red-800">Пишете веднага на Диспечер през Scoober, за да премахне поръчката. След това се обадете на вашия <strong>Капитан</strong>.</p>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">4</div>
+                                <h4 data-i18n="car_sos_step4_title" class="font-bold text-red-900 text-sm">Репатрак</h4>
+                                <p data-i18n="car_sos_step4_desc" class="text-xs text-red-800">Ако колата не е в движение, Капитанът ще ви инструктира да се обадите на партньорския репатрак.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 bg-blue-50/50 border border-blue-100 rounded-[2rem] p-6 shadow-sm">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-lg font-black"><i class="fa-solid fa-file-signature"></i></div>
+                            <h4 data-i18n="car_protocol_title" class="text-lg sm:text-xl font-bold text-brand-dark">Двустранен констативен протокол</h4>
+                        </div>
+                        <p data-i18n="car_protocol_desc" class="text-brand-slate text-xs sm:text-sm mb-4 leading-relaxed">При леки материални щети, <strong>без пострадали хора</strong> и при пълно съгласие между двамата водачи за обстоятелствата, се попълва Двустранен протокол.</p>
+                        <div class="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm p-2 flex justify-center mx-auto max-w-3xl">
+                            <img src="https://drive.google.com/uc?export=view&id=1dwUjOnj2PkLXBJBart4YjPgRRbe5zPLA" alt="Двустранен Протокол" class="w-full h-auto rounded-lg object-contain">
+                        </div>
+                    </div>
+                </section>
+
+                <section id="sec-car-contacts" class="car-tab-section bg-white rounded-[2rem] p-5 sm:p-8 border border-gray-200 space-y-6 hidden">
+                    <div class="space-y-2 border-b border-gray-100 pb-5">
+                        <h3 data-i18n="car_contact_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">4.  Телефонен указател</h3>
+                        <p data-i18n="car_contact_desc" class="text-brand-slate text-sm sm:text-base">Списък с отговорниците за автопарка. Използвайте бутоните за директно набиране.</p>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-5 flex flex-col justify-between hover:shadow-sm transition">
+                            <div class="mb-4">
+                                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-base mb-3"><i class="fa-solid fa-user-tie"></i></div>
+                                <h4 class="font-black text-lg text-brand-dark">Християн Борисов</h4>
+                                <div data-i18n="car_c1_role" class="text-[10px] font-bold text-brand-orange uppercase tracking-wider mt-0.5 mb-2">Капитан</div>
+                                <p data-i18n="car_c1_desc" class="text-xs text-gray-500 mb-3">За въпроси, свързани с промяна в графика и разпределението на колите.</p>
+                                <div class="text-[11px] text-gray-600 bg-gray-200/60 px-2.5 py-1.5 rounded-lg inline-block font-bold"><i class="fa-regular fa-clock mr-1"></i> <span data-i18n="car_cap_hours">Пон-Пет | 10:00 - 18:00</span></div>
+                            </div>
+                            <a href="tel:+359877021585" class="w-full bg-white border border-gray-200 hover:border-brand-orange hover:text-brand-orange text-brand-dark font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
+                        </div>
+                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-5 flex flex-col justify-between hover:shadow-sm transition">
+                            <div class="mb-4">
+                                <div class="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-base mb-3"><i class="fa-solid fa-user-shield"></i></div>
+                                <h4 class="font-black text-lg text-brand-dark">Владимир Ненков</h4>
+                                <div data-i18n="car_c2_role" class="text-[10px] font-bold text-brand-orange uppercase tracking-wider mt-0.5 mb-2">Капитан</div>
+                                <p data-i18n="car_c2_desc" class="text-xs text-gray-500 mb-3">За спешни въпроси, свързани с повреда по автомобила или при възникнало ПТП.</p>
+                                <div class="text-[11px] text-gray-600 bg-gray-200/60 px-2.5 py-1.5 rounded-lg inline-block font-bold"><i class="fa-regular fa-clock mr-1"></i> <span data-i18n="car_cap_hours">Пон-Пет | 10:00 - 18:00</span></div>
+                            </div>
+                            <a href="tel:+359889627470" class="w-full bg-white border border-gray-200 hover:border-brand-orange hover:text-brand-orange text-brand-dark font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
+                        </div>
+                        <div class="bg-brand-orange/5 border border-brand-orange/20 rounded-2xl p-5 flex flex-col justify-between hover:shadow-sm transition">
+                            <div class="mb-4">
+                                <div class="w-10 h-10 bg-brand-orange text-white rounded-full flex items-center justify-center text-base mb-3"><i class="fa-solid fa-truck-pickup"></i></div>
+                                <h4 data-i18n="car_c3_title" class="font-black text-lg text-brand-dark">Пътна помощ</h4>
+                                <div data-i18n="car_c3_role" class="text-[10px] font-bold text-brand-orange uppercase tracking-wider mt-0.5 mb-2">Денонощен репатрак</div>
+                                <p data-i18n="car_c3_desc" class="text-xs text-gray-500">Звънете на този номер само след предварително съгласуване с Капитан.</p>
+                            </div>
+                            <a href="tel:+359887239391" class="w-full bg-brand-orange hover:bg-brand-orangeLight text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-white mt-12 py-8 border-t border-gray-200 shadow-inner">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm">
+            <div class="flex items-center gap-3">
+                <span class="bg-brand-orange text-white text-[10px] sm:text-xs font-black px-2 py-1 rounded shadow-sm">TAKEAWAY BG</span>
+                <span data-i18n="footer_rights" class="text-gray-500 font-medium">© 2026 Всички права запазени.</span>
+            </div>
+            <div class="flex gap-4">
+                <span data-i18n="footer_info" class="text-gray-400 font-medium">Вътрешна информационна платформа</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function switchGlobalPage(pageId) {
+            document.querySelectorAll('.global-page').forEach(page => page.classList.replace('block', 'hidden'));
+            document.getElementById('page-' + pageId).classList.replace('hidden', 'block');
+            
+            const btnHome = document.getElementById('nav-home');
+            const btnCars = document.getElementById('nav-cars');
+            const activeNav = "flex-1 sm:flex-none px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer bg-white text-brand-orange shadow-sm border border-gray-100/50";
+            const inactiveNav = "flex-1 sm:flex-none px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-gray-600 hover:text-brand-dark";
+            
+            if (pageId === 'home') {
+                btnHome.className = activeNav; btnCars.className = inactiveNav;
+                if (map) setTimeout(() => map.invalidateSize(), 150);
+            } else {
+                btnCars.className = activeNav; btnHome.className = inactiveNav;
+                if (carMap) setTimeout(() => carMap.invalidateSize(), 150);
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 50) {
+                header.classList.add('opacity-30', 'scale-90', 'hover:opacity-100', 'hover:scale-100');
+            } else {
+                header.classList.remove('opacity-30', 'scale-90', 'hover:opacity-100', 'hover:scale-100');
+            }
+        });
+
+        function openCarTab(tabName) {
+            document.querySelectorAll('.car-tab-section').forEach(el => { el.classList.add('hidden'); el.classList.remove('block'); });
+            document.querySelectorAll('.car-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-orange', 'text-white', 'shadow-sm');
+                btn.classList.add('bg-white', 'text-gray-500', 'hover:bg-gray-50', 'hover:text-brand-dark');
+            });
+            document.getElementById('sec-' + tabName).classList.remove('hidden');
+            document.getElementById('sec-' + tabName).classList.add('block');
+            
+            const activeBtn = document.getElementById('btn-' + tabName);
+            activeBtn.classList.remove('bg-white', 'text-gray-500', 'hover:bg-gray-50', 'hover:text-brand-dark');
+            activeBtn.classList.add('bg-brand-orange', 'text-white', 'shadow-sm');
+            
+            if (tabName === 'car-map' && carMap) setTimeout(() => carMap.invalidateSize(), 150);
+        }
+
+        const translations = {
+            bg: {
+                lang_name: "БГ | Български", nav_home: "🏠 Начало", nav_cars: "🚗 Служебни коли",
+                hero_badge: "АКТУАЛЕН НАРЪЧНИК 2026", hero_title: "Всичко за твоя успешен старт в Takeaway", hero_desc: "Добре дошли в нашия портал! Тук сме събрали актуалната информация за стартовите точки, методологията на плащане и директни контакти към ключовите отдели.",
+                map_title: "1. Стартови точки (София)", map_desc: "Интерактивна GPS карта с разпределение на официалните четири стартови зони в столицата.",
+                map_subtitle: "Ключови райони", map_text: "Официалните стартови точки са съобразени с гъстотата на поръчките и гарантират бърз старт на работния ви ден.",
+                map_list_title: "Основни стартови точки:", zone_1: "1 — Зона Център", zone_2: "2 — Зона Лозенец", zone_3: "3 — Зона Борово", zone_4: "4 — Зона Дървеница",
+                map_start_info: "Винаги активирайте смяната си <strong>вътре в границите</strong> на вашата назначена стартова точка в приложението Scoober.",
+                map_interactive: "Интерактивна GPS Карта", map_footer_info: "Това са официалните стартови точки за пускане (започване на смяна), а не зони за каране.",
+                pay_title: "2. График на плащанията", pay_desc: "Възнаграждението се разпределя в два транша всеки месец:", pay_30_title: "30-то число", pay_30_bul1: "Часове (1-ва половина на текущ месец).", pay_30_bul2: "Амортизация (1-ва половина на текущ месец).", pay_15_title: "15-то число", pay_15_bul1: "Остатък часове (2-ра половина на предходен месец).", pay_15_bul2: "Амортизация (2-ра половина на предходен месец).", pay_15_bul3: "Бонус поръчки за целия месец.",
+                schedule_title: "3. Планиране на смените", schedule_subtitle: "ГРАФИЦИ И КОРЕКЦИИ", schedule_important_title: "Краен срок за подаване", schedule_important_desc: "Всеки куриер трябва да подаде своите часове за следващата седмица <strong>най-късно до Вторник 23:59 ч.</strong>", schedule_edit_title: "Корекции след Вторник", schedule_edit_desc: "Корекции могат да се правят <strong>до Петък най-късно</strong>, и то <strong>само след изрично разрешение</strong> и връзка с отдел PAS. След публикуване на графика в петък, промени не са възможни.", schedule_how: "Как се подава график в приложението:", schedule_step1: "Отворете <strong>менюто вляво</strong> в приложението Scoober.", schedule_step2: "Изберете секция <strong>Планиране на график (Schedule)</strong>.", schedule_step3: "Маркирайте часовете, в които сте на разположение за новата седмица.",
+                matrix_title: "4. Доходи и Бонусна схема", matrix_info_desc: "Бонусът се трупа на месечна база. Посочените суми са брутни.", tab_personal: "С лична кола", tab_company: "Със служебна", contract_8h: "8-Hour (8ч)", contract_6h: "6-Hour (6ч)", contract_4h: "4-Hour (4ч)", contract_2h: "2-Hour (2ч)", avg_net_title: "Средно Нето Месечно*", avg_net_title_2: "Средно Нето Месечно*", avg_net_title_3: "Средно Нето Месечно*", avg_net_title_4: "Средно Нето Месечно*",
+                sim_title: "Симулатор", sim_desc: "Симулирай заплатата си спрямо очакваното представяне.", sim_net: "Очаквано Нето", sim_gross: "Бруто", sim_orders: "Поръчки", sim_hours: "Часове", calc_contract_lbl: "Договор", calc_vehicle_lbl: "Превозно", calc_days_lbl: "Раб. дни", calc_eff_lbl: "Ефект. (ч)", calc_eff_tooltip: "Среден брой поръчки за 1 час.",
+                helper_title: "5. Намери бързо това, което търсиш", helper_desc: "Не сте сигурни към кого да се обърнете? Напишете какво ви трябва по-долу и ние ще ви покажем точното място в приложението Scoober.", helper_quick: "Бързи търсения (Кликни)", helper_ph: "Напр. 'ресторант', 'болничен', 'заплата', 'график'...", helper_notfound: "Не открихме точна категория за", helper_try: "Опитайте с друга дума.", helper_path: "Как да стигна до там:",
+                contact_disp_title: "6. Връзка с Диспечери", contact_disp_subtitle: "ПО ВРЕМЕ НА АКТИВНА СМЯНА", contact_how_title: "Как да се свържете:", contact_step1: "Отворете приложението <strong>Scoober</strong>.", contact_step2: "Кликнете на <strong>иконата за чат</strong> в горния десен ъгъл.", contact_step3: "Опишете ясно казуса си в чата.",
+                contact_admin_title: "7. Директна Администрация", contact_admin_subtitle: "ИЗВЪН АКТИВНА СМЯНА", contact_admin_important: "<i class='fa-solid fa-envelope text-blue-500 mr-2'></i>Отговор до следващия работен ден.", contact_admin_how: "Къде е контактната форма:", admin_step1: "Отворете <strong>менюто вляво</strong> в Scoober.", admin_step2: "Изберете секция <strong>Профил (Profile)</strong>.", admin_step3: "Изберете <strong>Contact Form</strong>.",
+                footer_rights: "© 2026 Всички права запазени.", footer_info: "Вътрешна информационна платформа", select_contract: "Договор...", select_vehicle: "Избери...", hours: "ч",
+                map_popup_title: "(Стартова Точка)", map_popup_desc1: "Стартирайте смяната си вътре в този кръг.", map_popup_desc2: "Зона в границите на София.",
+                car_hero_badge: "СЛУЖЕБНИ АВТОМОБИЛИ 2026", car_hero_title: "Твоят служебен автомобил", car_hero_desc: "Пълен наръчник за експлоатация: локации на паркинга, правила за поддръжка, правилно зареждане с гориво и протоколи за действие при аварии.",
+                car_tab_map: "1. Карта & Старт", car_tab_maint: "2. Поддръжка", car_tab_sos: "3. Аварии & ПТП", car_tab_contacts: "4. Указател",
+                car_map_title: "1. Паркинг и Стартова зона", car_map_desc: "Локация на служебния паркинг и вашата задължителна стартова точка (Зона Център).", car_map_subtitle: "Ключови локации", car_map_text: "За куриерите със служебни автомобили процесът започва от фирмения паркинг, но смяната стартира официално едва когато достигнете определената зона.",
+                car_loc_parking_title: "Паркинг Западен Парк", car_loc_parking_desc: "От тук взимате и тук връщате служебния автомобил. (бул. Сливница / Суходолска река)", car_loc_zone_title: "Стартова Зона (Център)", car_loc_zone_desc: "Единствената стартова точка за служебни автомобили. Тук се очаква най-голям брой поръчки.",
+                car_map_start_info: "<strong>Внимание:</strong> Активирайте смяната си в приложението <strong>САМО</strong> след като физически навлезете в границите на Зона Център.",
+                car_maint_title: "2. Експлоатация и Поддръжка", car_maint_desc: "Основни правила за грижа към служебния автомобил.",
+                car_maint_fuel_title: "Зареждане с гориво", car_maint_fuel_desc: "Зареждаме само на бензиностанции <strong>Лукойл</strong>. Фирмената карта е в жабката на колата, а ПИН кодът е написан на самата нея.", car_maint_wash_title: "Служебна Автомивка", car_maint_wash_desc: "Колата трябва да се предава чиста. Използвайте партньорската автомивка на адрес: [Адрес на мивката].", car_maint_clean_title: "Правила за автомобила", car_maint_clean_desc: "В колата <strong>не се пуши, не се яде</strong> и не се пият напитки без капачка. Забранено е возенето на други лица! Предавайте колата чиста и по възможност заредена.",
+                car_sos_title: "3. Действия при ПТП или Авария", car_sos_desc: "Задължителни стъпки при инцидент на пътя или повреда на автомобила.", car_sos_step1_title: "Осигурете района", car_sos_step1_desc: "Сложете светлоотразителна жилетка и триъгълник. Ако има пострадали, веднага позвънете на <strong>112</strong>.", car_sos_step2_title: "Протокол от КАТ", car_sos_step2_desc: "При ПТП е задължително да извикате полиция (на 112) за съставяне на протокол, дори щетите да са леки.", car_sos_step3_title: "Уведомете ни", car_sos_step3_desc: "Пишете веднага на Диспечер през Scoober, за да премахне поръчката. След това се обадете на вашия <strong>Капитан</strong>.", car_sos_step4_title: "Репатрак", car_sos_step4_desc: "Ако колата не е в движение, Капитанът ще ви инструктира да се обадите на партньорския репатрак.",
+                car_protocol_title: "Двустранен констативен протокол", car_protocol_desc: "При леки материални щети, <strong>без пострадали хора</strong> и при пълно съгласие между двамата водачи за обстоятелствата, се попълва Двустранен протокол.",
+                car_contact_title: "4. Телефонен указател", car_contact_desc: "Списък с отговорниците за автопарка. Използвайте бутоните за директно набиране.", car_c1_role: "Капитан", car_c1_desc: "За въпроси, свързани с промяна в графика и разпределението на колите.", car_c2_role: "Капитан", car_c2_desc: "За спешни въпроси, свързани с повреда по автомобила или при възникнало ПТП.", car_c3_title: "Пътна помощ", car_c3_role: "Денонощен репатрак", car_c3_desc: "Звънете на този номер само след предварително съгласуване с Капитан.", car_btn_call: "Позвъни", car_cap_hours: "Пон-Пет | 10:00 - 18:00"
+            },
+            en: {
+                lang_name: "EN | English", nav_home: "🏠 Home", nav_cars: "🚗 Company Cars",
+                hero_badge: "LATEST GUIDE 2026", hero_title: "Everything for your successful start at Takeaway", hero_desc: "Welcome to our portal! Here we have gathered the latest information about the starting points, payment methodology, and direct contacts to key departments.",
+                map_title: "1. Starting Points (Sofia)", map_desc: "Interactive GPS map with the distribution of the official four starting zones in the capital.",
+                map_subtitle: "Key Areas", map_text: "The official starting points are tailored to order density and guarantee a quick start to your working day.",
+                map_list_title: "Main starting points:", zone_1: "1 — Zone Center", zone_2: "2 — Zone Lozenets", zone_3: "3 — Zone Borovo", zone_4: "4 — Zone Darvenitsa",
+                map_start_info: "Always activate your shift <strong>within the boundaries</strong> of your assigned starting point in the Scoober app.",
+                map_interactive: "Interactive GPS Map", map_footer_info: "These are the official starting points for starting a shift, not riding zones.",
+                pay_title: "2. Payment Schedule", pay_desc: "The remuneration is distributed in two tranches every month:", pay_30_title: "30th of the month", pay_30_bul1: "Hours (1st half of the current month).", pay_30_bul2: "Amortization (1st half of the current month).", pay_15_title: "15th of the month", pay_15_bul1: "Remaining hours (2nd half of the previous month).", pay_15_bul2: "Amortization (2nd half of the previous month).", pay_15_bul3: "Order bonus for the whole month.",
+                schedule_title: "3. Shift Planning", schedule_subtitle: "SCHEDULES & CORRECTIONS", schedule_important_title: "Submission Deadline", schedule_important_desc: "Every courier must submit their hours for the next week <strong>by Tuesday 23:59 at the latest</strong>.", schedule_edit_title: "Corrections after Tuesday", schedule_edit_desc: "Corrections can be made <strong>until Friday at the latest</strong>, and <strong>only after explicit permission</strong> and contact with the PAS department. Once the schedule is published on Friday, no changes are possible.", schedule_how: "How to submit a schedule:", schedule_step1: "Open the <strong>left menu</strong> in the Scoober app.", schedule_step2: "Select the <strong>Schedule Planning</strong> section.", schedule_step3: "Mark the hours you are available for the new week.",
+                matrix_title: "4. Income and Bonus Scheme", matrix_info_desc: "The bonus is accumulated on a monthly basis. The amounts are gross.", tab_personal: "Personal Car", tab_company: "Company Car", contract_8h: "8-Hour", contract_6h: "6-Hour", contract_4h: "4-Hour", contract_2h: "2-Hour", avg_net_title: "Avg. Net Monthly*", avg_net_title_2: "Avg. Net Monthly*", avg_net_title_3: "Avg. Net Monthly*", avg_net_title_4: "Avg. Net Monthly*",
+                sim_title: "Simulator", sim_desc: "Simulate your salary based on expected performance.", sim_net: "Expected Net", sim_gross: "Gross", sim_orders: "Orders", sim_hours: "Hours", calc_contract_lbl: "Contract", calc_vehicle_lbl: "Vehicle", calc_days_lbl: "Work days", calc_eff_lbl: "Efficiency (h)", calc_eff_tooltip: "Average number of orders you deliver per 1 hour.",
+                helper_title: "5. Find what you need quickly", helper_desc: "Not sure who to contact? Type what you need below and we will show you exactly where to go in the Scoober app.", helper_quick: "Quick searches (Click)", helper_ph: "E.g. 'restaurant', 'sick', 'salary', 'schedule'...", helper_notfound: "We couldn't find an exact match for", helper_try: "Try another word.", helper_path: "Where to click in the app:",
+                contact_disp_title: "6. Contact Dispatchers", contact_disp_subtitle: "DURING AN ACTIVE SHIFT", contact_how_title: "How to connect:", contact_step1: "Open the <strong>Scoober</strong> app.", contact_step2: "Click on the <strong>chat icon</strong> in the top right corner.", contact_step3: "Clearly describe your issue in the chat.",
+                contact_admin_title: "7. Direct Administration", contact_admin_subtitle: "OUTSIDE ACTIVE SHIFT", contact_admin_important: "<i class='fa-solid fa-envelope text-blue-500 mr-2'></i>Answer within the next working day.", contact_admin_how: "Where is the contact form:", admin_step1: "Open the <strong>left menu</strong> in Scoober.", admin_step2: "Select the <strong>Profile</strong> section.", admin_step3: "Select <strong>Contact Form</strong>.",
+                footer_rights: "© 2026 All rights reserved.", footer_info: "Internal Information Platform", select_contract: "Select...", select_vehicle: "Select...", hours: "h",
+                map_popup_title: "(Starting Point)", map_popup_desc1: "Start your shift inside this circle.", map_popup_desc2: "Zone within Sofia boundaries.",
+                car_hero_badge: "COMPANY CARS 2026", car_hero_title: "Your Company Car", car_hero_desc: "Complete operational handbook: locations, maintenance, refueling, and emergency protocols.",
+                car_tab_map: "Map & Start", car_tab_maint: "Maintenance", car_tab_sos: "Accidents & SOS", car_tab_contacts: "Contacts",
+                car_map_title: "1. Parking & Starting Zone", car_map_desc: "Location of the company parking and your mandatory starting point (Zone Center).", car_map_subtitle: "Key Locations", car_map_text: "For couriers with company cars, the process starts at the company parking lot, but the shift officially begins only when you reach the designated zone.",
+                car_loc_parking_title: "Parking Zapaden Park", car_loc_parking_desc: "Pick up and drop off the company car here. (Slivnitsa Blvd / Suhodolska River)", car_loc_zone_title: "Starting Zone (Center)", car_loc_zone_desc: "The only starting point for company cars. The highest volume of orders is expected here.",
+                car_map_start_info: "<strong>Attention:</strong> Activate your shift in the app <strong>ONLY</strong> after physically entering the boundaries of Zone Center.",
+                car_maint_title: "2. Maintenance & Operation", car_maint_desc: "Basic rules for taking care of the company car.",
+                car_maint_fuel_title: "Refueling", car_maint_fuel_desc: "Refuel only at <strong>Lukoil</strong> stations. The company card is in the glove box, and the PIN code is written on it.", car_maint_wash_title: "Company Car Wash", car_maint_wash_desc: "The car must be returned clean. Use the partner car wash at: [Car Wash Address].", car_maint_clean_title: "Car Rules", car_maint_clean_desc: "<strong>No smoking, no eating</strong>, and no open drinks. Transporting other people is strictly forbidden! Return the car clean and preferably refueled.",
+                car_sos_title: "3. Accidents & Emergencies", car_sos_desc: "Mandatory steps in case of a road accident or vehicle breakdown.", car_sos_step1_title: "Secure the area", car_sos_step1_desc: "Put on a reflective vest and place a triangle. If anyone is injured, call <strong>112</strong> immediately.", car_sos_step2_title: "Police Protocol", car_sos_step2_desc: "In case of an accident, you must call the police (112) for a protocol, even if the damage is minor.", car_sos_step3_title: "Inform Us", car_sos_step3_desc: "Message Dispatch immediately via Scoober to remove the order. Then call your <strong>Captain</strong>.", car_sos_step4_title: "Tow Truck", car_sos_step4_desc: "If the car is not drivable, the Captain will instruct you to call the partner tow truck.",
+                car_protocol_title: "Bilateral Accident Protocol", car_protocol_desc: "For minor material damages, with no injured people and full agreement between drivers, fill out a Bilateral Protocol.",
+                car_contact_title: "4. Phone Directory", car_contact_desc: "List of fleet managers. Use the buttons for direct calling.", car_c1_role: "Schedule Captain", car_c1_desc: "For questions related to schedule changes and car distribution.", car_c2_role: "Emergency Captain", car_c2_desc: "For urgent questions related to car breakdowns or accidents.", car_c3_title: "Tow Truck / Assistance", car_c3_role: "24/7 Service", car_c3_desc: "Call this number only after prior consultation with a Captain.", car_btn_call: "Call Now", car_cap_hours: "Mon-Fri | 10:00 - 18:00"
+            }
+        };
+
+        const helperContactData = {
+            bg: [
+                { id: "field_issue", title: "Проблем на терен / С поръчка", keywords: ["поръчка", "клиент", "ресторант", "адрес", "грешен", "отказана", "бави", "чакам", "доставка", "терен", "смяната", "адреси", "клиенти", "ресторанти"], path: ["Scoober Приложение", "Икона Чат (Горе вдясно)", "Поддръжка"], icon: "fa-motorcycle", color: "text-red-500", bg: "bg-red-50", border: "border-red-200", instructions: "За проблеми на терен, грешни адреси или отказани поръчки се свържете <strong>веднага с Диспечер през чата</strong> (иконата горе вдясно)." },
+                { id: "sick_leave", title: "Качване на Болничен лист", keywords: ["болничен", "болен", "лекар", "доктор", "отсъствие", "sick", "leave"], path: ["Меню", "Профил", "Формуляр за контакт", "Болничен"], icon: "fa-notes-medical", color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200", instructions: "<strong>❗️ Важно:</strong> При прикачване на снимка на болничния лист трябва да се виждат <strong>всичките 4 ъгъла на листа</strong>!" },
+                { id: "leave", title: "Отпуска (Молба, Остатък)", keywords: ["отпуска", "почивка", "дни", "платена", "неплатена", "молба"], path: ["Меню", "Профил", "Формуляр за контакт", "Отпуска"], icon: "fa-plane-departure", color: "text-teal-500", bg: "bg-teal-50", border: "border-teal-200", instructions: "Качване на молби или проверка на оставащи дни. Снимката трябва да обхваща и 4-те ъгъла на листа." },
+                { id: "schedule", title: "Въпроси за смени и Графици", keywords: ["график", "смяна", "забравих", "часове", "промяна", "availability"], path: ["Меню", "Профил", "Формуляр за контакт", "График и Планиране"], icon: "fa-calendar-day", color: "text-brand-orange", bg: "bg-brand-orange/10", border: "border-brand-orange/30", instructions: "Подаване на закъснели графици или заявки за корекция." },
+                { id: "documents", title: "Бележки, IBAN и Документи", keywords: ["сметка", "ибан", "банкова", "iban", "документи", "бележка"], path: ["Меню", "Профил", "Формуляр за контакт", "Документи"], icon: "fa-folder-open", color: "text-indigo-500", bg: "bg-indigo-50", border: "border-indigo-200", instructions: "За промяна на банкова сметка или издаване на служебни бележки." },
+                { id: "salary", title: "Заплата и Бонуси", keywords: ["заплата", "пари", "бонус", "плащане", "фиш", "липсва"], path: ["Меню", "Профил", "Формуляр за контакт", "Заплата"], icon: "fa-money-bill-wave", color: "text-green-600", bg: "bg-green-50", border: "border-green-200", instructions: "Всички въпроси, свързани с фишове, удръжки или бонусна система." }
+            ],
+            en: [
+                { id: "field_issue", title: "Field / Order Issue", keywords: ["order", "customer", "restaurant", "address", "wrong", "cancelled", "delay", "waiting"], path: ["Scoober App", "Chat Icon (Top Right)", "Support"], icon: "fa-motorcycle", color: "text-red-500", bg: "bg-red-50", border: "border-red-200", instructions: "Contact <strong>Dispatchers immediately via chat</strong> (icon in top right corner) for active deliveries." },
+                { id: "sick_leave", title: "Submit Sick Leave", keywords: ["sick", "leave", "doctor", "absence", "hospital"], path: ["Menu", "Profile", "Contact form", "Sick Leave"], icon: "fa-notes-medical", color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200", instructions: "<strong>❗️ Important:</strong> Ensure all <strong>4 corners of the document</strong> are completely visible in the image!" }
+            ]
+        };
+
+        const helperQuickLinks = {
+            bg: [{ t: 'болничен', l: '💊 Болничен' }, { t: 'отпуска', l: '✈️ Отпуска' }, { t: 'график', l: '📅 График' }, { t: 'клиент', l: '🍔 Проблем на терен' }, { t: 'заплата', l: '💰 Заплата' }],
+            en: [{ t: 'sick', l: '💊 Sick Leave' }, { t: 'leave', l: '✈️ Leave' }, { t: 'schedule', l: '📅 Schedule' }, { t: 'order', l: '🍔 Field Issue' }]
+        };
+
+        let currentLangCode = 'bg';
+
+        function toggleLangMenu() { document.getElementById('lang-menu').classList.toggle('hidden'); }
+        function setLang(lang) {
+            currentLangCode = lang;
+            document.getElementById('current-lang').innerText = translations[lang].lang_name;
+            document.getElementById('lang-menu').classList.add('hidden');
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) el.innerHTML = translations[lang][key];
+            });
+            initCalculator(); updateUI();
+            if (map) showSofiaOnMap(); if (carMap) showCompanyLocationsOnMap();
+            document.getElementById('searchInput').placeholder = translations[lang].helper_ph;
+            renderHelperQuickLinks();
+            const searchVal = document.getElementById('searchInput').value.trim();
+            if(searchVal !== "") performHelperSearch(searchVal.toLowerCase());
+        }
+
+        function switchVehicleTab(type) {
+            const tabPersonal = document.getElementById('tab-personal'); const tabCompany = document.getElementById('tab-company');
+            const grid = document.getElementById('contracts-grid'); const card6h = document.getElementById('card-6h'); const card2h = document.getElementById('card-2h');
+            const avg8h = document.getElementById('avg-8h'); const avg6h = document.getElementById('avg-6h'); const avg4h = document.getElementById('avg-4h'); const avg2h = document.getElementById('avg-2h');
+            const activeClass = "px-6 py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 bg-white text-brand-orange shadow-md border border-gray-100 whitespace-nowrap";
+            const inactiveClass = "px-6 py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 text-gray-500 hover:text-gray-700 whitespace-nowrap";
+            if (type === 'personal') {
+                tabPersonal.className = activeClass; tabCompany.className = inactiveClass;
+                grid.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6";
+                card6h.style.display = "flex"; card2h.style.display = "flex";
+                avg8h.textContent = "1110 - 1300 €"; avg6h.textContent = "800 - 900 €"; avg4h.textContent = "510 - 620 €"; avg2h.textContent = "~260 €";
+            } else {
+                tabCompany.className = activeClass; tabPersonal.className = inactiveClass;
+                grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:max-w-4xl lg:mx-auto gap-4 sm:gap-6";
+                card6h.style.display = "none"; card2h.style.display = "none";
+                avg8h.textContent = "920 - 1020 €"; avg4h.textContent = "400 - 500 €";
+            }
+        }
+
+        const CONFIG = { TAX: 0.224, CITIES: { "София": { hasTierBonus: true, vehicles: ["personal_car", "company_car", "personal_bike"] } }, V_LABELS: { bg: { personal_car: "Лична кола", company_car: "Служебна кола", personal_bike: "Лично колело" }, en: { personal_car: "Personal Car", company_car: "Company Car", personal_bike: "Personal Bike" } } };
+        function initCalculator() {
+            const city = CONFIG.CITIES["София"]; const sal = {8:820, 6:615, 4:410, 2:205}; const t = translations[currentLangCode];
+            const conSel = document.getElementById("contract"); const savedContract = conSel ? conSel.value : "";
+            if (conSel) {
+                conSel.innerHTML = `<option value="" disabled ${!savedContract ? 'selected' : ''}>${t.select_contract}</option>`;
+                [8,6,4,2].forEach(h => { conSel.innerHTML += `<option value="${h}" ${savedContract == h ? 'selected' : ''}>${h} ${t.hours} (${sal[h]} €)</option>`; });
+            }
+            const vSel = document.getElementById("vehicle"); const savedVehicle = vSel ? vSel.value : "";
+            if (vSel) {
+                vSel.innerHTML = `<option value="" disabled ${!savedVehicle ? 'selected' : ''}>${t.select_vehicle}</option>`;
+                city.vehicles.forEach(v => { vSel.innerHTML += `<option value="${v}" ${savedVehicle === v ? 'selected' : ''}>${CONFIG.V_LABELS[currentLangCode][v]}</option>`; });
+            }
+        }
+        function updateUI() {
+            const contractVal = document.getElementById("contract")?.value; const vehicleVal = document.getElementById("vehicle")?.value; const daysVal = document.getElementById("days")?.value; const effVal = document.getElementById("eff")?.value;
+            if (!contractVal || !vehicleVal || !daysVal || !effVal) { document.getElementById("outNet").textContent = "0.00 €"; document.getElementById("outGross").textContent = "0.00 €"; document.getElementById("outOrders").textContent = "0"; document.getElementById("outMonthlyHours").textContent = "0"; return; }
+            const contract = Number(contractVal); const workedDays = Math.max(0, Number(daysVal)); const eff = Number(effVal);
+            const hours = contract * workedDays; const orders = Math.round(eff * hours);
+            const kmPerOrder = (vehicleVal === "personal_car" || vehicleVal === "company_car") ? 5.5 : 3.5; const km = orders * kmPerOrder;
+            const baseGross = {8:820,6:615,4:410,2:205}[contract]; let bonusGross = 0;
+            const th = { 8:[100,200,300], 6:[75,150,225], 4:[50,100,150], 2:[25,50,75] }[contract];
+            const n = [Math.min(orders, th[0]), Math.max(0, Math.min(orders, th[1]) - th[0]), Math.max(0, Math.min(orders, th[2]) - th[1]), Math.max(0, orders - th[2])];
+            bonusGross = (n[0]*0.25) + (n[1]*1.0) + (n[2]*1.5) + (n[3]*3.0);
+            const amortGross = vehicleVal === "company_car" ? 0 : (km * (vehicleVal.includes("bike") ? 0.11 : 0.17));
+            const totalGross = baseGross + bonusGross + amortGross; const totalNet = totalGross - (totalGross * CONFIG.TAX);
+            document.getElementById("outNet").textContent = totalNet.toFixed(2) + " €"; document.getElementById("outGross").textContent = totalGross.toFixed(2) + " €"; document.getElementById("outOrders").textContent = orders; document.getElementById("outMonthlyHours").textContent = hours;
+        }
+
+        function renderHelperQuickLinks() {
+            const container = document.getElementById('quickLinksContainer'); container.innerHTML = '';
+            helperQuickLinks[currentLangCode].forEach(link => {
+                const btn = document.createElement('button'); btn.className = "px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold text-brand-slate hover:border-brand-orange hover:text-brand-orange hover:shadow-md transition-all cursor-pointer"; btn.innerText = link.l;
+                btn.onclick = () => { document.getElementById('searchInput').value = link.t; document.getElementById('searchInput').dispatchEvent(new Event('input')); };
+                container.appendChild(btn);
+            });
+        }
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            if (query.length > 0) { document.getElementById('clearBtn').classList.remove('hidden'); document.getElementById('quickCategories').classList.add('hidden'); performHelperSearch(query); }
+            else { document.getElementById('clearBtn').classList.add('hidden'); document.getElementById('quickCategories').classList.remove('hidden'); document.getElementById('resultsArea').classList.add('hidden'); }
+        });
+        document.getElementById('clearBtn').addEventListener('click', function() { document.getElementById('searchInput').value = ''; this.classList.add('hidden'); document.getElementById('quickCategories').classList.remove('hidden'); document.getElementById('resultsArea').classList.add('hidden'); });
+        function performHelperSearch(query) {
+            const resultsArea = document.getElementById('resultsArea'); const t = translations[currentLangCode]; const queryWords = query.split(/[\s,!?]+/).filter(w => w.length >= 3);
+            const results = helperContactData[currentLangCode].filter(item => {
+                if (item.title.toLowerCase().includes(query) || item.keywords.some(kw => kw.toLowerCase().includes(query) || query.includes(kw.toLowerCase()))) return true;
+                for (let word of queryWords) {
+                    let root = word.replace(/(та|те|то|и|а|ът|ят|ния|ният)$/i, ''); if (root.length < 3) root = word;
+                    if (item.keywords.some(kw => kw.toLowerCase().includes(root))) return true;
+                }
+                return false;
+            });
+            resultsArea.innerHTML = ''; resultsArea.classList.remove('hidden');
+            if (results.length === 0) { resultsArea.innerHTML = `<div class="text-center py-8 bg-gray-50 rounded-2xl border border-gray-200 shadow-inner"><i class="fa-solid fa-face-frown-open text-3xl text-gray-400 mb-3"></i><p class="text-brand-slate font-medium">${t.helper_notfound} "${query}".</p></div>`; return; }
+            results.forEach(item => {
+                const pathHtml = item.path.map((step, i) => `<span class="${i === item.path.length-1 ? 'bg-brand-orange text-white':'bg-white text-brand-dark'} px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold shadow-sm border border-gray-200">${step}</span>`).join('<i class="fa-solid fa-chevron-right text-[10px] text-gray-400 mx-2"></i>');
+                resultsArea.innerHTML += `<div class="result-card ${item.bg} border ${item.border} rounded-2xl p-5 shadow-sm"><div class="flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 border text-xl ${item.color} shadow-sm"><i class="fa-solid ${item.icon}"></i></div><div class="space-y-3 w-full"><h3 class="text-base font-extrabold text-brand-dark">${item.title}</h3><div class="bg-white/60 p-3 rounded-xl border"><div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">${t.helper_path}</div><div class="flex flex-wrap items-center gap-y-2">${pathHtml}</div></div><div class="text-xs text-brand-slate flex gap-2 items-start"><i class="fa-solid fa-circle-info mt-0.5 text-brand-orange"></i><span>${item.instructions}</span></div></div></div></div>`;
+            });
+        }
+
+        var map, carMap; var mapLayers = [], carMapLayers = [];
+        const MAP_ZONES = { sofia: { center: [42.680, 23.325], zoom: 12.4, circles: [{ coords: [42.6975, 23.3320], color: '#2563eb', fillColor: '#3b82f6', fillOpacity: 0.22, weight: 3.5, radius: 2100, label: '1 — Зона Център', labelEn: '1 — Zone Center', pinColor: '#2563eb' }, { coords: [42.6705, 23.3195], color: '#7c3aed', fillColor: '#a855f7', fillOpacity: 0.22, weight: 3.5, radius: 1800, label: '2 — Зона Лозенец', labelEn: '2 — Zone Lozenets', pinColor: '#7c3aed' }, { coords: [42.6730, 23.2925], color: '#16a34a', fillColor: '#22c55e', fillOpacity: 0.22, weight: 3.5, radius: 1950, label: '3 — Зона Борово', labelEn: '3 — Zone Borovo', pinColor: '#16a34a' }, { coords: [42.6560, 23.3610], color: '#dc2626', fillColor: '#ef4444', fillOpacity: 0.22, weight: 3.5, radius: 3850, label: '4 — Зона Дървеница', labelEn: '4 — Zone Darvenitsa', pinColor: '#dc2626' }] } };
+        const CAR_MAP_LOCATIONS = { center: [42.70607, 23.30569], zoom: 13, parking: [42.715471, 23.279151], zoneCenter: [42.6975, 23.3320], radius: 2100 };
+
+        function initMaps() {
+            if (typeof L === 'undefined') return;
+            if (document.getElementById('main-map')) {
+                map = L.map('main-map', { zoomControl: true, scrollWheelZoom: false }).setView(MAP_ZONES.sofia.center, MAP_ZONES.sofia.zoom);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(map);
+            }
+            if (document.getElementById('company-map')) {
+                carMap = L.map('company-map', { zoomControl: false, scrollWheelZoom: false }).setView(CAR_MAP_LOCATIONS.center, CAR_MAP_LOCATIONS.zoom);
+                L.control.zoom({ position: 'bottomright' }).addTo(carMap);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(carMap);
+            }
+        }
+
+        function showSofiaOnMap() {
+            if (!map) return; mapLayers.forEach(layer => map.removeLayer(layer)); mapLayers = []; const t = translations[currentLangCode];
+            MAP_ZONES.sofia.circles.forEach((c, index) => {
+                const lbl = currentLangCode === 'en' ? c.labelEn : c.label;
+                const circle = L.circle(c.coords, { color: c.color, fillColor: c.fillColor, fillOpacity: c.fillOpacity, weight: c.weight, radius: c.radius }).addTo(map).bindPopup(`<strong>${lbl} ${t.map_popup_title}</strong><br><span style="font-size:11px;">${t.map_popup_desc1}</span>`); mapLayers.push(circle);
+                const marker = L.marker(c.coords, { icon: L.divIcon({ className: 'custom-div-icon', html: `<div class="flex items-center justify-center w-8 h-8 rounded-full shadow-lg border-2 border-white text-white font-black text-sm" style="background-color: ${c.pinColor};">${index + 1}</div>`, iconSize: [32, 32], iconAnchor: [16, 16] }) }).addTo(map).bindPopup(`<strong>${lbl} ${t.map_popup_title}</strong><br><span style="font-size:11px;">${t.map_popup_desc2}</span>`); mapLayers.push(marker);
+            });
+        }
+
+        function showCompanyLocationsOnMap() {
+            if (!carMap) return; carMapLayers.forEach(layer => carMap.removeLayer(layer)); carMapLayers = []; const t = translations[currentLangCode];
+            const zoneCircle = L.circle(CAR_MAP_LOCATIONS.zoneCenter, { color: '#2563eb', fillColor: '#3b82f6', fillOpacity: 0.22, weight: 3.5, radius: CAR_MAP_LOCATIONS.radius }).addTo(carMap).bindPopup(`<strong>1 — ${t.car_loc_zone_title}</strong>`); carMapLayers.push(zoneCircle);
+            const zoneMarker = L.marker(CAR_MAP_LOCATIONS.zoneCenter, { icon: L.divIcon({ className: 'custom-div-icon', html: `<div class="flex items-center justify-center w-8 h-8 rounded-full shadow-lg border-2 border-white text-white font-black text-sm" style="background-color: #2563eb;">1</div>`, iconSize: [32, 32], iconAnchor: [16, 16] }) }).addTo(carMap).bindPopup(`<strong>1 — ${t.car_loc_zone_title}</strong>`); carMapLayers.push(zoneMarker);
+            const parkingMarker = L.marker(CAR_MAP_LOCATIONS.parking, { icon: L.divIcon({ className: 'custom-div-icon', html: `<div class="pulse-marker flex items-center justify-center w-10 h-10 rounded-full shadow-xl border-2 border-white text-white text-lg bg-brand-orange"><i class="fa-solid fa-car"></i></div>`, iconSize: [40, 40], iconAnchor: [20, 20] }) }).addTo(carMap).bindPopup(`<strong>${t.car_loc_parking_title}</strong>`); carMapLayers.push(parkingMarker);
+        }
+
+        window.onload = function() {
+            initMaps();
+            setLang('bg');
+            switchGlobalPage('home');
+            openCarTab('car-map');
+        }
+    </script>
+</body>
+</html>
