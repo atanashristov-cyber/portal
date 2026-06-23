@@ -13,6 +13,8 @@
     
     <link class="scroll-smooth" rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Добавяне на Supabase SDK за безплатна облачна база данни -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
         tailwind.config = {
@@ -513,23 +515,23 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div class="space-y-2">
                                 <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">1</div>
-                                <h4 data-i18n="car_sos_step1_title" class="font-bold text-red-900 text-sm">Осигурете района</h4>
-                                <p data-i18n="car_sos_step1_desc" class="text-xs text-red-800">Сложете светлоотразителна жилетка и триъгълник. Ако има пострадали, веднага позвънете на <strong>112</strong>.</p>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">2</div>
-                                <h4 data-i18n="car_sos_step2_title" class="font-bold text-red-900 text-sm">Протокол от КАТ</h4>
-                                <p data-i18n="car_sos_step2_desc" class="text-xs text-red-800">При ПТП е задължително да извикате полиция (на 112) за съставяне на протокол, дори щетите да са леки.</p>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">3</div>
-                                <h4 data-i18n="car_sos_step3_title" class="font-bold text-red-900 text-sm">Уведомете ни</h4>
-                                <p data-i18n="car_sos_step3_desc" class="text-xs text-red-800">Пишете веднага на Диспечер през Scoober, за да премахне поръчката. След това се обадете на вашия <strong>Капитан</strong>.</p>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">4</div>
-                                <h4 data-i18n="car_sos_step4_title" class="font-bold text-red-900 text-sm">Репатрак</h4>
-                                <p data-i18n="car_sos_step4_desc" class="text-xs text-red-800">Ако колата не е в движение, Капитанът ще ви инструктира да се обадите на партньорския репатрак.</p>
+                                 <h4 data-i18n="car_sos_step1_title" class="font-bold text-red-900 text-sm">Установяване на щетите</h4>
+                                 <p data-i18n="car_sos_step1_desc" class="text-xs text-red-800">Първо, огледайте внимателно щетите. При ПТП и спор за вина, веднага позвънете на <strong>112</strong>.</p>
+                             </div>
+                             <div class="space-y-2">
+                                 <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">2</div>
+                                 <h4 data-i18n="car_sos_step2_title" class="font-bold text-red-900 text-sm">Попълване на двустранен протокол</h4>
+                                 <p data-i18n="car_sos_step2_desc" class="text-xs text-red-800">Ако вината е установена от един от участниците и няма пострадали, попълнете двустранен констативен протокол по образеца по-долу.</p>
+                             </div>
+                             <div class="space-y-2">
+                                 <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">3</div>
+                                 <h4 data-i18n="car_sos_step3_title" class="font-bold text-red-900 text-sm">Уведомяване на Капитан</h4>
+                                 <p data-i18n="car_sos_step3_desc" class="text-xs text-red-800">Уведомете <a href="tel:+359889627470" class="text-blue-700 underline">Владимир Ненков</a> за инцидента. Той ще ви даде последващи действия и указания.</p>
+                             </div>
+                             <div class="space-y-2">
+                                 <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">4</div>
+                                 <h4 data-i18n="car_sos_step4_title" class="font-bold text-red-900 text-sm">Репатрак (при нужда)</h4>
+                                 <p data-i18n="car_sos_step4_desc" class="text-xs text-red-800">Ако колата не е в движение и има нужда от репатрак, Капитанът ще ви инструктира.</p>
                             </div>
                         </div>
                     </div>
@@ -701,7 +703,7 @@
                 car_map_start_info: "<strong>Внимание:</strong> Активирайте смяната си в приложението <strong>САМО</strong> след като физически навлезете в границите на Зона Център.",
                 car_maint_title: "2. Експлоатация и Поддръжка", car_maint_desc: "Основни правила за грижа към служебния автомобил.",
                 car_maint_fuel_title: "Зареждане с гориво", car_maint_fuel_desc: "Зареждаме само на бензиностанции <strong>Лукойл</strong>. Фирмената карта е в жабката на колата, а ПИН кодът е написан на самата нея.", car_maint_wash_title: "Служебна Автомивка", car_maint_wash_desc: "Колата трябва да се предава чиста. Използвайте партньорската автомивка на адрес: [Адрес на мивката].", car_maint_clean_title: "Правила за автомобила", car_maint_clean_desc: "В колата <strong>не се пуши, не се яде</strong> и не се пият напитки без капачка. Забранено е возенето на други лица! Предавайте колата чиста и по възможност заредена.",
-                car_sos_title: "3. Действия при ПТП или Авария", car_sos_desc: "Задължителни стъпки при инцидент на пътя или повреда на автомобила.", car_sos_step1_title: "Осигурете района", car_sos_step1_desc: "Сложете светлоотразителна жилетка и триъгълник. Ако има пострадали, веднага позвънете на <strong>112</strong>.", car_sos_step2_title: "Протокол от КАТ", car_sos_step2_desc: "При ПТП е задължително да извикате полиция (на 112) за съставяне на протокол, дори щетите да са леки.", car_sos_step3_title: "Уведомете ни", car_sos_step3_desc: "Пишете веднага на Диспечер през Scoober, за да премахне поръчката. След това се обадете на вашия <strong>Капитан</strong>.", car_sos_step4_title: "Репатрак", car_sos_step4_desc: "Ако колата не е в движение, Капитанът ще ви инструктира да се обадите на партньорския репатрак.",
+                car_sos_title: "3. Действия при ПТП или Авария", car_sos_desc: "Задължителни стъпки при инцидент на пътя или повреда на автомобила.", car_sos_step1_title: "Установяване на щетите", car_sos_step1_desc: "Първо, огледайте внимателно щетите. При ПТП и спор за вина, веднага позвънете на <strong>112</strong>.", car_sos_step2_title: "Попълване на двустранен протокол", car_sos_step2_desc: "Ако вината е установена от един от участниците и няма пострадали, попълнете двустранен констативен протокол по образеца по-долу.", car_sos_step3_title: "Уведомяване на Капитан", car_sos_step3_desc: "Уведомете <a href=\"tel:+359889627470\" class=\"text-blue-700 underline\">Владимир Ненков</a> за инцидента. Той ще ви даде последващи действия и указания.", car_sos_step4_title: "Репатрак (при нужда)", car_sos_step4_desc: "Ако колата не е в движение и има нужда от репатрак, Капитанът ще ви инструктира.",
                 car_protocol_title: "Двустранен констативен протокол", car_protocol_desc: "При леки материални щети, <strong>без пострадали хора</strong> и при пълно съгласие между двамата водачи за обстоятелствата, се попълва Двустранен протокол.",
                 car_contact_title: "4. Телефонен указател", car_contact_desc: "Списък с отговорниците за автопарка. Използвайте бутоните за директно набиране.", car_c1_role: "Капитан", car_c1_desc: "За въпроси, свързани с промяна в графика и разпределението на колите.", car_c2_role: "Капитан", car_c2_desc: "За спешни въпроси, свързани с повреда по автомобила или при възникнало ПТП.", car_c3_title: "Пътна помощ", car_c3_role: "Денонощен репатрак", car_c3_desc: "Звънете на този номер само след предварително съгласуване с Капитан.", car_btn_call: "Позвъни", car_cap_hours: "Пон-Пет | 10:00 - 18:00",
                 btn_show_sample: "Виж примерния протокол"
