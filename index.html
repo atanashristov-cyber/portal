@@ -54,10 +54,178 @@
         .glass-header { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); }
         .interactive-card { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .interactive-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08); border-color: rgba(255, 122, 0, 0.3); }
+        .app-screen { min-height: 100vh; }
+        .admin-field-label { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; }
     </style>
 </head>
 <body class="bg-[#F3F4F6] text-gray-800 font-sans antialiased min-h-screen relative selection:bg-brand-orange selection:text-white">
 
+    <div id="screen-login" class="app-screen flex items-center justify-center px-4 py-10">
+        <div class="w-full max-w-md bg-white rounded-[2rem] border border-gray-200 shadow-lg p-8 space-y-6">
+            <div class="text-center space-y-2">
+                <span class="inline-block bg-brand-orange text-white text-xs font-black px-3 py-1 rounded-md">TAKEAWAY BG</span>
+                <h1 class="text-2xl font-black text-brand-dark">Вход в портала</h1>
+                <p class="text-sm text-gray-500">Потребителско име и парола</p>
+            </div>
+            <form id="login-form" class="space-y-4" onsubmit="return handleLoginSubmit(event)">
+                <div>
+                    <label class="admin-field-label" for="login-username">Потребител</label>
+                    <input id="login-username" type="text" required autocomplete="username" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-orange/40">
+                </div>
+                <div>
+                    <label class="admin-field-label" for="login-password">Парола</label>
+                    <input id="login-password" type="password" required autocomplete="current-password" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-orange/40">
+                </div>
+                <p id="login-error" class="hidden text-sm text-red-600 font-semibold"></p>
+                <button type="submit" class="w-full bg-brand-orange hover:bg-brand-orangeLight text-white font-bold py-3 rounded-xl shadow-sm transition">Вход</button>
+            </form>
+            <p id="login-config-hint" class="text-xs text-center text-gray-400"></p>
+        </div>
+    </div>
+
+    <div id="screen-admin-choice" class="app-screen hidden flex items-center justify-center px-4 py-10">
+        <div class="w-full max-w-2xl space-y-6">
+            <div class="text-center space-y-2">
+                <h1 class="text-3xl font-black text-brand-dark">Здравей, <span id="admin-choice-name">Админ</span></h1>
+                <p class="text-gray-500">Избери режим на работа</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button type="button" onclick="enterPortalView()" class="interactive-card bg-white border border-gray-200 rounded-[2rem] p-8 text-left space-y-3">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-orange/10 text-brand-orange flex items-center justify-center text-xl"><i class="fa-solid fa-motorcycle"></i></div>
+                    <h2 class="text-xl font-black text-brand-dark">Потребителски портал</h2>
+                    <p class="text-sm text-gray-500">Наръчникът за куриери – както го виждат служителите.</p>
+                </button>
+                <button type="button" onclick="enterAdminPanel()" class="interactive-card bg-white border border-gray-200 rounded-[2rem] p-8 text-left space-y-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gray-900 text-white flex items-center justify-center text-xl"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                    <h2 class="text-xl font-black text-brand-dark">Администрация</h2>
+                    <p class="text-sm text-gray-500">Потребители, права и редакция на съдържанието.</p>
+                </button>
+            </div>
+            <div class="text-center">
+                <button type="button" onclick="handleLogout()" class="text-sm font-bold text-gray-500 hover:text-brand-orange">Изход</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-admin" class="app-screen hidden">
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-[200]">
+            <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h1 class="text-xl font-black text-brand-dark">Администрация</h1>
+                    <p class="text-xs text-gray-500" id="admin-user-label"></p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="showAdminSection('users')" id="admin-tab-users" class="px-4 py-2 rounded-xl text-sm font-bold bg-brand-orange text-white">Потребители</button>
+                    <button type="button" onclick="showAdminSection('content')" id="admin-tab-content" class="px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600">Съдържание</button>
+                    <button type="button" onclick="openAdminChoice()" class="px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600">Назад</button>
+                    <button type="button" onclick="handleLogout()" class="px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600">Изход</button>
+                </div>
+            </div>
+        </header>
+        <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+            <section id="admin-section-users" class="space-y-6">
+                <div class="bg-white rounded-[2rem] border border-gray-200 p-6 space-y-4">
+                    <h2 class="text-lg font-black text-brand-dark">Нов потребител</h2>
+                    <form id="create-user-form" class="grid grid-cols-1 md:grid-cols-2 gap-4" onsubmit="return handleCreateUser(event)">
+                        <div>
+                            <label class="admin-field-label" for="new-username">Потребител</label>
+                            <input id="new-username" required class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 font-semibold">
+                        </div>
+                        <div>
+                            <label class="admin-field-label" for="new-password">Парола</label>
+                            <input id="new-password" type="password" required minlength="6" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 font-semibold">
+                        </div>
+                        <div>
+                            <label class="admin-field-label" for="new-display-name">Име за показване</label>
+                            <input id="new-display-name" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 font-semibold">
+                        </div>
+                        <div>
+                            <label class="admin-field-label" for="new-role">Роля</label>
+                            <select id="new-role" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 font-semibold">
+                                <option value="user">Потребител</option>
+                                <option value="admin">Администратор</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <p class="admin-field-label mb-2">Права</p>
+                            <div class="flex flex-wrap gap-4 text-sm font-semibold">
+                                <label class="flex items-center gap-2"><input type="checkbox" name="new-perm" value="view_portal" checked> Достъп до портала</label>
+                                <label class="flex items-center gap-2"><input type="checkbox" name="new-perm" value="view_company_cars" checked> Служебни коли</label>
+                                <label class="flex items-center gap-2"><input type="checkbox" name="new-perm" value="manage_users"> Управление потребители</label>
+                                <label class="flex items-center gap-2"><input type="checkbox" name="new-perm" value="manage_content"> Редакция съдържание</label>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <p id="create-user-error" class="hidden text-sm text-red-600 font-semibold mb-2"></p>
+                            <button type="submit" class="bg-brand-orange text-white font-bold px-5 py-2.5 rounded-xl">Създай потребител</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="bg-white rounded-[2rem] border border-gray-200 p-6 overflow-x-auto">
+                    <h2 class="text-lg font-black text-brand-dark mb-4">Списък потребители</h2>
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-gray-500 border-b">
+                                <th class="py-2 pr-3">Потребител</th>
+                                <th class="py-2 pr-3">Роля</th>
+                                <th class="py-2 pr-3">Права</th>
+                                <th class="py-2 pr-3">Активен</th>
+                                <th class="py-2">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+            <section id="admin-section-content" class="hidden space-y-6">
+                <div class="bg-white rounded-[2rem] border border-gray-200 p-6 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <h2 class="text-lg font-black text-brand-dark">Редакция на потребителската страница</h2>
+                        <button type="button" onclick="openMatrixEditor()" class="bg-gray-900 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-gray-800 transition">
+                            <i class="fa-solid fa-pen-to-square mr-2"></i>Редактирай „4. Доходи и Бонусна схема“
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-500">Пълен редактор на раздел 4: текстове, таблици с бонуси, средни нетни суми и настройки на симулатора.</p>
+                </div>
+                <div class="bg-white rounded-[2rem] border border-gray-200 p-6 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <h2 class="text-lg font-black text-brand-dark">Други текстове на портала</h2>
+                        <button type="button" onclick="savePortalContent()" class="bg-brand-orange text-white font-bold px-5 py-2.5 rounded-xl">Запази промените</button>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <select id="content-section-select" onchange="renderContentEditor()" class="rounded-xl border border-gray-200 px-3 py-2 font-semibold"></select>
+                        <select id="content-lang-select" onchange="renderContentEditor()" class="rounded-xl border border-gray-200 px-3 py-2 font-semibold">
+                            <option value="bg">Български</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <div id="content-editor-fields" class="grid grid-cols-1 gap-4"></div>
+                    <p id="content-save-status" class="text-sm font-semibold text-green-600 hidden"></p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="screen-admin-matrix" class="app-screen hidden">
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-[200]">
+            <div class="max-w-5xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h1 class="text-xl font-black text-brand-dark">4. Доходи и Бонусна схема</h1>
+                    <p class="text-xs text-gray-500">Пълен редактор на раздела</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="saveMatrixFromAdmin()" class="px-4 py-2 rounded-xl text-sm font-bold bg-brand-orange text-white">Запази</button>
+                    <button type="button" onclick="closeMatrixEditor()" class="px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600">Назад</button>
+                </div>
+            </div>
+        </header>
+        <main class="max-w-5xl mx-auto px-4 py-8">
+            <p id="matrix-save-status" class="hidden mb-4 text-sm font-semibold text-green-600"></p>
+            <div id="matrix-admin-form" class="space-y-6"></div>
+        </main>
+    </div>
+
+    <div id="screen-portal" class="hidden">
     <header id="main-header" class="sticky top-4 z-[100] mx-auto px-4 max-w-2xl transition-all duration-500 ease-in-out transform origin-top">
         <div class="bg-white/60 backdrop-blur-md rounded-full p-1.5 shadow-lg border border-white/50 flex justify-between items-center gap-2 transition-all duration-300">
             
@@ -91,6 +259,20 @@
             <div class="flex-grow flex justify-center">
                 <button type="button" id="nav-action" onclick="handleNavAction()" class="hidden px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer bg-white text-brand-orange shadow-sm border border-gray-100/50 hover:text-brand-dark">
                 </button>
+            </div>
+
+            <!-- Portal user menu -->
+            <div class="relative shrink-0">
+                <button type="button" id="portal-user-btn" onclick="togglePortalUserMenu()" class="flex items-center gap-2 bg-white/90 border border-gray-200/50 px-3 py-2.5 rounded-full text-sm font-bold text-brand-dark shadow-sm hover:border-brand-orange transition-all duration-300 cursor-pointer" title="Акаунт">
+                    <i class="fa-solid fa-user text-brand-orange"></i>
+                    <span id="portal-user-name" class="hidden sm:inline max-w-[120px] truncate"></span>
+                </button>
+                <div id="portal-user-menu" class="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 hidden z-50 overflow-hidden">
+                    <ul class="py-2 text-sm font-semibold text-brand-dark list-none m-0 p-0">
+                        <li id="portal-menu-admin-choice" class="hidden"><button type="button" onclick="openAdminChoice()" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange">Админ избор</button></li>
+                        <li><button type="button" onclick="handleLogout()" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange">Изход</button></li>
+                    </ul>
+                </div>
             </div>
 
             <!-- Right Side: Language Dropdown -->
@@ -244,68 +426,7 @@
                             <button id="tab-personal" onclick="switchVehicleTab('personal')" class="px-6 py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 bg-white text-brand-orange shadow-md border border-gray-100 whitespace-nowrap"><i class="fa-solid fa-car-side mr-2"></i><span data-i18n="tab_personal">С лична кола</span></button>
                             <button id="tab-company" onclick="switchVehicleTab('company')" class="px-6 py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 text-gray-500 hover:text-gray-700 whitespace-nowrap"><i class="fa-solid fa-car mr-2"></i><span data-i18n="tab_company">Със служебна</span></button>
                         </div>
-                        <div id="contracts-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                            <div id="card-8h" class="bg-brand-lightBg border border-gray-200 hover:border-brand-orange hover:shadow-md transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between space-y-5">
-                                <div>
-                                    <div data-i18n="contract_8h" class="bg-brand-orange/10 border border-brand-orange/20 text-brand-orange font-black text-sm px-3 py-3 rounded-xl text-center uppercase tracking-widest mb-5">8-Hour (8ч)</div>
-                                    <div class="space-y-3 text-sm">
-                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-500">Base (0-100)</span><span class="font-black text-brand-dark">€0.25</span></div>
-                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-600">Mid (101-200)</span><span class="font-black text-brand-dark">€1.00</span></div>
-                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-700">High (201-300)</span><span class="font-black text-brand-dark">€1.50</span></div>
-                                        <div class="flex justify-between pb-1"><span class="font-black text-brand-orange">Super (301+)</span><span class="font-black text-brand-orange">€3.00</span></div>
-                                    </div>
-                                </div>
-                                <div class="pt-5 border-t-2 border-gray-200 text-center">
-                                    <div data-i18n="avg_net_title" class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Средно Нето Месечно* (заплата плюс бонус)</div>
-                                    <div id="avg-8h" class="text-2xl font-black text-brand-orange">1110 - 1300 €</div>
-                                </div>
-                            </div>
-                            <div id="card-6h" class="bg-white border border-gray-200 hover:border-brand-orange hover:shadow-md transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between space-y-5">
-                                <div>
-                                    <div data-i18n="contract_6h" class="bg-gray-100 border border-gray-200 text-gray-700 font-black text-sm px-3 py-3 rounded-xl text-center uppercase tracking-widest mb-5">6-Hour (6ч)</div>
-                                    <div class="space-y-3 text-sm">
-                                        <div class="flex justify-between border-b border-gray-100 pb-2"><span class="font-bold text-gray-500">Base (0-75)</span><span class="font-black text-brand-dark">€0.25</span></div>
-                                        <div class="flex justify-between border-b border-gray-100 pb-2"><span class="font-bold text-gray-600">Mid (76-150)</span><span class="font-black text-brand-dark">€1.00</span></div>
-                                        <div class="flex justify-between border-b border-gray-100 pb-2"><span class="font-bold text-gray-700">High (151-225)</span><span class="font-black text-brand-dark">€1.50</span></div>
-                                        <div class="flex justify-between pb-1"><span class="font-black text-brand-orange">Super (226+)</span><span class="font-black text-brand-orange">€3.00</span></div>
-                                    </div>
-                                </div>
-                                <div class="pt-5 border-t-2 border-gray-100 text-center">
-                                    <div data-i18n="avg_net_title_2" class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Средно Нето Месечно* (заплата плюс бонус)</div>
-                                    <div id="avg-6h" class="text-2xl font-black text-brand-dark">800 - 900 €</div>
-                                </div>
-                            </div>
-                            <div id="card-4h" class="bg-white border border-gray-200 hover:border-brand-orange hover:shadow-md transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between space-y-5">
-                                <div>
-                                    <div data-i18n="contract_4h" class="bg-gray-100 border border-gray-200 text-gray-700 font-black text-sm px-3 py-3 rounded-xl text-center uppercase tracking-widest mb-5">4-Hour (4ч)</div>
-                                    <div class="space-y-3 text-sm">
-                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-500">Base (0-50)</span><span class="font-black text-brand-dark">€0.25</span></div>
-                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-600">Mid (51-100)</span><span class="font-black text-brand-dark">€1.00</span></div>
-                                        <div class="flex justify-between border-b border-gray-200 pb-2"><span class="font-bold text-gray-700">High (101-150)</span><span class="font-black text-brand-dark">€1.50</span></div>
-                                        <div class="flex justify-between pb-1"><span class="font-black text-brand-orange">Super (151+)</span><span class="font-black text-brand-orange">€3.00</span></div>
-                                    </div>
-                                </div>
-                                <div class="pt-5 border-t-2 border-gray-100 text-center">
-                                    <div data-i18n="avg_net_title_3" class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Средно Нето Месечно* (заплата плюс бонус)</div>
-                                    <div id="avg-4h" class="text-2xl font-black text-brand-dark">510 - 620 €</div>
-                                </div>
-                            </div>
-                            <div id="card-2h" class="bg-white border border-gray-200 hover:border-brand-orange hover:shadow-md transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between space-y-5">
-                                <div>
-                                    <div data-i18n="contract_2h" class="bg-gray-100 border border-gray-200 text-gray-700 font-black text-sm px-3 py-3 rounded-xl text-center uppercase tracking-widest mb-5">2-Hour (2ч)</div>
-                                    <div class="space-y-3 text-sm">
-                                        <div class="flex justify-between border-b border-gray-100 pb-2"><span class="font-bold text-gray-500">Base (0-25)</span><span class="font-black text-brand-dark">€0.25</span></div>
-                                        <div class="flex justify-between border-b border-gray-100 pb-2"><span class="font-bold text-gray-600">Mid (26-50)</span><span class="font-black text-brand-dark">€1.00</span></div>
-                                        <div class="flex justify-between border-b border-gray-100 pb-2"><span class="font-bold text-gray-700">High (51-75)</span><span class="font-black text-brand-dark">€1.50</span></div>
-                                        <div class="flex justify-between pb-1"><span class="font-black text-brand-orange">Super (76+)</span><span class="font-black text-brand-orange">€3.00</span></div>
-                                    </div>
-                                </div>
-                                <div class="pt-5 border-t-2 border-gray-100 text-center">
-                                    <div data-i18n="avg_net_title_4" class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Средно Нето Месечно* (заплата плюс бонус)</div>
-                                    <div id="avg-2h" class="text-2xl font-black text-brand-dark">~260 €</div>
-                                </div>
-                            </div>
-                        </div>
+                        <div id="contracts-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6"></div>
                     </div>
                     <div class="lg:col-span-4 bg-[#FFF8F3] rounded-[2rem] p-6 shadow-sm border border-brand-orange/20 flex flex-col relative overflow-hidden">
                         <div class="space-y-2 border-b border-brand-orange/10 pb-5 mb-5 relative z-10">
@@ -609,8 +730,806 @@
             </div>
         </div>
     </footer>
+    </div>
 
     <script>
+        const SUPABASE_URL = '';
+        const SUPABASE_ANON_KEY = '';
+        const AUTH_EMAIL_DOMAIN = 'takeaway.portal';
+        const ALL_PERMISSIONS = ['view_portal', 'view_company_cars', 'manage_users', 'manage_content'];
+        const CONTENT_SECTIONS = {
+            hero: { label: 'Начало', keys: ['hero_badge', 'hero_title', 'hero_desc'] },
+            map: { label: 'Стартови точки', keys: ['map_title', 'map_desc', 'map_subtitle', 'map_text', 'map_list_title', 'zone_1', 'zone_2', 'zone_3', 'zone_4', 'map_start_info', 'map_footer_info'] },
+            pay: { label: 'Плащания', keys: ['pay_title', 'pay_desc', 'pay_30_title', 'pay_30_bul1', 'pay_30_bul2', 'pay_15_title', 'pay_15_bul1', 'pay_15_bul2', 'pay_15_bul3'] },
+            schedule: { label: 'Графици', keys: ['schedule_title', 'schedule_subtitle', 'schedule_important_title', 'schedule_important_desc', 'schedule_edit_title', 'schedule_edit_desc', 'schedule_how', 'schedule_step1', 'schedule_step2', 'schedule_step3'] },
+            matrix: { label: 'Доходи (виж отделния редактор)', keys: [] },
+            helper: { label: 'Търсачка', keys: ['helper_title', 'helper_desc', 'helper_quick', 'helper_ph', 'helper_notfound', 'helper_path'] },
+            contact: { label: 'Контакти', keys: ['contact_disp_title', 'contact_disp_subtitle', 'contact_how_title', 'contact_step1', 'contact_step2', 'contact_step3', 'contact_admin_title', 'contact_admin_subtitle', 'contact_admin_important', 'contact_admin_how', 'admin_step1', 'admin_step2', 'admin_step3'] },
+            cars: { label: 'Служебни коли', keys: ['car_hero_badge', 'car_hero_title', 'car_hero_desc', 'car_map_title', 'car_map_desc', 'car_maint_title', 'car_maint_fuel_title', 'car_maint_fuel_desc', 'car_sos_title', 'car_sos_step1_desc'] },
+            footer: { label: 'Футър', keys: ['footer_rights', 'footer_info'] }
+        };
+
+        let supabaseClient = null;
+        let signupClient = null;
+        let currentProfile = null;
+        let usingLocalAuth = false;
+
+        function authEmail(username) {
+            return `${String(username).trim().toLowerCase()}@${AUTH_EMAIL_DOMAIN}`;
+        }
+
+        function hasPermission(perm) {
+            if (!currentProfile || !currentProfile.is_active) return false;
+            if (currentProfile.role === 'admin') return true;
+            return Array.isArray(currentProfile.permissions) && currentProfile.permissions.includes(perm);
+        }
+
+        function isAdmin() {
+            return currentProfile && currentProfile.role === 'admin' && currentProfile.is_active;
+        }
+
+        function showScreen(screenId) {
+            ['screen-login', 'screen-admin-choice', 'screen-admin', 'screen-portal'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.classList.toggle('hidden', id !== screenId);
+            });
+        }
+
+        function initSupabaseClients() {
+            if (!SUPABASE_URL || !SUPABASE_ANON_KEY || typeof supabase === 'undefined') {
+                usingLocalAuth = true;
+                const hint = document.getElementById('login-config-hint');
+                if (hint) hint.textContent = 'Демо режим: admin / admin123 или user / user123';
+                return;
+            }
+            usingLocalAuth = false;
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            signupClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+            });
+            const hint = document.getElementById('login-config-hint');
+            if (hint) hint.textContent = 'Свързано с Supabase база данни.';
+        }
+
+        function getLocalUsers() {
+            const raw = localStorage.getItem('takeaway-portal-users-v1');
+            if (raw) return JSON.parse(raw);
+            const defaults = {
+                admin: { username: 'admin', password: 'admin123', display_name: 'Администратор', role: 'admin', permissions: [...ALL_PERMISSIONS], is_active: true },
+                user: { username: 'user', password: 'user123', display_name: 'Куриер', role: 'user', permissions: ['view_portal', 'view_company_cars'], is_active: true }
+            };
+            localStorage.setItem('takeaway-portal-users-v1', JSON.stringify(defaults));
+            return defaults;
+        }
+
+        function saveLocalUsers(users) {
+            localStorage.setItem('takeaway-portal-users-v1', JSON.stringify(users));
+        }
+
+        function getLocalContent() {
+            const raw = localStorage.getItem('takeaway-portal-content-v1');
+            if (raw) return JSON.parse(raw);
+            return null;
+        }
+
+        function saveLocalContent(payload) {
+            localStorage.setItem('takeaway-portal-content-v1', JSON.stringify(payload));
+        }
+
+        async function fetchProfile(userId) {
+            if (usingLocalAuth) {
+                const users = getLocalUsers();
+                return Object.values(users).find((u) => u.id === userId || u.username === userId) || null;
+            }
+            const { data, error } = await supabaseClient.from('portal_profiles').select('*').eq('id', userId).maybeSingle();
+            if (error) throw error;
+            return data;
+        }
+
+        async function loadPortalContentFromDb() {
+            if (usingLocalAuth) {
+                const local = getLocalContent();
+                if (local) applyPortalContent(local);
+                return;
+            }
+            const { data, error } = await supabaseClient.from('portal_content').select('content').eq('id', 'main').maybeSingle();
+            if (error) throw error;
+            if (data && data.content) applyPortalContent(data.content);
+        }
+
+        function applyPortalContent(payload) {
+            if (payload.translations) {
+                translations = deepMerge(translations, payload.translations);
+            }
+            if (payload.helperContactData) {
+                helperContactData = deepMerge(helperContactData, payload.helperContactData);
+            }
+            if (payload.helperQuickLinks) {
+                helperQuickLinks = deepMerge(helperQuickLinks, payload.helperQuickLinks);
+            }
+            if (payload.incomeMatrix) {
+                incomeMatrix = deepMerge(getDefaultIncomeMatrix(), payload.incomeMatrix);
+                syncIncomeMatrixTextsToTranslations();
+            }
+        }
+
+        function getDefaultIncomeMatrix() {
+            return {
+                tax: 0.224,
+                baseSalary: { 8: 820, 6: 615, 4: 410, 2: 205 },
+                bonusRates: { base: 0.25, mid: 1.0, high: 1.5, super: 3.0 },
+                bonusThresholds: { 8: [100, 200, 300], 6: [75, 150, 225], 4: [50, 100, 150], 2: [25, 50, 75] },
+                kmPerOrder: { car: 5.5, bike: 3.5 },
+                amortPerKm: { car: 0.17, bike: 0.11 },
+                vehicles: ['personal_car', 'company_car', 'personal_bike'],
+                vehicleLabels: {
+                    bg: { personal_car: 'Лична кола', company_car: 'Служебна кола', personal_bike: 'Лично колело' },
+                    en: { personal_car: 'Personal Car', company_car: 'Company Car', personal_bike: 'Personal Bike' }
+                },
+                texts: {
+                    bg: {
+                        matrix_title: '4. Доходи и Бонусна схема',
+                        matrix_info_desc: 'Бонусът се трупа на месечна база. Посочените суми са брутни.',
+                        tab_personal: 'С лична кола',
+                        tab_company: 'Със служебна',
+                        sim_title: 'Симулатор',
+                        sim_desc: 'Симулирай заплатата си спрямо очакваното представяне.',
+                        sim_net: 'Очаквано Нето',
+                        sim_gross: 'Бруто',
+                        sim_orders: 'Поръчки',
+                        sim_hours: 'Часове',
+                        calc_contract_lbl: 'Договор',
+                        calc_vehicle_lbl: 'Превозно',
+                        calc_days_lbl: 'Раб. дни',
+                        calc_eff_lbl: 'Ефект. (ч)',
+                        calc_eff_tooltip: 'Среден брой поръчки за 1 час.'
+                    },
+                    en: {
+                        matrix_title: '4. Income and Bonus Scheme',
+                        matrix_info_desc: 'The bonus is accumulated on a monthly basis. The amounts are gross.',
+                        tab_personal: 'Personal Car',
+                        tab_company: 'Company Car',
+                        sim_title: 'Simulator',
+                        sim_desc: 'Simulate your salary based on expected performance.',
+                        sim_net: 'Expected Net',
+                        sim_gross: 'Gross',
+                        sim_orders: 'Orders',
+                        sim_hours: 'Hours',
+                        calc_contract_lbl: 'Contract',
+                        calc_vehicle_lbl: 'Vehicle',
+                        calc_days_lbl: 'Work days',
+                        calc_eff_lbl: 'Efficiency (h)',
+                        calc_eff_tooltip: 'Average number of orders you deliver per 1 hour.'
+                    }
+                },
+                contracts: {
+                    8: {
+                        label: { bg: '8-Hour (8ч)', en: '8-Hour' },
+                        avgNetLabel: { bg: 'Средно Нето Месечно* (заплата плюс бонус)', en: 'Avg. Net Monthly* (salary plus bonus)' },
+                        avgPersonal: '1110 - 1300 €',
+                        avgCompany: '920 - 1020 €',
+                        tiers: [
+                            { label: 'Base (0-100)', price: '€0.25' },
+                            { label: 'Mid (101-200)', price: '€1.00' },
+                            { label: 'High (201-300)', price: '€1.50' },
+                            { label: 'Super (301+)', price: '€3.00' }
+                        ]
+                    },
+                    6: {
+                        label: { bg: '6-Hour (6ч)', en: '6-Hour' },
+                        avgNetLabel: { bg: 'Средно Нето Месечно* (заплата плюс бонус)', en: 'Avg. Net Monthly* (salary plus bonus)' },
+                        avgPersonal: '800 - 900 €',
+                        avgCompany: '',
+                        tiers: [
+                            { label: 'Base (0-75)', price: '€0.25' },
+                            { label: 'Mid (76-150)', price: '€1.00' },
+                            { label: 'High (151-225)', price: '€1.50' },
+                            { label: 'Super (226+)', price: '€3.00' }
+                        ]
+                    },
+                    4: {
+                        label: { bg: '4-Hour (4ч)', en: '4-Hour' },
+                        avgNetLabel: { bg: 'Средно Нето Месечно* (заплата плюс бонус)', en: 'Avg. Net Monthly* (salary plus bonus)' },
+                        avgPersonal: '510 - 620 €',
+                        avgCompany: '400 - 500 €',
+                        tiers: [
+                            { label: 'Base (0-50)', price: '€0.25' },
+                            { label: 'Mid (51-100)', price: '€1.00' },
+                            { label: 'High (101-150)', price: '€1.50' },
+                            { label: 'Super (151+)', price: '€3.00' }
+                        ]
+                    },
+                    2: {
+                        label: { bg: '2-Hour (2ч)', en: '2-Hour' },
+                        avgNetLabel: { bg: 'Средно Нето Месечно* (заплата плюс бонус)', en: 'Avg. Net Monthly* (salary plus bonus)' },
+                        avgPersonal: '~260 €',
+                        avgCompany: '',
+                        tiers: [
+                            { label: 'Base (0-25)', price: '€0.25' },
+                            { label: 'Mid (26-50)', price: '€1.00' },
+                            { label: 'High (51-75)', price: '€1.50' },
+                            { label: 'Super (76+)', price: '€3.00' }
+                        ]
+                    }
+                }
+            };
+        }
+
+        let incomeMatrix = getDefaultIncomeMatrix();
+        let currentVehicleTab = 'personal';
+        let matrixAdminLang = 'bg';
+
+        const MATRIX_TEXT_KEYS = [
+            'matrix_title', 'matrix_info_desc', 'tab_personal', 'tab_company',
+            'sim_title', 'sim_desc', 'sim_net', 'sim_gross', 'sim_orders', 'sim_hours',
+            'calc_contract_lbl', 'calc_vehicle_lbl', 'calc_days_lbl', 'calc_eff_lbl', 'calc_eff_tooltip'
+        ];
+
+        function syncIncomeMatrixTextsToTranslations() {
+            ['bg', 'en'].forEach((lang) => {
+                if (!translations[lang]) translations[lang] = {};
+                MATRIX_TEXT_KEYS.forEach((key) => {
+                    if (incomeMatrix.texts?.[lang]?.[key] !== undefined) {
+                        translations[lang][key] = incomeMatrix.texts[lang][key];
+                    }
+                });
+                const contracts = incomeMatrix.contracts || {};
+                Object.keys(contracts).forEach((hours) => {
+                    const contractKey = `contract_${hours}h`;
+                    if (contracts[hours].label?.[lang]) translations[lang][contractKey] = contracts[hours].label[lang];
+                });
+            });
+        }
+
+        function renderIncomeMatrixSection() {
+            syncIncomeMatrixTextsToTranslations();
+            const lang = currentLangCode || 'bg';
+            MATRIX_TEXT_KEYS.forEach((key) => {
+                document.querySelectorAll(`[data-i18n="${key}"]`).forEach((el) => {
+                    if (incomeMatrix.texts?.[lang]?.[key]) el.innerHTML = incomeMatrix.texts[lang][key];
+                });
+            });
+            const tooltip = document.getElementById('eff-tooltip-box');
+            if (tooltip && incomeMatrix.texts?.[lang]?.calc_eff_tooltip) {
+                tooltip.textContent = incomeMatrix.texts[lang].calc_eff_tooltip;
+            }
+            renderContractCards();
+            initCalculator();
+            updateUI();
+        }
+
+        function renderContractCards() {
+            const grid = document.getElementById('contracts-grid');
+            if (!grid) return;
+            const lang = currentLangCode || 'bg';
+            const hoursList = currentVehicleTab === 'personal' ? [8, 6, 4, 2] : [8, 4];
+            grid.className = currentVehicleTab === 'personal'
+                ? 'grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'
+                : 'grid grid-cols-1 sm:grid-cols-2 lg:max-w-4xl lg:mx-auto gap-4 sm:gap-6';
+
+            grid.innerHTML = hoursList.map((hours, index) => {
+                const contract = incomeMatrix.contracts[hours];
+                if (!contract) return '';
+                const isPrimary = hours === 8 && currentVehicleTab === 'personal';
+                const cardBg = isPrimary ? 'bg-brand-lightBg' : 'bg-white';
+                const headerClass = isPrimary
+                    ? 'bg-brand-orange/10 border border-brand-orange/20 text-brand-orange'
+                    : 'bg-gray-100 border border-gray-200 text-gray-700';
+                const borderClass = isPrimary ? 'border-gray-200' : 'border-gray-100';
+                const avgValue = currentVehicleTab === 'personal' ? contract.avgPersonal : contract.avgCompany;
+                const avgColor = isPrimary ? 'text-brand-orange' : 'text-brand-dark';
+                const tiersHtml = (contract.tiers || []).map((tier, tierIndex) => {
+                    const isSuper = tierIndex === (contract.tiers.length - 1);
+                    const labelClass = isSuper ? 'font-black text-brand-orange' : `font-bold text-gray-${500 + tierIndex * 100}`.replace('gray-700', 'gray-700').replace('gray-900', 'gray-700');
+                    const priceClass = isSuper ? 'font-black text-brand-orange' : 'font-black text-brand-dark';
+                    const rowBorder = tierIndex < contract.tiers.length - 1 ? `border-b ${borderClass} pb-2` : 'pb-1';
+                    return `<div class="flex justify-between ${rowBorder}"><span class="${labelClass}">${tier.label}</span><span class="${priceClass}">${tier.price}</span></div>`;
+                }).join('');
+                return `
+                    <div class="${cardBg} border border-gray-200 hover:border-brand-orange hover:shadow-md transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between space-y-5">
+                        <div>
+                            <div class="${headerClass} font-black text-sm px-3 py-3 rounded-xl text-center uppercase tracking-widest mb-5">${contract.label?.[lang] || ''}</div>
+                            <div class="space-y-3 text-sm">${tiersHtml}</div>
+                        </div>
+                        <div class="pt-5 border-t-2 ${borderClass} text-center">
+                            <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">${contract.avgNetLabel?.[lang] || ''}</div>
+                            <div class="text-2xl font-black ${avgColor}">${avgValue || '—'}</div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function openMatrixEditor() {
+            if (!isAdmin() && !hasPermission('manage_content')) {
+                alert('Нямате право за редакция на съдържание.');
+                return;
+            }
+            matrixAdminLang = 'bg';
+            renderMatrixAdminForm();
+            document.getElementById('screen-admin').classList.add('hidden');
+            document.getElementById('screen-admin-matrix').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function closeMatrixEditor() {
+            document.getElementById('screen-admin-matrix').classList.add('hidden');
+            document.getElementById('screen-admin').classList.remove('hidden');
+            showAdminSection('content');
+        }
+
+        function matrixField(label, html) {
+            return `<div><label class="admin-field-label">${label}</label><div class="mt-1">${html}</div></div>`;
+        }
+
+        function matrixInput(path, value, type = 'text') {
+            const escaped = String(value ?? '').replace(/"/g, '&quot;');
+            return `<input type="${type}" data-matrix-path="${path}" value="${escaped}" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium">`;
+        }
+
+        function matrixTextarea(path, value) {
+            return `<textarea data-matrix-path="${path}" rows="2" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium">${value ?? ''}</textarea>`;
+        }
+
+        function typeOfMatrixPath(path) {
+            if (path === 'tax') return 'number';
+            if (path.startsWith('baseSalary.')) return 'number';
+            if (path.startsWith('bonusRates.')) return 'number';
+            if (path.startsWith('kmPerOrder.') || path.startsWith('amortPerKm.')) return 'number';
+            return 'text';
+        }
+
+        function setMatrixValueByPath(path, value) {
+            const parts = path.split('.');
+            let ref = incomeMatrix;
+            for (let i = 0; i < parts.length - 1; i += 1) {
+                const key = /^\d+$/.test(parts[i]) ? Number(parts[i]) : parts[i];
+                if (ref[key] === undefined) {
+                    ref[key] = /^\d+$/.test(parts[i + 1]) ? {} : {};
+                }
+                ref = ref[key];
+            }
+            const last = parts[parts.length - 1];
+            const lastKey = /^\d+$/.test(last) ? Number(last) : last;
+            ref[lastKey] = value;
+        }
+
+        function getMatrixValueByPath(path) {
+            return path.split('.').reduce((acc, key) => (acc == null ? undefined : acc[key]), incomeMatrix);
+        }
+
+        function renderMatrixAdminForm() {
+            const lang = matrixAdminLang;
+            const form = document.getElementById('matrix-admin-form');
+            const t = incomeMatrix.texts[lang];
+            let html = `
+                <div class="bg-white rounded-[2rem] border border-gray-200 p-6 space-y-4">
+                    <div class="flex flex-wrap gap-2 items-center justify-between">
+                        <h2 class="text-lg font-black text-brand-dark">Език за редакция</h2>
+                        <select id="matrix-admin-lang" onchange="matrixAdminLang=this.value; renderMatrixAdminForm()" class="rounded-xl border border-gray-200 px-3 py-2 font-semibold">
+                            <option value="bg" ${lang === 'bg' ? 'selected' : ''}>Български</option>
+                            <option value="en" ${lang === 'en' ? 'selected' : ''}>English</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="bg-white rounded-[2rem] border border-gray-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <h2 class="md:col-span-2 text-lg font-black text-brand-dark">Заглавие и табове</h2>
+                    ${matrixField('Заглавие на раздела', matrixInput(`texts.${lang}.matrix_title`, t.matrix_title))}
+                    ${matrixField('Описание под заглавието', matrixTextarea(`texts.${lang}.matrix_info_desc`, t.matrix_info_desc))}
+                    ${matrixField('Таб: лична кола', matrixInput(`texts.${lang}.tab_personal`, t.tab_personal))}
+                    ${matrixField('Таб: служебна кола', matrixInput(`texts.${lang}.tab_company`, t.tab_company))}
+                </div>`;
+
+            [8, 6, 4, 2].forEach((hours) => {
+                const c = incomeMatrix.contracts[hours];
+                html += `<div class="bg-white rounded-[2rem] border border-gray-200 p-6 space-y-4">
+                    <h2 class="text-lg font-black text-brand-dark">Договор ${hours} часа</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${matrixField('Етикет на картата', matrixInput(`contracts.${hours}.label.${lang}`, c.label[lang]))}
+                        ${matrixField('Етикет „Средно нето“', matrixInput(`contracts.${hours}.avgNetLabel.${lang}`, c.avgNetLabel[lang]))}
+                        ${matrixField('Средно нето – лична кола', matrixInput(`contracts.${hours}.avgPersonal`, c.avgPersonal))}
+                        ${matrixField('Средно нето – служебна кола', matrixInput(`contracts.${hours}.avgCompany`, c.avgCompany))}
+                    </div>
+                    <div class="space-y-3">
+                        <p class="admin-field-label">Бонус нива (етикет + цена)</p>`;
+                c.tiers.forEach((tier, index) => {
+                    html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                        ${matrixField(`Ниво ${index + 1} – етикет`, matrixInput(`contracts.${hours}.tiers.${index}.label`, tier.label))}
+                        ${matrixField(`Ниво ${index + 1} – цена`, matrixInput(`contracts.${hours}.tiers.${index}.price`, tier.price))}
+                    </div>`;
+                });
+                html += `</div></div>`;
+            });
+
+            html += `<div class="bg-white rounded-[2rem] border border-gray-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h2 class="md:col-span-2 text-lg font-black text-brand-dark">Симулатор – текстове (${lang === 'bg' ? 'БГ' : 'EN'})</h2>
+                ${matrixField('Заглавие', matrixInput(`texts.${lang}.sim_title`, t.sim_title))}
+                ${matrixField('Описание', matrixTextarea(`texts.${lang}.sim_desc`, t.sim_desc))}
+                ${matrixField('Етикет нето', matrixInput(`texts.${lang}.sim_net`, t.sim_net))}
+                ${matrixField('Етикет бруто', matrixInput(`texts.${lang}.sim_gross`, t.sim_gross))}
+                ${matrixField('Етикет поръчки', matrixInput(`texts.${lang}.sim_orders`, t.sim_orders))}
+                ${matrixField('Етикет часове', matrixInput(`texts.${lang}.sim_hours`, t.sim_hours))}
+                ${matrixField('Поле договор', matrixInput(`texts.${lang}.calc_contract_lbl`, t.calc_contract_lbl))}
+                ${matrixField('Поле превозно', matrixInput(`texts.${lang}.calc_vehicle_lbl`, t.calc_vehicle_lbl))}
+                ${matrixField('Поле работни дни', matrixInput(`texts.${lang}.calc_days_lbl`, t.calc_days_lbl))}
+                ${matrixField('Поле ефективност', matrixInput(`texts.${lang}.calc_eff_lbl`, t.calc_eff_lbl))}
+                ${matrixField('Подсказка ефективност', matrixTextarea(`texts.${lang}.calc_eff_tooltip`, t.calc_eff_tooltip))}
+            </div>`;
+
+            html += `<div class="bg-white rounded-[2rem] border border-gray-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h2 class="md:col-span-2 text-lg font-black text-brand-dark">Симулатор – числа и формули</h2>
+                ${matrixField('Данък/удръжка (0.224 = 22.4%)', matrixInput('tax', incomeMatrix.tax, 'number'))}
+                ${matrixField('Базова заплата 8ч (€)', matrixInput('baseSalary.8', incomeMatrix.baseSalary[8], 'number'))}
+                ${matrixField('Базова заплата 6ч (€)', matrixInput('baseSalary.6', incomeMatrix.baseSalary[6], 'number'))}
+                ${matrixField('Базова заплата 4ч (€)', matrixInput('baseSalary.4', incomeMatrix.baseSalary[4], 'number'))}
+                ${matrixField('Базова заплата 2ч (€)', matrixInput('baseSalary.2', incomeMatrix.baseSalary[2], 'number'))}
+                ${matrixField('Бонус Base (€/поръчка)', matrixInput('bonusRates.base', incomeMatrix.bonusRates.base, 'number'))}
+                ${matrixField('Бонус Mid (€/поръчка)', matrixInput('bonusRates.mid', incomeMatrix.bonusRates.mid, 'number'))}
+                ${matrixField('Бонус High (€/поръчка)', matrixInput('bonusRates.high', incomeMatrix.bonusRates.high, 'number'))}
+                ${matrixField('Бонус Super (€/поръчка)', matrixInput('bonusRates.super', incomeMatrix.bonusRates.super, 'number'))}
+                ${matrixField('Прагове 8ч (3 числа, запетая)', matrixInput('bonusThresholds.8', incomeMatrix.bonusThresholds[8].join(', ')))}
+                ${matrixField('Прагове 6ч', matrixInput('bonusThresholds.6', incomeMatrix.bonusThresholds[6].join(', ')))}
+                ${matrixField('Прагове 4ч', matrixInput('bonusThresholds.4', incomeMatrix.bonusThresholds[4].join(', ')))}
+                ${matrixField('Прагове 2ч', matrixInput('bonusThresholds.2', incomeMatrix.bonusThresholds[2].join(', ')))}
+                ${matrixField('Км на поръчка (кола)', matrixInput('kmPerOrder.car', incomeMatrix.kmPerOrder.car, 'number'))}
+                ${matrixField('Км на поръчка (колело)', matrixInput('kmPerOrder.bike', incomeMatrix.kmPerOrder.bike, 'number'))}
+                ${matrixField('Амортизация €/км (кола)', matrixInput('amortPerKm.car', incomeMatrix.amortPerKm.car, 'number'))}
+                ${matrixField('Амортизация €/км (колело)', matrixInput('amortPerKm.bike', incomeMatrix.amortPerKm.bike, 'number'))}
+                ${matrixField('Етикет лична кола (БГ)', matrixInput('vehicleLabels.bg.personal_car', incomeMatrix.vehicleLabels.bg.personal_car))}
+                ${matrixField('Етикет служебна кола (БГ)', matrixInput('vehicleLabels.bg.company_car', incomeMatrix.vehicleLabels.bg.company_car))}
+                ${matrixField('Етикет лично колело (БГ)', matrixInput('vehicleLabels.bg.personal_bike', incomeMatrix.vehicleLabels.bg.personal_bike))}
+                ${matrixField('Етикет personal car (EN)', matrixInput('vehicleLabels.en.personal_car', incomeMatrix.vehicleLabels.en.personal_car))}
+                ${matrixField('Етикет company car (EN)', matrixInput('vehicleLabels.en.company_car', incomeMatrix.vehicleLabels.en.company_car))}
+                ${matrixField('Етикет personal bike (EN)', matrixInput('vehicleLabels.en.personal_bike', incomeMatrix.vehicleLabels.en.personal_bike))}
+            </div>`;
+
+            form.innerHTML = html;
+            form.querySelectorAll('[data-matrix-path]').forEach((el) => {
+                el.addEventListener('input', () => {
+                    const path = el.getAttribute('data-matrix-path');
+                    let val = el.value;
+                    if (path.startsWith('bonusThresholds.')) {
+                        const hours = Number(path.split('.')[1]);
+                        incomeMatrix.bonusThresholds[hours] = val.split(',').map((x) => Number(x.trim())).filter((x) => !Number.isNaN(x));
+                        return;
+                    }
+                    if (typeOfMatrixPath(path) === 'number') val = val === '' ? 0 : Number(val);
+                    setMatrixValueByPath(path, val);
+                });
+            });
+        }
+
+        async function saveMatrixFromAdmin() {
+            document.querySelectorAll('#matrix-admin-form [data-matrix-path]').forEach((el) => {
+                const path = el.getAttribute('data-matrix-path');
+                let val = el.value;
+                if (path.startsWith('bonusThresholds.')) {
+                    const hours = Number(path.split('.')[1]);
+                    incomeMatrix.bonusThresholds[hours] = val.split(',').map((x) => Number(x.trim())).filter((x) => !Number.isNaN(x));
+                    return;
+                }
+                if (typeOfMatrixPath(path) === 'number') val = val === '' ? 0 : Number(val);
+                setMatrixValueByPath(path, val);
+            });
+            syncIncomeMatrixTextsToTranslations();
+            await savePortalContent();
+            renderIncomeMatrixSection();
+            const status = document.getElementById('matrix-save-status');
+            if (status) {
+                status.textContent = 'Раздел „4. Доходи и Бонусна схема“ е запазен. Промените са видими в потребителския портал.';
+                status.classList.remove('hidden');
+                setTimeout(() => status.classList.add('hidden'), 4000);
+            }
+            if (!document.getElementById('screen-portal').classList.contains('hidden')) {
+                setLang(currentLangCode || 'bg');
+            }
+        }
+
+        function deepMerge(target, source) {
+            const out = Array.isArray(target) ? [...target] : { ...target };
+            if (!source || typeof source !== 'object') return out;
+            Object.keys(source).forEach((key) => {
+                if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                    out[key] = deepMerge(out[key] || {}, source[key]);
+                } else {
+                    out[key] = source[key];
+                }
+            });
+            return out;
+        }
+
+        function getPortalContentSnapshot() {
+            syncIncomeMatrixTextsToTranslations();
+            return {
+                translations: JSON.parse(JSON.stringify(translations)),
+                helperContactData: JSON.parse(JSON.stringify(helperContactData)),
+                helperQuickLinks: JSON.parse(JSON.stringify(helperQuickLinks)),
+                incomeMatrix: JSON.parse(JSON.stringify(incomeMatrix))
+            };
+        }
+
+        async function savePortalContent() {
+            const payload = getPortalContentSnapshot();
+            const status = document.getElementById('content-save-status');
+            try {
+                if (usingLocalAuth) {
+                    saveLocalContent(payload);
+                } else {
+                    const { error } = await supabaseClient.from('portal_content').upsert({
+                        id: 'main',
+                        content: payload,
+                        updated_at: new Date().toISOString(),
+                        updated_by: currentProfile.id
+                    });
+                    if (error) throw error;
+                }
+                if (status) {
+                    status.textContent = 'Съдържанието е запазено успешно.';
+                    status.classList.remove('hidden');
+                    setTimeout(() => status.classList.add('hidden'), 3000);
+                }
+                if (!document.getElementById('screen-portal').classList.contains('hidden')) {
+                    setLang(currentLangCode || 'bg');
+                }
+            } catch (err) {
+                alert('Грешка при запис: ' + (err.message || err));
+            }
+        }
+
+        async function handleLoginSubmit(event) {
+            event.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errEl = document.getElementById('login-error');
+            errEl.classList.add('hidden');
+            try {
+                if (usingLocalAuth) {
+                    const users = getLocalUsers();
+                    const found = Object.values(users).find((u) => u.username === username && u.password === password && u.is_active);
+                    if (!found) throw new Error('Грешно потребителско име или парола.');
+                    currentProfile = { ...found, id: found.username };
+                    localStorage.setItem('takeaway-portal-session', found.username);
+                    afterLogin();
+                    return false;
+                }
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: authEmail(username),
+                    password
+                });
+                if (error) throw error;
+                currentProfile = await fetchProfile(data.user.id);
+                if (!currentProfile || !currentProfile.is_active) throw new Error('Профилът е неактивен или липсва.');
+                afterLogin();
+            } catch (err) {
+                errEl.textContent = err.message || 'Грешка при вход.';
+                errEl.classList.remove('hidden');
+            }
+            return false;
+        }
+
+        async function afterLogin() {
+            await loadPortalContentFromDb();
+            document.getElementById('portal-user-name').textContent = currentProfile.display_name || currentProfile.username;
+            document.getElementById('admin-choice-name').textContent = currentProfile.display_name || currentProfile.username;
+            document.getElementById('admin-user-label').textContent = (currentProfile.display_name || currentProfile.username) + ' · ' + (currentProfile.role === 'admin' ? 'Администратор' : 'Потребител');
+            document.getElementById('portal-menu-admin-choice').classList.toggle('hidden', !isAdmin());
+            if (isAdmin()) {
+                showScreen('screen-admin-choice');
+            } else {
+                enterPortalView();
+            }
+        }
+
+        function enterPortalView() {
+            if (!hasPermission('view_portal')) {
+                alert('Нямате право за достъп до портала.');
+                return;
+            }
+            showScreen('screen-portal');
+            renderIncomeMatrixSection();
+            setLang(currentLangCode || 'bg');
+            setCity(currentCityName || 'София', document.getElementById('current-city-short')?.innerText || 'СФ');
+            switchGlobalPage('home');
+            if (map) setTimeout(() => map.invalidateSize(), 200);
+        }
+
+        function enterAdminPanel() {
+            if (!isAdmin() && !hasPermission('manage_users') && !hasPermission('manage_content')) {
+                alert('Нямате административни права.');
+                return;
+            }
+            showScreen('screen-admin');
+            document.getElementById('admin-tab-users').classList.toggle('hidden', !isAdmin() && !hasPermission('manage_users'));
+            document.getElementById('admin-tab-content').classList.toggle('hidden', !isAdmin() && !hasPermission('manage_content'));
+            if (isAdmin() || hasPermission('manage_users')) {
+                showAdminSection('users');
+                loadUsersTable();
+            } else {
+                showAdminSection('content');
+            }
+            initContentEditor();
+        }
+
+        function openAdminChoice() {
+            if (!isAdmin()) return;
+            showScreen('screen-admin-choice');
+        }
+
+        async function handleLogout() {
+            if (!usingLocalAuth && supabaseClient) await supabaseClient.auth.signOut();
+            localStorage.removeItem('takeaway-portal-session');
+            currentProfile = null;
+            document.getElementById('login-form')?.reset();
+            showScreen('screen-login');
+        }
+
+        function togglePortalUserMenu() {
+            document.getElementById('portal-user-menu').classList.toggle('hidden');
+            document.getElementById('lang-menu')?.classList.add('hidden');
+            document.getElementById('city-menu')?.classList.add('hidden');
+        }
+
+        function showAdminSection(section) {
+            document.getElementById('admin-section-users').classList.toggle('hidden', section !== 'users');
+            document.getElementById('admin-section-content').classList.toggle('hidden', section !== 'content');
+            document.getElementById('admin-tab-users').className = section === 'users'
+                ? 'px-4 py-2 rounded-xl text-sm font-bold bg-brand-orange text-white'
+                : 'px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600';
+            document.getElementById('admin-tab-content').className = section === 'content'
+                ? 'px-4 py-2 rounded-xl text-sm font-bold bg-brand-orange text-white'
+                : 'px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600';
+        }
+
+        function getSelectedPermissions(prefix) {
+            return Array.from(document.querySelectorAll(`input[name="${prefix}"]:checked`)).map((el) => el.value);
+        }
+
+        async function handleCreateUser(event) {
+            event.preventDefault();
+            const username = document.getElementById('new-username').value.trim().toLowerCase();
+            const password = document.getElementById('new-password').value;
+            const displayName = document.getElementById('new-display-name').value.trim() || username;
+            const role = document.getElementById('new-role').value;
+            let permissions = getSelectedPermissions('new-perm');
+            if (role === 'admin') permissions = [...ALL_PERMISSIONS];
+            if (!permissions.includes('view_portal')) permissions.unshift('view_portal');
+            const errEl = document.getElementById('create-user-error');
+            errEl.classList.add('hidden');
+            try {
+                if (usingLocalAuth) {
+                    const users = getLocalUsers();
+                    if (users[username]) throw new Error('Потребителят вече съществува.');
+                    users[username] = { username, password, display_name: displayName, role, permissions, is_active: true, id: username };
+                    saveLocalUsers(users);
+                    document.getElementById('create-user-form').reset();
+                    loadUsersTable();
+                    return false;
+                }
+                const { data, error } = await signupClient.auth.signUp({
+                    email: authEmail(username),
+                    password,
+                    options: { data: { username, display_name: displayName } }
+                });
+                if (error) throw error;
+                if (!data.user) throw new Error('Потребителят не беше създаден.');
+                const { error: profileError } = await supabaseClient.from('portal_profiles').upsert({
+                    id: data.user.id,
+                    username,
+                    display_name: displayName,
+                    role,
+                    permissions,
+                    is_active: true,
+                    updated_at: new Date().toISOString()
+                });
+                if (profileError) throw profileError;
+                document.getElementById('create-user-form').reset();
+                loadUsersTable();
+            } catch (err) {
+                errEl.textContent = err.message || 'Грешка при създаване.';
+                errEl.classList.remove('hidden');
+            }
+            return false;
+        }
+
+        async function loadUsersTable() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+            let rows = [];
+            if (usingLocalAuth) {
+                rows = Object.values(getLocalUsers());
+            } else {
+                const { data, error } = await supabaseClient.from('portal_profiles').select('*').order('username');
+                if (error) throw error;
+                rows = data || [];
+            }
+            rows.forEach((user) => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100';
+                const perms = (user.permissions || []).join(', ');
+                tr.innerHTML = `
+                    <td class="py-3 pr-3 font-semibold">${user.display_name || user.username}<br><span class="text-xs text-gray-400">${user.username}</span></td>
+                    <td class="py-3 pr-3">${user.role}</td>
+                    <td class="py-3 pr-3 text-xs text-gray-500 max-w-[200px]">${perms}</td>
+                    <td class="py-3 pr-3">${user.is_active ? 'Да' : 'Не'}</td>
+                    <td class="py-3">
+                        <button type="button" class="text-brand-orange font-bold text-xs mr-2" onclick="toggleUserActive('${user.username}', ${user.is_active ? 'false' : 'true'})">${user.is_active ? 'Спри' : 'Активирай'}</button>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function toggleUserActive(username, active) {
+            if (usingLocalAuth) {
+                const users = getLocalUsers();
+                if (!users[username]) return;
+                users[username].is_active = active;
+                saveLocalUsers(users);
+                loadUsersTable();
+                return;
+            }
+            const { error } = await supabaseClient.from('portal_profiles').update({ is_active: active, updated_at: new Date().toISOString() }).eq('username', username);
+            if (error) alert(error.message);
+            loadUsersTable();
+        }
+
+        function initContentEditor() {
+            const select = document.getElementById('content-section-select');
+            select.innerHTML = Object.entries(CONTENT_SECTIONS).map(([key, sec]) => `<option value="${key}">${sec.label}</option>`).join('');
+            renderContentEditor();
+        }
+
+        function renderContentEditor() {
+            const sectionKey = document.getElementById('content-section-select').value;
+            const lang = document.getElementById('content-lang-select').value;
+            const section = CONTENT_SECTIONS[sectionKey];
+            const container = document.getElementById('content-editor-fields');
+            container.innerHTML = '';
+            if (!section || !section.keys || !section.keys.length) {
+                container.innerHTML = '<p class="text-sm text-gray-500">За раздел „4. Доходи и Бонусна схема“ използвайте отделния бутон за пълен редактор.</p>';
+                return;
+            }
+            (section.keys || []).forEach((key) => {
+                const value = (translations[lang] && translations[lang][key]) || '';
+                const wrap = document.createElement('div');
+                wrap.innerHTML = `
+                    <label class="admin-field-label">${key}</label>
+                    <textarea data-content-key="${key}" rows="3" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium">${value.replace(/</g, '&lt;')}</textarea>`;
+                const textarea = wrap.querySelector('textarea');
+                textarea.value = value;
+                textarea.addEventListener('input', (e) => {
+                    if (!translations[lang]) translations[lang] = {};
+                    translations[lang][key] = e.target.value;
+                });
+                container.appendChild(wrap);
+            });
+        }
+
+        async function bootstrapApp() {
+            initSupabaseClients();
+            if (usingLocalAuth) {
+                const sessionUser = localStorage.getItem('takeaway-portal-session');
+                if (sessionUser) {
+                    const users = getLocalUsers();
+                    currentProfile = users[sessionUser] ? { ...users[sessionUser], id: sessionUser } : null;
+                    if (currentProfile && currentProfile.is_active) {
+                        await afterLogin();
+                        return;
+                    }
+                }
+                showScreen('screen-login');
+                return;
+            }
+            const { data } = await supabaseClient.auth.getSession();
+            if (data.session) {
+                currentProfile = await fetchProfile(data.session.user.id);
+                if (currentProfile && currentProfile.is_active) {
+                    await afterLogin();
+                    return;
+                }
+            }
+            showScreen('screen-login');
+        }
+
         var currentPage = 'home';
 
         function updateNavbar() {
@@ -621,7 +1540,7 @@
                 navAction.classList.remove('hidden');
                 navAction.innerHTML = `<i class="fa-solid fa-house"></i> <span>${currentLangCode === 'en' ? 'Home' : '🏠 Начало'}</span>`;
             } else {
-                if (CITIES_WITH_CARS.includes(currentCityName)) {
+                if (CITIES_WITH_CARS.includes(currentCityName) && hasPermission('view_company_cars')) {
                     navAction.classList.remove('hidden');
                     navAction.innerHTML = `<i class="fa-solid fa-car"></i> <span>${currentLangCode === 'en' ? 'Company Cars' : '🚗 Служебни коли'}</span>`;
                 } else {
@@ -639,6 +1558,10 @@
         }
 
         function switchGlobalPage(pageId) {
+            if (pageId === 'cars' && !hasPermission('view_company_cars')) {
+                alert('Нямате достъп до секцията за служебни коли.');
+                return;
+            }
             document.querySelectorAll('.global-page').forEach(page => page.classList.replace('block', 'hidden'));
             document.getElementById('page-' + pageId).classList.replace('hidden', 'block');
             
@@ -678,7 +1601,7 @@
             if (tabName === 'car-map' && carMap) setTimeout(() => carMap.invalidateSize(), 150);
         }
 
-        const translations = {
+        let translations = {
             bg: {
                 lang_name: "БГ | Български", nav_home: "🏠 Начало", nav_cars: "🚗 Служебни коли",
                 hero_badge: "АКТУАЛЕН НАРЪЧНИК 2026", hero_title: "Всичко за твоя успешен старт в Takeaway", hero_desc: "Добре дошли в нашия портал! Тук сме събрали актуалната информация за стартовите точки, методологията на плащане и директни контакти към ключовите отдели.",
@@ -739,7 +1662,7 @@
             }
         };
 
-        const helperContactData = {
+        let helperContactData = {
             bg: [
                 { id: "field_issue", title: "Проблем на терен / С поръчка", keywords: ["поръчка", "клиент", "ресторант", "адрес", "грешен", "отказана", "бави", "чакам", "доставка", "терен", "смяната", "адреси", "клиенти", "ресторанти"], path: ["Scoober Приложение", "Икона Чат (Горе вдясно)", "Поддръжка"], icon: "fa-motorcycle", color: "text-red-500", bg: "bg-red-50", border: "border-red-200", instructions: "За проблеми на терен, грешни адреси или отказани поръчки се свържете <strong>веднага с Диспечер през чата</strong> (иконата горе вдясно)." },
                 { id: "sick_leave", title: "Качване на Болничен лист", keywords: ["болничен", "болен", "лекар", "доктор", "отсъствие", "sick", "leave"], path: ["Меню", "Профил", "Формуляр за контакт", "Болничен"], icon: "fa-notes-medical", color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200", instructions: "<strong>❗️ Важно:</strong> При прикачване на снимка на болничния лист трябва да се виждат <strong>всичките 4 ъгъла на листа</strong>!" },
@@ -754,7 +1677,7 @@
             ]
         };
 
-        const helperQuickLinks = {
+        let helperQuickLinks = {
             bg: [{ t: 'болничен', l: '💊 Болничен' }, { t: 'отпуска', l: '✈️ Отпуска' }, { t: 'график', l: '📅 График' }, { t: 'клиент', l: '🍔 Проблем на терен' }, { t: 'заплата', l: '💰 Заплата' }],
             en: [{ t: 'sick', l: '💊 Sick Leave' }, { t: 'leave', l: '✈️ Leave' }, { t: 'schedule', l: '📅 Schedule' }, { t: 'order', l: '🍔 Field Issue' }]
         };
@@ -809,6 +1732,11 @@
             if (langBtn && langMenu && !langBtn.contains(e.target) && !langMenu.contains(e.target)) {
                 langMenu.classList.add('hidden');
             }
+            const portalUserBtn = document.getElementById('portal-user-btn');
+            const portalUserMenu = document.getElementById('portal-user-menu');
+            if (portalUserBtn && portalUserMenu && !portalUserBtn.contains(e.target) && !portalUserMenu.contains(e.target)) {
+                portalUserMenu.classList.add('hidden');
+            }
         });
 
         function setLang(lang) {
@@ -826,6 +1754,7 @@
                 }
             });
             initCalculator(); updateUI();
+            renderContractCards();
             if (map) showSofiaOnMap(); if (carMap) showCompanyLocationsOnMap();
             document.getElementById('searchInput').placeholder = translations[lang].helper_ph;
             renderHelperQuickLinks();
@@ -845,51 +1774,83 @@
         }
 
         function switchVehicleTab(type) {
-            const tabPersonal = document.getElementById('tab-personal'); const tabCompany = document.getElementById('tab-company');
-            const grid = document.getElementById('contracts-grid'); const card6h = document.getElementById('card-6h'); const card2h = document.getElementById('card-2h');
-            const avg8h = document.getElementById('avg-8h'); const avg6h = document.getElementById('avg-6h'); const avg4h = document.getElementById('avg-4h'); const avg2h = document.getElementById('avg-2h');
+            currentVehicleTab = type;
+            const tabPersonal = document.getElementById('tab-personal');
+            const tabCompany = document.getElementById('tab-company');
             const activeClass = "px-6 py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 bg-white text-brand-orange shadow-md border border-gray-100 whitespace-nowrap";
             const inactiveClass = "px-6 py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 text-gray-500 hover:text-gray-700 whitespace-nowrap";
             if (type === 'personal') {
-                tabPersonal.className = activeClass; tabCompany.className = inactiveClass;
-                grid.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6";
-                card6h.style.display = "flex"; card2h.style.display = "flex";
-                avg8h.textContent = "1110 - 1300 €"; avg6h.textContent = "800 - 900 €"; avg4h.textContent = "510 - 620 €"; avg2h.textContent = "~260 €";
+                tabPersonal.className = activeClass;
+                tabCompany.className = inactiveClass;
             } else {
-                tabCompany.className = activeClass; tabPersonal.className = inactiveClass;
-                grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:max-w-4xl lg:mx-auto gap-4 sm:gap-6";
-                card6h.style.display = "none"; card2h.style.display = "none";
-                avg8h.textContent = "920 - 1020 €"; avg4h.textContent = "400 - 500 €";
+                tabCompany.className = activeClass;
+                tabPersonal.className = inactiveClass;
             }
+            renderContractCards();
         }
 
-        const CONFIG = { TAX: 0.224, CITIES: { "София": { hasTierBonus: true, vehicles: ["personal_car", "company_car", "personal_bike"] } }, V_LABELS: { bg: { personal_car: "Лична кола", company_car: "Служебна кола", personal_bike: "Лично колело" }, en: { personal_car: "Personal Car", company_car: "Company Car", personal_bike: "Personal Bike" } } };
+        const CONFIG = { CITIES: { "София": { hasTierBonus: true, vehicles: ["personal_car", "company_car", "personal_bike"] } } };
         function initCalculator() {
-            const city = CONFIG.CITIES["София"]; const sal = {8:820, 6:615, 4:410, 2:205}; const t = translations[currentLangCode];
-            const conSel = document.getElementById("contract"); const savedContract = conSel ? conSel.value : "";
+            const city = CONFIG.CITIES["София"];
+            const sal = incomeMatrix.baseSalary;
+            const t = translations[currentLangCode];
+            const labels = incomeMatrix.vehicleLabels[currentLangCode] || incomeMatrix.vehicleLabels.bg;
+            const conSel = document.getElementById("contract");
+            const savedContract = conSel ? conSel.value : "";
             if (conSel) {
                 conSel.innerHTML = `<option value="" disabled ${!savedContract ? 'selected' : ''}>${t.select_contract}</option>`;
-                [8,6,4,2].forEach(h => { conSel.innerHTML += `<option value="${h}" ${savedContract == h ? 'selected' : ''}>${h} ${t.hours} (${sal[h]} €)</option>`; });
+                [8, 6, 4, 2].forEach(h => {
+                    conSel.innerHTML += `<option value="${h}" ${savedContract == h ? 'selected' : ''}>${h} ${t.hours} (${sal[h]} €)</option>`;
+                });
             }
-            const vSel = document.getElementById("vehicle"); const savedVehicle = vSel ? vSel.value : "";
+            const vSel = document.getElementById("vehicle");
+            const savedVehicle = vSel ? vSel.value : "";
             if (vSel) {
                 vSel.innerHTML = `<option value="" disabled ${!savedVehicle ? 'selected' : ''}>${t.select_vehicle}</option>`;
-                city.vehicles.forEach(v => { vSel.innerHTML += `<option value="${v}" ${savedVehicle === v ? 'selected' : ''}>${CONFIG.V_LABELS[currentLangCode][v]}</option>`; });
+                incomeMatrix.vehicles.forEach(v => {
+                    vSel.innerHTML += `<option value="${v}" ${savedVehicle === v ? 'selected' : ''}>${labels[v] || v}</option>`;
+                });
             }
         }
         function updateUI() {
-            const contractVal = document.getElementById("contract")?.value; const vehicleVal = document.getElementById("vehicle")?.value; const daysVal = document.getElementById("days")?.value; const effVal = document.getElementById("eff")?.value;
-            if (!contractVal || !vehicleVal || !daysVal || !effVal) { document.getElementById("outNet").textContent = "0.00 €"; document.getElementById("outGross").textContent = "0.00 €"; document.getElementById("outOrders").textContent = "0"; document.getElementById("outMonthlyHours").textContent = "0"; return; }
-            const contract = Number(contractVal); const workedDays = Math.max(0, Number(daysVal)); const eff = Number(effVal);
-            const hours = contract * workedDays; const orders = Math.round(eff * hours);
-            const kmPerOrder = (vehicleVal === "personal_car" || vehicleVal === "company_car") ? 5.5 : 3.5; const km = orders * kmPerOrder;
-            const baseGross = {8:820,6:615,4:410,2:205}[contract]; let bonusGross = 0;
-            const th = { 8:[100,200,300], 6:[75,150,225], 4:[50,100,150], 2:[25,50,75] }[contract];
-            const n = [Math.min(orders, th[0]), Math.max(0, Math.min(orders, th[1]) - th[0]), Math.max(0, Math.min(orders, th[2]) - th[1]), Math.max(0, orders - th[2])];
-            bonusGross = (n[0]*0.25) + (n[1]*1.0) + (n[2]*1.5) + (n[3]*3.0);
-            const amortGross = vehicleVal === "company_car" ? 0 : (km * (vehicleVal.includes("bike") ? 0.11 : 0.17));
-            const totalGross = baseGross + bonusGross + amortGross; const totalNet = totalGross - (totalGross * CONFIG.TAX);
-            document.getElementById("outNet").textContent = totalNet.toFixed(2) + " €"; document.getElementById("outGross").textContent = totalGross.toFixed(2) + " €"; document.getElementById("outOrders").textContent = orders; document.getElementById("outMonthlyHours").textContent = hours;
+            const contractVal = document.getElementById("contract")?.value;
+            const vehicleVal = document.getElementById("vehicle")?.value;
+            const daysVal = document.getElementById("days")?.value;
+            const effVal = document.getElementById("eff")?.value;
+            if (!contractVal || !vehicleVal || !daysVal || !effVal) {
+                document.getElementById("outNet").textContent = "0.00 €";
+                document.getElementById("outGross").textContent = "0.00 €";
+                document.getElementById("outOrders").textContent = "0";
+                document.getElementById("outMonthlyHours").textContent = "0";
+                return;
+            }
+            const contract = Number(contractVal);
+            const workedDays = Math.max(0, Number(daysVal));
+            const eff = Number(effVal);
+            const hours = contract * workedDays;
+            const orders = Math.round(eff * hours);
+            const isCar = vehicleVal === "personal_car" || vehicleVal === "company_car";
+            const kmPerOrder = isCar ? incomeMatrix.kmPerOrder.car : incomeMatrix.kmPerOrder.bike;
+            const km = orders * kmPerOrder;
+            const baseGross = incomeMatrix.baseSalary[contract];
+            let bonusGross = 0;
+            const th = incomeMatrix.bonusThresholds[contract];
+            const rates = incomeMatrix.bonusRates;
+            const n = [
+                Math.min(orders, th[0]),
+                Math.max(0, Math.min(orders, th[1]) - th[0]),
+                Math.max(0, Math.min(orders, th[2]) - th[1]),
+                Math.max(0, orders - th[2])
+            ];
+            bonusGross = (n[0] * rates.base) + (n[1] * rates.mid) + (n[2] * rates.high) + (n[3] * rates.super);
+            const amortRate = vehicleVal === "company_car" ? 0 : (vehicleVal.includes("bike") ? incomeMatrix.amortPerKm.bike : incomeMatrix.amortPerKm.car);
+            const amortGross = vehicleVal === "company_car" ? 0 : (km * amortRate);
+            const totalGross = baseGross + bonusGross + amortGross;
+            const totalNet = totalGross - (totalGross * incomeMatrix.tax);
+            document.getElementById("outNet").textContent = totalNet.toFixed(2) + " €";
+            document.getElementById("outGross").textContent = totalGross.toFixed(2) + " €";
+            document.getElementById("outOrders").textContent = orders;
+            document.getElementById("outMonthlyHours").textContent = hours;
         }
 
         // --- УМЕН ПОМОЩНИК ТЪРСЕНЕ ---
@@ -979,10 +1940,14 @@
 
         window.onload = function() {
             initMaps();
-            setLang('bg');
-            setCity('София', 'СФ');
-            switchGlobalPage('home');
-            openCarTab('car-map');
+            bootstrapApp().then(() => {
+                if (currentProfile && document.getElementById('screen-portal') && !document.getElementById('screen-portal').classList.contains('hidden')) {
+                    setLang('bg');
+                    setCity('София', 'СФ');
+                    switchGlobalPage('home');
+                    openCarTab('car-map');
+                }
+            });
         }
     </script>
 </body>
