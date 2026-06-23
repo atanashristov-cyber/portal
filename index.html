@@ -13,8 +13,10 @@
     
     <link class="scroll-smooth" rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <!-- Добавяне на Supabase SDK за безплатна облачна база данни -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Firebase SDK v10 (Auth + Firestore) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
     <script>
         tailwind.config = {
@@ -60,17 +62,17 @@
 </head>
 <body class="bg-[#F3F4F6] text-gray-800 font-sans antialiased min-h-screen relative selection:bg-brand-orange selection:text-white">
 
-    <div id="screen-login" class="app-screen flex items-center justify-center px-4 py-10">
+    <div id="screen-login" class="app-screen hidden flex items-center justify-center px-4 py-10">
         <div class="w-full max-w-md bg-white rounded-[2rem] border border-gray-200 shadow-lg p-8 space-y-6">
             <div class="text-center space-y-2">
                 <span class="inline-block bg-brand-orange text-white text-xs font-black px-3 py-1 rounded-md">TAKEAWAY BG</span>
-                <h1 class="text-2xl font-black text-brand-dark">Вход в портала</h1>
-                <p class="text-sm text-gray-500">Потребителско име и парола</p>
+                <h1 class="text-2xl font-black text-brand-dark">Вход за администратор</h1>
+                <p class="text-sm text-gray-500">Имейл и парола (Firebase Auth)</p>
             </div>
             <form id="login-form" class="space-y-4" onsubmit="return handleLoginSubmit(event)">
                 <div>
-                    <label class="admin-field-label" for="login-username">Потребител</label>
-                    <input id="login-username" type="text" required autocomplete="username" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-orange/40">
+                    <label class="admin-field-label" for="login-email">Имейл</label>
+                    <input id="login-email" type="email" required autocomplete="email" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-orange/40">
                 </div>
                 <div>
                     <label class="admin-field-label" for="login-password">Парола</label>
@@ -80,6 +82,9 @@
                 <button type="submit" class="w-full bg-brand-orange hover:bg-brand-orangeLight text-white font-bold py-3 rounded-xl shadow-sm transition">Вход</button>
             </form>
             <p id="login-config-hint" class="text-xs text-center text-gray-400"></p>
+            <div class="text-center">
+                <button type="button" onclick="enterPortalView()" class="text-sm font-bold text-gray-500 hover:text-brand-orange">← Обратно към портала</button>
+            </div>
         </div>
     </div>
 
@@ -128,8 +133,8 @@
                     <h2 class="text-lg font-black text-brand-dark">Нов потребител</h2>
                     <form id="create-user-form" class="grid grid-cols-1 md:grid-cols-2 gap-4" onsubmit="return handleCreateUser(event)">
                         <div>
-                            <label class="admin-field-label" for="new-username">Потребител</label>
-                            <input id="new-username" required class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 font-semibold">
+                            <label class="admin-field-label" for="new-email">Имейл</label>
+                            <input id="new-email" type="email" required class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 font-semibold">
                         </div>
                         <div>
                             <label class="admin-field-label" for="new-password">Парола</label>
@@ -225,7 +230,7 @@
         </main>
     </div>
 
-    <div id="screen-portal" class="hidden">
+    <div id="screen-portal" class="app-screen">
     <header id="main-header" class="sticky top-4 z-[100] mx-auto px-4 max-w-2xl transition-all duration-500 ease-in-out transform origin-top">
         <div class="bg-white/60 backdrop-blur-md rounded-full p-1.5 shadow-lg border border-white/50 flex justify-between items-center gap-2 transition-all duration-300">
             
@@ -261,8 +266,16 @@
                 </button>
             </div>
 
-            <!-- Portal user menu -->
+            <!-- Admin login (видим само за нелогнати) -->
             <div class="relative shrink-0">
+                <button type="button" id="portal-admin-login-btn" onclick="openAdminLogin()" class="flex items-center gap-2 bg-white/90 border border-gray-200/50 px-3 py-2.5 rounded-full text-sm font-bold text-brand-dark shadow-sm hover:border-brand-orange transition-all duration-300 cursor-pointer" title="Вход за администратор">
+                    <i class="fa-solid fa-lock text-brand-orange"></i>
+                    <span class="hidden sm:inline">Админ</span>
+                </button>
+            </div>
+
+            <!-- Portal user menu (видим само след вход) -->
+            <div id="portal-user-menu-wrap" class="relative shrink-0 hidden">
                 <button type="button" id="portal-user-btn" onclick="togglePortalUserMenu()" class="flex items-center gap-2 bg-white/90 border border-gray-200/50 px-3 py-2.5 rounded-full text-sm font-bold text-brand-dark shadow-sm hover:border-brand-orange transition-all duration-300 cursor-pointer" title="Акаунт">
                     <i class="fa-solid fa-user text-brand-orange"></i>
                     <span id="portal-user-name" class="hidden sm:inline max-w-[120px] truncate"></span>
@@ -270,6 +283,7 @@
                 <div id="portal-user-menu" class="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 hidden z-50 overflow-hidden">
                     <ul class="py-2 text-sm font-semibold text-brand-dark list-none m-0 p-0">
                         <li id="portal-menu-admin-choice" class="hidden"><button type="button" onclick="openAdminChoice()" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange">Админ избор</button></li>
+                        <li id="portal-menu-admin-panel" class="hidden"><button type="button" onclick="enterAdminPanel()" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange">Администрация</button></li>
                         <li><button type="button" onclick="handleLogout()" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange">Изход</button></li>
                     </ul>
                 </div>
@@ -733,9 +747,19 @@
     </div>
 
     <script>
-        const SUPABASE_URL = '';
-        const SUPABASE_ANON_KEY = '';
-        const AUTH_EMAIL_DOMAIN = 'takeaway.portal';
+        // =============================================================================
+        // ВАШИЯТ FIREBASE CONFIG — ПОПЪЛНЕТЕ ОТ FIREBASE CONSOLE → Project Settings → Web app
+        // =============================================================================
+        const firebaseConfig = {
+            apiKey: 'AIzaSyD96aMeyypnRVpfBmtrIofyakufz4Jdpwc',
+            authDomain: 'takeaway-hub-d2c26.firebaseapp.com',
+            projectId: 'takeaway-hub-d2c26',
+            storageBucket: 'takeaway-hub-d2c26.firebasestorage.app',
+            messagingSenderId: '312920909259',
+            appId: '1:312920909259:web:27eba32c28b9a72750c24e',
+            measurementId: 'G-DBCDSHJXPL'
+        };
+
         const ALL_PERMISSIONS = ['view_portal', 'view_company_cars', 'manage_users', 'manage_content'];
         const CONTENT_SECTIONS = {
             hero: { label: 'Начало', keys: ['hero_badge', 'hero_title', 'hero_desc'] },
@@ -749,17 +773,49 @@
             footer: { label: 'Футър', keys: ['footer_rights', 'footer_info'] }
         };
 
-        let supabaseClient = null;
-        let signupClient = null;
+        let auth = null;
+        let db = null;
+        let secondaryAuth = null;
         let currentProfile = null;
-        let usingLocalAuth = false;
 
-        function authEmail(username) {
-            return `${String(username).trim().toLowerCase()}@${AUTH_EMAIL_DOMAIN}`;
+        function isFirebaseConfigured() {
+            return firebaseConfig.apiKey && firebaseConfig.apiKey !== 'YOUR_API_KEY';
+        }
+
+        function initFirebase() {
+            if (!isFirebaseConfigured() || typeof firebase === 'undefined') {
+                const hint = document.getElementById('login-config-hint');
+                if (hint) hint.textContent = 'Добавете firebaseConfig от Firebase Console, за да активирате облачното запазване.';
+                return false;
+            }
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            auth = firebase.auth();
+            db = firebase.firestore();
+            const hint = document.getElementById('login-config-hint');
+            if (hint) hint.textContent = 'Свързано с Firebase (Auth + Firestore).';
+            return true;
+        }
+
+        function getSecondaryAuth() {
+            if (!isFirebaseConfigured()) throw new Error('Firebase не е конфигуриран.');
+            if (!secondaryAuth) {
+                const secondaryApp = firebase.apps.find((app) => app.name === 'Secondary')
+                    || firebase.initializeApp(firebaseConfig, 'Secondary');
+                secondaryAuth = secondaryApp.auth();
+            }
+            return secondaryAuth;
+        }
+
+        function usersCollection() {
+            return db.collection('siteData').doc('profiles').collection('users');
         }
 
         function hasPermission(perm) {
-            if (!currentProfile || !currentProfile.is_active) return false;
+            if (!currentProfile || !currentProfile.is_active) {
+                return ['view_portal', 'view_company_cars'].includes(perm);
+            }
             if (currentProfile.role === 'admin') return true;
             return Array.isArray(currentProfile.permissions) && currentProfile.permissions.includes(perm);
         }
@@ -768,74 +824,34 @@
             return currentProfile && currentProfile.role === 'admin' && currentProfile.is_active;
         }
 
+        function canManageAdminPanel() {
+            return isAdmin() || hasPermission('manage_users') || hasPermission('manage_content');
+        }
+
         function showScreen(screenId) {
-            ['screen-login', 'screen-admin-choice', 'screen-admin', 'screen-portal'].forEach((id) => {
+            ['screen-login', 'screen-admin-choice', 'screen-admin', 'screen-admin-matrix', 'screen-portal'].forEach((id) => {
                 const el = document.getElementById(id);
                 if (!el) return;
                 el.classList.toggle('hidden', id !== screenId);
             });
         }
 
-        function initSupabaseClients() {
-            if (!SUPABASE_URL || !SUPABASE_ANON_KEY || typeof supabase === 'undefined') {
-                usingLocalAuth = true;
-                const hint = document.getElementById('login-config-hint');
-                if (hint) hint.textContent = 'Демо режим: admin / admin123 или user / user123';
-                return;
-            }
-            usingLocalAuth = false;
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            signupClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-                auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
-            });
-            const hint = document.getElementById('login-config-hint');
-            if (hint) hint.textContent = 'Свързано с Supabase база данни.';
-        }
-
-        function getLocalUsers() {
-            const raw = localStorage.getItem('takeaway-portal-users-v1');
-            if (raw) return JSON.parse(raw);
-            const defaults = {
-                admin: { username: 'admin', password: 'admin123', display_name: 'Администратор', role: 'admin', permissions: [...ALL_PERMISSIONS], is_active: true },
-                user: { username: 'user', password: 'user123', display_name: 'Куриер', role: 'user', permissions: ['view_portal', 'view_company_cars'], is_active: true }
-            };
-            localStorage.setItem('takeaway-portal-users-v1', JSON.stringify(defaults));
-            return defaults;
-        }
-
-        function saveLocalUsers(users) {
-            localStorage.setItem('takeaway-portal-users-v1', JSON.stringify(users));
-        }
-
-        function getLocalContent() {
-            const raw = localStorage.getItem('takeaway-portal-content-v1');
-            if (raw) return JSON.parse(raw);
-            return null;
-        }
-
-        function saveLocalContent(payload) {
-            localStorage.setItem('takeaway-portal-content-v1', JSON.stringify(payload));
-        }
-
         async function fetchProfile(userId) {
-            if (usingLocalAuth) {
-                const users = getLocalUsers();
-                return Object.values(users).find((u) => u.id === userId || u.username === userId) || null;
-            }
-            const { data, error } = await supabaseClient.from('portal_profiles').select('*').eq('id', userId).maybeSingle();
-            if (error) throw error;
-            return data;
+            if (!db) return null;
+            const doc = await usersCollection().doc(userId).get();
+            return doc.exists ? doc.data() : null;
         }
 
         async function loadPortalContentFromDb() {
-            if (usingLocalAuth) {
-                const local = getLocalContent();
-                if (local) applyPortalContent(local);
-                return;
+            if (!db) return;
+            try {
+                const doc = await db.collection('siteData').doc('main').get();
+                if (doc.exists && doc.data().content) {
+                    applyPortalContent(doc.data().content);
+                }
+            } catch (err) {
+                console.error('Грешка при зареждане от Firestore:', err);
             }
-            const { data, error } = await supabaseClient.from('portal_content').select('content').eq('id', 'main').maybeSingle();
-            if (error) throw error;
-            if (data && data.content) applyPortalContent(data.content);
         }
 
         function applyPortalContent(payload) {
@@ -1249,22 +1265,20 @@
         }
 
         async function savePortalContent() {
+            if (!db || !auth || !auth.currentUser) {
+                alert('Нямате права за запис. Влезте като администратор.');
+                return;
+            }
             const payload = getPortalContentSnapshot();
             const status = document.getElementById('content-save-status');
             try {
-                if (usingLocalAuth) {
-                    saveLocalContent(payload);
-                } else {
-                    const { error } = await supabaseClient.from('portal_content').upsert({
-                        id: 'main',
-                        content: payload,
-                        updated_at: new Date().toISOString(),
-                        updated_by: currentProfile.id
-                    });
-                    if (error) throw error;
-                }
+                await db.collection('siteData').doc('main').set({
+                    content: payload,
+                    updated_at: firebase.firestore.FieldValue.serverTimestamp(),
+                    updated_by: auth.currentUser.uid
+                }, { merge: true });
                 if (status) {
-                    status.textContent = 'Съдържанието е запазено успешно.';
+                    status.textContent = 'Съдържанието е запазено успешно във Firestore.';
                     status.classList.remove('hidden');
                     setTimeout(() => status.classList.add('hidden'), 3000);
                 }
@@ -1276,30 +1290,45 @@
             }
         }
 
+        function updateAuthUI() {
+            const isLoggedIn = !!currentProfile;
+            const admin = isAdmin();
+            const canManage = canManageAdminPanel();
+
+            document.getElementById('portal-admin-login-btn')?.classList.toggle('hidden', isLoggedIn);
+            document.getElementById('portal-user-menu-wrap')?.classList.toggle('hidden', !isLoggedIn);
+
+            if (isLoggedIn) {
+                const label = currentProfile.display_name || currentProfile.email || currentProfile.username || 'Акаунт';
+                document.getElementById('portal-user-name').textContent = label;
+                document.getElementById('admin-choice-name').textContent = label;
+                document.getElementById('admin-user-label').textContent = label + ' · ' + (currentProfile.role === 'admin' ? 'Администратор' : 'Потребител');
+            }
+
+            document.getElementById('portal-menu-admin-choice')?.classList.toggle('hidden', !admin);
+            document.getElementById('portal-menu-admin-panel')?.classList.toggle('hidden', !canManage);
+        }
+
+        function openAdminLogin() {
+            document.getElementById('login-error')?.classList.add('hidden');
+            showScreen('screen-login');
+        }
+
         async function handleLoginSubmit(event) {
             event.preventDefault();
-            const username = document.getElementById('login-username').value.trim();
+            const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
             const errEl = document.getElementById('login-error');
             errEl.classList.add('hidden');
             try {
-                if (usingLocalAuth) {
-                    const users = getLocalUsers();
-                    const found = Object.values(users).find((u) => u.username === username && u.password === password && u.is_active);
-                    if (!found) throw new Error('Грешно потребителско име или парола.');
-                    currentProfile = { ...found, id: found.username };
-                    localStorage.setItem('takeaway-portal-session', found.username);
-                    afterLogin();
-                    return false;
+                if (!auth) throw new Error('Firebase не е конфигуриран. Попълнете firebaseConfig.');
+                const { user } = await auth.signInWithEmailAndPassword(email, password);
+                currentProfile = await fetchProfile(user.uid);
+                if (!currentProfile || !currentProfile.is_active) {
+                    await auth.signOut();
+                    throw new Error('Профилът е неактивен или липсва в Firestore.');
                 }
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: authEmail(username),
-                    password
-                });
-                if (error) throw error;
-                currentProfile = await fetchProfile(data.user.id);
-                if (!currentProfile || !currentProfile.is_active) throw new Error('Профилът е неактивен или липсва.');
-                afterLogin();
+                await afterLogin();
             } catch (err) {
                 errEl.textContent = err.message || 'Грешка при вход.';
                 errEl.classList.remove('hidden');
@@ -1309,12 +1338,11 @@
 
         async function afterLogin() {
             await loadPortalContentFromDb();
-            document.getElementById('portal-user-name').textContent = currentProfile.display_name || currentProfile.username;
-            document.getElementById('admin-choice-name').textContent = currentProfile.display_name || currentProfile.username;
-            document.getElementById('admin-user-label').textContent = (currentProfile.display_name || currentProfile.username) + ' · ' + (currentProfile.role === 'admin' ? 'Администратор' : 'Потребител');
-            document.getElementById('portal-menu-admin-choice').classList.toggle('hidden', !isAdmin());
+            updateAuthUI();
             if (isAdmin()) {
                 showScreen('screen-admin-choice');
+            } else if (canManageAdminPanel()) {
+                enterAdminPanel();
             } else {
                 enterPortalView();
             }
@@ -1330,11 +1358,12 @@
             setLang(currentLangCode || 'bg');
             setCity(currentCityName || 'София', document.getElementById('current-city-short')?.innerText || 'СФ');
             switchGlobalPage('home');
+            updateAuthUI();
             if (map) setTimeout(() => map.invalidateSize(), 200);
         }
 
         function enterAdminPanel() {
-            if (!isAdmin() && !hasPermission('manage_users') && !hasPermission('manage_content')) {
+            if (!canManageAdminPanel()) {
                 alert('Нямате административни права.');
                 return;
             }
@@ -1356,11 +1385,10 @@
         }
 
         async function handleLogout() {
-            if (!usingLocalAuth && supabaseClient) await supabaseClient.auth.signOut();
-            localStorage.removeItem('takeaway-portal-session');
+            if (auth) await auth.signOut();
             currentProfile = null;
             document.getElementById('login-form')?.reset();
-            showScreen('screen-login');
+            enterPortalView();
         }
 
         function togglePortalUserMenu() {
@@ -1386,9 +1414,9 @@
 
         async function handleCreateUser(event) {
             event.preventDefault();
-            const username = document.getElementById('new-username').value.trim().toLowerCase();
+            const email = document.getElementById('new-email').value.trim().toLowerCase();
             const password = document.getElementById('new-password').value;
-            const displayName = document.getElementById('new-display-name').value.trim() || username;
+            const displayName = document.getElementById('new-display-name').value.trim() || email.split('@')[0];
             const role = document.getElementById('new-role').value;
             let permissions = getSelectedPermissions('new-perm');
             if (role === 'admin') permissions = [...ALL_PERMISSIONS];
@@ -1396,32 +1424,21 @@
             const errEl = document.getElementById('create-user-error');
             errEl.classList.add('hidden');
             try {
-                if (usingLocalAuth) {
-                    const users = getLocalUsers();
-                    if (users[username]) throw new Error('Потребителят вече съществува.');
-                    users[username] = { username, password, display_name: displayName, role, permissions, is_active: true, id: username };
-                    saveLocalUsers(users);
-                    document.getElementById('create-user-form').reset();
-                    loadUsersTable();
-                    return false;
-                }
-                const { data, error } = await signupClient.auth.signUp({
-                    email: authEmail(username),
-                    password,
-                    options: { data: { username, display_name: displayName } }
-                });
-                if (error) throw error;
-                if (!data.user) throw new Error('Потребителят не беше създаден.');
-                const { error: profileError } = await supabaseClient.from('portal_profiles').upsert({
-                    id: data.user.id,
-                    username,
+                if (!db || !auth || !auth.currentUser) throw new Error('Нямате права за създаване на потребители.');
+                const signupAuth = getSecondaryAuth();
+                const { user } = await signupAuth.createUserWithEmailAndPassword(email, password);
+                await signupAuth.signOut();
+                await usersCollection().doc(user.uid).set({
+                    id: user.uid,
+                    email,
+                    username: email.split('@')[0],
                     display_name: displayName,
                     role,
                     permissions,
                     is_active: true,
-                    updated_at: new Date().toISOString()
+                    updated_at: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                if (profileError) throw profileError;
+                await db.collection('siteData').doc('profiles').set({ _type: 'meta' }, { merge: true });
                 document.getElementById('create-user-form').reset();
                 loadUsersTable();
             } catch (err) {
@@ -1434,42 +1451,39 @@
         async function loadUsersTable() {
             const tbody = document.getElementById('users-table-body');
             tbody.innerHTML = '';
-            let rows = [];
-            if (usingLocalAuth) {
-                rows = Object.values(getLocalUsers());
-            } else {
-                const { data, error } = await supabaseClient.from('portal_profiles').select('*').order('username');
-                if (error) throw error;
-                rows = data || [];
+            try {
+                const snap = await usersCollection().orderBy('email').get();
+                snap.forEach((doc) => {
+                    const user = doc.data();
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-100';
+                    const perms = (user.permissions || []).join(', ');
+                    const userKey = user.email || user.username;
+                    tr.innerHTML = `
+                        <td class="py-3 pr-3 font-semibold">${user.display_name || user.username}<br><span class="text-xs text-gray-400">${userKey}</span></td>
+                        <td class="py-3 pr-3">${user.role}</td>
+                        <td class="py-3 pr-3 text-xs text-gray-500 max-w-[200px]">${perms}</td>
+                        <td class="py-3 pr-3">${user.is_active ? 'Да' : 'Не'}</td>
+                        <td class="py-3">
+                            <button type="button" class="text-brand-orange font-bold text-xs mr-2" onclick="toggleUserActive('${doc.id}', ${user.is_active ? 'false' : 'true'})">${user.is_active ? 'Спри' : 'Активирай'}</button>
+                        </td>`;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-sm text-red-600">${err.message || err}</td></tr>`;
             }
-            rows.forEach((user) => {
-                const tr = document.createElement('tr');
-                tr.className = 'border-b border-gray-100';
-                const perms = (user.permissions || []).join(', ');
-                tr.innerHTML = `
-                    <td class="py-3 pr-3 font-semibold">${user.display_name || user.username}<br><span class="text-xs text-gray-400">${user.username}</span></td>
-                    <td class="py-3 pr-3">${user.role}</td>
-                    <td class="py-3 pr-3 text-xs text-gray-500 max-w-[200px]">${perms}</td>
-                    <td class="py-3 pr-3">${user.is_active ? 'Да' : 'Не'}</td>
-                    <td class="py-3">
-                        <button type="button" class="text-brand-orange font-bold text-xs mr-2" onclick="toggleUserActive('${user.username}', ${user.is_active ? 'false' : 'true'})">${user.is_active ? 'Спри' : 'Активирай'}</button>
-                    </td>`;
-                tbody.appendChild(tr);
-            });
         }
 
-        async function toggleUserActive(username, active) {
-            if (usingLocalAuth) {
-                const users = getLocalUsers();
-                if (!users[username]) return;
-                users[username].is_active = active;
-                saveLocalUsers(users);
+        async function toggleUserActive(userId, active) {
+            try {
+                await usersCollection().doc(userId).update({
+                    is_active: active,
+                    updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 loadUsersTable();
-                return;
+            } catch (err) {
+                alert(err.message || err);
             }
-            const { error } = await supabaseClient.from('portal_profiles').update({ is_active: active, updated_at: new Date().toISOString() }).eq('username', username);
-            if (error) alert(error.message);
-            loadUsersTable();
         }
 
         function initContentEditor() {
@@ -1505,29 +1519,29 @@
         }
 
         async function bootstrapApp() {
-            initSupabaseClients();
-            if (usingLocalAuth) {
-                const sessionUser = localStorage.getItem('takeaway-portal-session');
-                if (sessionUser) {
-                    const users = getLocalUsers();
-                    currentProfile = users[sessionUser] ? { ...users[sessionUser], id: sessionUser } : null;
-                    if (currentProfile && currentProfile.is_active) {
-                        await afterLogin();
-                        return;
+            initFirebase();
+            await loadPortalContentFromDb();
+            enterPortalView();
+
+            if (auth) {
+                auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        try {
+                            currentProfile = await fetchProfile(user.uid);
+                            if (!currentProfile || !currentProfile.is_active) {
+                                await auth.signOut();
+                                currentProfile = null;
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            currentProfile = null;
+                        }
+                    } else {
+                        currentProfile = null;
                     }
-                }
-                showScreen('screen-login');
-                return;
+                    updateAuthUI();
+                });
             }
-            const { data } = await supabaseClient.auth.getSession();
-            if (data.session) {
-                currentProfile = await fetchProfile(data.session.user.id);
-                if (currentProfile && currentProfile.is_active) {
-                    await afterLogin();
-                    return;
-                }
-            }
-            showScreen('screen-login');
         }
 
         var currentPage = 'home';
@@ -1941,7 +1955,7 @@
         window.onload = function() {
             initMaps();
             bootstrapApp().then(() => {
-                if (currentProfile && document.getElementById('screen-portal') && !document.getElementById('screen-portal').classList.contains('hidden')) {
+                if (document.getElementById('screen-portal') && !document.getElementById('screen-portal').classList.contains('hidden')) {
                     setLang('bg');
                     setCity('София', 'СФ');
                     switchGlobalPage('home');
