@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Takeaway - Единен Информационен Портал</title>
+    <meta name="description" content="Официален информационен портал за куриери на Takeaway — стартови точки, плащания, графици, доходи и служебни коли.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="bg_BG">
+    <meta property="og:title" content="Takeaway — Единен информационен портал">
+    <meta property="og:description" content="Наръчник за куриери: градове, заплати, графици, контакти и служебни коли.">
+    <meta property="og:url" content="https://atanashristov-cyber.github.io/portal/">
+    <meta property="og:image" content="https://atanashristov-cyber.github.io/portal/og-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Takeaway — Единен информационен портал">
+    <meta name="twitter:description" content="Наръчник за куриери: градове, заплати, графици, контакти и служебни коли.">
+    <meta name="twitter:image" content="https://atanashristov-cyber.github.io/portal/og-preview.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -742,9 +755,7 @@
                             </button>
                         </div>
                         
-                        <div id="protocol-image-container" class="hidden max-w-2xl mx-auto border border-gray-200 rounded-xl overflow-hidden bg-white p-2 shadow-inner mt-4 transition-all duration-300">
-                            <img src="protokol.jpg" alt="Protocol" class="w-full h-auto rounded-lg object-contain">
-                        </div>
+                        <div id="protocol-image-container" class="hidden max-w-2xl mx-auto border border-gray-200 rounded-xl overflow-hidden bg-white p-2 shadow-inner mt-4 transition-all duration-300"></div>
 
                         <div class="mt-6 bg-white border border-blue-200 rounded-2xl p-5 sm:p-6 space-y-4">
                             <div class="flex items-center gap-3 border-b border-blue-100 pb-4">
@@ -1639,6 +1650,14 @@
             const lang = currentLangCode;
             
             if (container.classList.contains('hidden')) {
+                if (!container.querySelector('img')) {
+                    const img = document.createElement('img');
+                    img.src = 'protokol.jpg';
+                    img.alt = lang === 'en' ? 'Accident protocol sample' : 'Примерен протокол';
+                    img.className = 'w-full h-auto rounded-lg object-contain';
+                    img.loading = 'lazy';
+                    container.appendChild(img);
+                }
                 container.classList.remove('hidden');
                 btn.innerHTML = `<i class="fa-solid fa-eye-slash"></i> <span>${lang === 'en' ? 'Hide sample' : 'Скрий примера'}</span>`;
                 btn.classList.replace('bg-blue-600', 'bg-gray-600');
