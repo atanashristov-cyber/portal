@@ -13,10 +13,6 @@
     
     <link class="scroll-smooth" rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <!-- Firebase SDK v10 (Auth + Firestore) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
     <script>
         tailwind.config = {
@@ -56,193 +52,189 @@
         .glass-header { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); }
         .interactive-card { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .interactive-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08); border-color: rgba(255, 122, 0, 0.3); }
-        .app-screen { min-height: 100vh; }
-        .admin-field-label { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; }
+        .guide-nav-btn.active { background-color: #FF7A00; color: white; border-color: #FF7A00; box-shadow: 0 4px 12px -2px rgba(255, 122, 0, 0.35); }
+        .guide-nav-btn.active i { color: white !important; }
+        html { scroll-behavior: smooth; }
+
+        /* Splash / intro loader */
+        body.splash-active { overflow: hidden; }
+        body.splash-active > *:not(#site-splash) { visibility: hidden; }
+        .site-splash {
+            position: fixed; inset: 0; z-[200];
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(145deg, #fff8f3 0%, #ffffff 45%, #f3f4f6 100%);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.7s;
+        }
+        .site-splash.splash-exit { opacity: 0; visibility: hidden; pointer-events: none; }
+        .splash-orb {
+            position: absolute; border-radius: 50%; pointer-events: none;
+            background: radial-gradient(circle, rgba(255,122,0,0.18) 0%, transparent 70%);
+            animation: splashOrbFloat 6s ease-in-out infinite;
+        }
+        .splash-orb-1 { width: 420px; height: 420px; top: -120px; right: -80px; }
+        .splash-orb-2 { width: 320px; height: 320px; bottom: -100px; left: -60px; animation-delay: -2s; }
+        .splash-road {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 88px; overflow: hidden;
+            background: linear-gradient(to top, rgba(17,24,39,0.04), transparent);
+        }
+        .splash-road-line {
+            position: absolute; bottom: 36px; left: -10%; width: 120%; height: 4px;
+            background: repeating-linear-gradient(90deg, #FF7A00 0, #FF7A00 28px, transparent 28px, transparent 56px);
+            animation: splashRoadMove 1.1s linear infinite;
+            opacity: 0.35;
+        }
+        .splash-content {
+            position: relative; z-10; text-align: center; padding: 2rem;
+            animation: splashContentIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .splash-icon-wrap {
+            position: relative; width: 112px; height: 112px; margin: 0 auto 1.5rem;
+        }
+        .splash-icon-ring {
+            position: absolute; inset: 0; border-radius: 2rem;
+            border: 2px solid rgba(255,122,0,0.2);
+            animation: splashRingPulse 2s ease-in-out infinite;
+        }
+        .splash-icon-box {
+            position: absolute; inset: 10px; border-radius: 1.35rem;
+            background: white; border: 1px solid rgba(255,122,0,0.15);
+            box-shadow: 0 20px 40px -12px rgba(255,122,0,0.25);
+            display: flex; align-items: center; justify-content: center;
+            animation: splashBikeDrive 2.4s ease-in-out infinite;
+        }
+        .splash-icon-box i { font-size: 2.75rem; color: #FF7A00; }
+        .splash-badge {
+            display: inline-block; margin-bottom: 0.75rem;
+            background: rgba(255,122,0,0.1); color: #FF7A00;
+            font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em;
+            padding: 0.4rem 0.85rem; border-radius: 0.5rem;
+            border: 1px solid rgba(255,122,0,0.2);
+            animation: splashFadeUp 0.8s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .splash-title {
+            margin: 0 0 0.5rem; font-size: clamp(1.75rem, 5vw, 2.5rem);
+            font-weight: 900; color: #111827; line-height: 1.15;
+            animation: splashFadeUp 0.8s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .splash-sub {
+            margin: 0 0 1.75rem; color: #4B5563; font-size: 0.95rem; font-weight: 500;
+            animation: splashFadeUp 0.8s 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .splash-progress {
+            width: min(220px, 70vw); height: 5px; margin: 0 auto;
+            background: #e5e7eb; border-radius: 999px; overflow: hidden;
+            animation: splashFadeUp 0.8s 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .splash-progress-bar {
+            height: 100%; width: 0; border-radius: 999px;
+            background: linear-gradient(90deg, #FF7A00, #FFA142);
+            animation: splashProgressFill 1.8s 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .splash-dots {
+            display: flex; justify-content: center; gap: 0.4rem; margin-top: 1rem;
+            animation: splashFadeUp 0.8s 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .splash-dots span {
+            width: 6px; height: 6px; border-radius: 50%; background: #FF7A00;
+            animation: splashDotBounce 1.2s ease-in-out infinite;
+        }
+        .splash-dots span:nth-child(2) { animation-delay: 0.15s; opacity: 0.7; }
+        .splash-dots span:nth-child(3) { animation-delay: 0.3s; opacity: 0.45; }
+        body.splash-revealed #lang-fixed,
+        body.splash-revealed #main-header,
+        body.splash-revealed main,
+        body.splash-revealed footer {
+            animation: splashPageReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @keyframes splashOrbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-12px, 10px) scale(1.05); }
+        }
+        @keyframes splashRoadMove { from { transform: translateX(0); } to { transform: translateX(-56px); } }
+        @keyframes splashContentIn {
+            from { opacity: 0; transform: translateY(24px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes splashFadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes splashRingPulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.06); opacity: 1; }
+        }
+        @keyframes splashBikeDrive {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(4px) rotate(1deg); }
+            75% { transform: translateX(-4px) rotate(-1deg); }
+        }
+        @keyframes splashProgressFill { to { width: 100%; } }
+        @keyframes splashDotBounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+        }
+        @keyframes splashPageReveal {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .site-splash, .site-splash *, body.splash-revealed > * { animation: none !important; transition-duration: 0.01ms !important; }
+            .splash-progress-bar { width: 100% !important; }
+        }
     </style>
 </head>
-<body class="bg-[#F3F4F6] text-gray-800 font-sans antialiased min-h-screen relative selection:bg-brand-orange selection:text-white">
+<body class="bg-[#F3F4F6] text-gray-800 font-sans antialiased min-h-screen relative selection:bg-brand-orange selection:text-white splash-active">
 
-    <div id="screen-login" class="app-screen hidden flex items-center justify-center px-4 py-10">
-        <div class="w-full max-w-md bg-white rounded-[2rem] border border-gray-200 shadow-lg p-8 space-y-6">
-            <div class="text-center space-y-2">
-                <span class="inline-block bg-brand-orange text-white text-xs font-black px-3 py-1 rounded-md">TAKEAWAY BG</span>
-                <h1 class="text-2xl font-black text-brand-dark">Вход за администратор</h1>
-                <p class="text-sm text-gray-500">Имейл и парола (Firebase Auth)</p>
+    <!-- Intro splash -->
+    <div id="site-splash" class="site-splash" aria-hidden="false" aria-label="Зареждане">
+        <div class="splash-orb splash-orb-1"></div>
+        <div class="splash-orb splash-orb-2"></div>
+        <div class="splash-road"><div class="splash-road-line"></div></div>
+        <div class="splash-content">
+            <div class="splash-icon-wrap">
+                <div class="splash-icon-ring"></div>
+                <div class="splash-icon-box"><i class="fa-solid fa-motorcycle"></i></div>
             </div>
-            <form id="login-form" class="space-y-4" onsubmit="return handleLoginSubmit(event)">
-                <div>
-                    <label class="admin-field-label" for="login-email">Имейл</label>
-                    <input id="login-email" type="email" required autocomplete="email" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-orange/40">
-                </div>
-                <div>
-                    <label class="admin-field-label" for="login-password">Парола</label>
-                    <input id="login-password" type="password" required autocomplete="current-password" class="mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-orange/40">
-                </div>
-                <p id="login-error" class="hidden text-sm text-red-600 font-semibold"></p>
-                <button type="submit" class="w-full bg-brand-orange hover:bg-brand-orangeLight text-white font-bold py-3 rounded-xl shadow-sm transition">Вход</button>
-            </form>
-            <p id="login-config-hint" class="text-xs text-center text-gray-400"></p>
-            <div class="text-center">
-                <button type="button" onclick="enterPortalView()" class="text-sm font-bold text-gray-500 hover:text-brand-orange">← Обратно към портала</button>
-            </div>
+            <span class="splash-badge">TAKEAWAY BG</span>
+            <h1 class="splash-title" id="splash-title">Добре дошли!</h1>
+            <p class="splash-sub" id="splash-sub">Информационен портал за куриери</p>
+            <div class="splash-progress"><div class="splash-progress-bar"></div></div>
+            <div class="splash-dots"><span></span><span></span><span></span></div>
         </div>
     </div>
 
-    <div id="screen-admin-choice" class="app-screen hidden flex items-center justify-center px-4 py-10">
-        <div class="w-full max-w-2xl space-y-6">
-            <div class="text-center space-y-2">
-                <h1 class="text-3xl font-black text-brand-dark">Здравей, <span id="admin-choice-name">Админ</span></h1>
-                <p class="text-gray-500">Избери режим на работа</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button type="button" onclick="enterPortalView()" class="interactive-card bg-white border border-gray-200 rounded-[2rem] p-8 text-left space-y-3">
-                    <div class="w-12 h-12 rounded-2xl bg-brand-orange/10 text-brand-orange flex items-center justify-center text-xl"><i class="fa-solid fa-motorcycle"></i></div>
-                    <h2 class="text-xl font-black text-brand-dark">Потребителски портал</h2>
-                    <p class="text-sm text-gray-500">Наръчникът за куриери – както го виждат служителите.</p>
-                </button>
-                <button type="button" onclick="enterAdminPanel()" class="interactive-card bg-white border border-gray-200 rounded-[2rem] p-8 text-left space-y-3">
-                    <div class="w-12 h-12 rounded-2xl bg-gray-900 text-white flex items-center justify-center text-xl"><i class="fa-solid fa-screwdriver-wrench"></i></div>
-                    <h2 class="text-xl font-black text-brand-dark">Администрация</h2>
-                    <p class="text-sm text-gray-500">Потребители, права и редакция на съдържанието.</p>
-                </button>
-            </div>
-            <div class="text-center">
-                <button type="button" onclick="handleLogout()" class="text-sm font-bold text-gray-500 hover:text-brand-orange">Изход</button>
-            </div>
+    <!-- Език – фиксиран горе вдясно -->
+    <div id="lang-fixed" class="fixed top-4 right-4 z-[110]">
+        <button type="button" id="lang-btn" onclick="toggleLangMenu()" class="flex items-center gap-2 bg-white/95 backdrop-blur-md border border-gray-200/80 px-3.5 py-2.5 rounded-full text-sm font-bold text-brand-dark shadow-lg hover:border-brand-orange transition-all duration-300 cursor-pointer">
+            <i class="fa-solid fa-globe text-brand-orange"></i>
+            <span id="current-lang" class="hidden sm:inline">БГ | Български</span>
+            <span id="current-lang-short" class="sm:hidden">БГ</span>
+            <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+        </button>
+        <div id="lang-menu" class="absolute right-0 mt-2 w-44 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 hidden transition-all duration-200 overflow-hidden z-50">
+            <ul class="py-2 text-sm font-semibold text-brand-dark list-none m-0 p-0">
+                <li><button type="button" onclick="setLang('bg')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">БГ | Български</button></li>
+                <li><button type="button" onclick="setLang('en')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">EN | English</button></li>
+            </ul>
         </div>
     </div>
 
-    <div id="screen-admin" class="app-screen hidden">
-        <header class="bg-white border-b border-gray-200 sticky top-0 z-[200]">
-            <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <h1 class="text-xl font-black text-brand-dark">Администрация</h1>
-                    <p class="text-xs text-gray-500" id="admin-user-label"></p>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    <button type="button" onclick="showAdminSection('users')" id="admin-tab-users" class="px-4 py-2 rounded-xl text-sm font-bold bg-brand-orange text-white">Потребители</button>
-                    <button type="button" onclick="showAdminSection('content')" id="admin-tab-content" class="px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600">Съдържание</button>
-                    <button type="button" onclick="openAdminChoice()" class="px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600">Назад</button>
-                    <button type="button" onclick="handleLogout()" class="px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600">Изход</button>
-                </div>
-            </div>
-        </header>
-        <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
-            <section id="admin-section-users" class="space-y-6">
-                <div class="bg-white rounded-[2rem] border border-gray-200 p-6 space-y-4">
-                    <h2 class="text-lg font-black text-brand-dark">Нов потребител</h2>
-                    <form id="create-user-form" class="grid grid-cols-1 md:grid-cols-2 gap-4" onsubmit="return handleCreateUser(event)">
-                        <div>
-                            <label class="admin-field-label" for="new-email">Имейл</label>
-                            <input id="new-email" type="email" required class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 font-semibold">
-                        </div>
-                        <div>
-                            <label class="admin-field-label" for="new-password">Парола</label>
-                            <input id="new-password" type="password" required minlength="6" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 font-semibold">
-                        </div>
-                        <div>
-                            <label class="admin-field-label" for="new-display-name">Име за показване</label>
-                            <input id="new-display-name" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 font-semibold">
-                        </div>
-                        <div>
-                            <label class="admin-field-label" for="new-role">Роля</label>
-                            <select id="new-role" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2.5 font-semibold">
-                                <option value="user">Потребител</option>
-                                <option value="admin">Администратор</option>
-                            </select>
-                        </div>
-                        <div class="md:col-span-2">
-                            <p class="admin-field-label mb-2">Права</p>
-                            <div class="flex flex-wrap gap-4 text-sm font-semibold">
-                                <label class="flex items-center gap-2"><input type="checkbox" name="new-perm" value="view_portal" checked> Достъп до портала</label>
-                                <label class="flex items-center gap-2"><input type="checkbox" name="new-perm" value="view_company_cars" checked> Служебни коли</label>
-                                <label class="flex items-center gap-2"><input type="checkbox" name="new-perm" value="manage_users"> Управление потребители</label>
-                                <label class="flex items-center gap-2"><input type="checkbox" name="new-perm" value="manage_content"> Редакция съдържание</label>
-                            </div>
-                        </div>
-                        <div class="md:col-span-2">
-                            <p id="create-user-error" class="hidden text-sm text-red-600 font-semibold mb-2"></p>
-                            <button type="submit" class="bg-brand-orange text-white font-bold px-5 py-2.5 rounded-xl">Създай потребител</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="bg-white rounded-[2rem] border border-gray-200 p-6 overflow-x-auto">
-                    <h2 class="text-lg font-black text-brand-dark mb-4">Списък потребители</h2>
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="text-left text-gray-500 border-b">
-                                <th class="py-2 pr-3">Потребител</th>
-                                <th class="py-2 pr-3">Роля</th>
-                                <th class="py-2 pr-3">Права</th>
-                                <th class="py-2 pr-3">Активен</th>
-                                <th class="py-2">Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-table-body"></tbody>
-                    </table>
-                </div>
-            </section>
-            <section id="admin-section-content" class="hidden space-y-6">
-                <div class="bg-white rounded-[2rem] border border-gray-200 p-6 space-y-4">
-                    <div class="flex flex-wrap items-center justify-between gap-3">
-                        <h2 class="text-lg font-black text-brand-dark">Редакция на потребителската страница</h2>
-                        <button type="button" onclick="openMatrixEditor()" class="bg-gray-900 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-gray-800 transition">
-                            <i class="fa-solid fa-pen-to-square mr-2"></i>Редактирай „4. Доходи и Бонусна схема“
-                        </button>
-                    </div>
-                    <p class="text-sm text-gray-500">Пълен редактор на раздел 4: текстове, таблици с бонуси, средни нетни суми и настройки на симулатора.</p>
-                </div>
-                <div class="bg-white rounded-[2rem] border border-gray-200 p-6 space-y-4">
-                    <div class="flex flex-wrap items-center justify-between gap-3">
-                        <h2 class="text-lg font-black text-brand-dark">Други текстове на портала</h2>
-                        <button type="button" onclick="savePortalContent()" class="bg-brand-orange text-white font-bold px-5 py-2.5 rounded-xl">Запази промените</button>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <select id="content-section-select" onchange="renderContentEditor()" class="rounded-xl border border-gray-200 px-3 py-2 font-semibold"></select>
-                        <select id="content-lang-select" onchange="renderContentEditor()" class="rounded-xl border border-gray-200 px-3 py-2 font-semibold">
-                            <option value="bg">Български</option>
-                            <option value="en">English</option>
-                        </select>
-                    </div>
-                    <div id="content-editor-fields" class="grid grid-cols-1 gap-4"></div>
-                    <p id="content-save-status" class="text-sm font-semibold text-green-600 hidden"></p>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <div id="screen-admin-matrix" class="app-screen hidden">
-        <header class="bg-white border-b border-gray-200 sticky top-0 z-[200]">
-            <div class="max-w-5xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <h1 class="text-xl font-black text-brand-dark">4. Доходи и Бонусна схема</h1>
-                    <p class="text-xs text-gray-500">Пълен редактор на раздела</p>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    <button type="button" onclick="saveMatrixFromAdmin()" class="px-4 py-2 rounded-xl text-sm font-bold bg-brand-orange text-white">Запази</button>
-                    <button type="button" onclick="closeMatrixEditor()" class="px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600">Назад</button>
-                </div>
-            </div>
-        </header>
-        <main class="max-w-5xl mx-auto px-4 py-8">
-            <p id="matrix-save-status" class="hidden mb-4 text-sm font-semibold text-green-600"></p>
-            <div id="matrix-admin-form" class="space-y-6"></div>
-        </main>
-    </div>
-
-    <div id="screen-portal" class="app-screen">
-    <header id="main-header" class="sticky top-4 z-[100] mx-auto px-4 max-w-2xl transition-all duration-500 ease-in-out transform origin-top">
-        <div class="bg-white/60 backdrop-blur-md rounded-full p-1.5 shadow-lg border border-white/50 flex justify-between items-center gap-2 transition-all duration-300">
-            
-            <!-- Left Side: City Dropdown -->
-            <div class="relative shrink-0">
-                <button type="button" id="city-btn" onclick="toggleCityMenu()" class="flex items-center gap-2 bg-white/90 border border-gray-200/50 px-4 py-2.5 rounded-full text-sm font-bold text-brand-dark shadow-sm hover:border-brand-orange transition-all duration-300 cursor-pointer">
-                    <i class="fa-solid fa-city text-brand-orange"></i>
-                    <span id="current-city" class="hidden sm:inline">София</span>
-                    <span id="current-city-short" class="sm:hidden">СФ</span>
-                    <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+    <header id="main-header" class="sticky top-4 z-[100] mx-auto px-4 max-w-2xl transition-all duration-300 hidden">
+        <div class="bg-white/90 backdrop-blur-md rounded-2xl px-3 sm:px-4 py-2.5 shadow-lg border border-gray-200/80 flex items-center gap-2 sm:gap-3">
+            <button type="button" onclick="goToWelcome()" class="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-gray-500 hover:text-brand-orange hover:bg-brand-orange/5 transition-all" title="Начало">
+                <i class="fa-solid fa-house"></i>
+                <span class="hidden sm:inline" data-i18n="nav_home">Начало</span>
+            </button>
+            <span class="text-gray-200 font-light select-none">|</span>
+            <div class="relative flex-1 min-w-0">
+                <button type="button" id="city-btn" onclick="toggleCityMenu()" class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-sm font-bold text-brand-dark hover:bg-gray-50 transition-all">
+                    <span class="flex items-center gap-2 min-w-0 truncate">
+                        <i class="fa-solid fa-location-dot text-brand-orange shrink-0"></i>
+                        <span id="current-city" class="truncate">София</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 shrink-0"></i>
                 </button>
-                <div id="city-menu" class="absolute left-0 mt-2 w-48 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 hidden transition-all duration-200 overflow-y-auto max-h-60 z-50 custom-scrollbar">
+                <div id="city-menu" class="absolute left-0 right-0 mt-1.5 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 hidden transition-all duration-200 overflow-y-auto max-h-60 z-50 custom-scrollbar">
                     <ul class="py-2 text-sm font-semibold text-brand-dark list-none m-0 p-0">
                         <li><button type="button" onclick="setCity('София', 'СФ')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">София</button></li>
                         <li><button type="button" onclick="setCity('Пловдив', 'ПЛ')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">Пловдив</button></li>
@@ -259,79 +251,109 @@
                     </ul>
                 </div>
             </div>
-
-            <!-- Middle: Action button leading to Company Cars OR Home -->
-            <div class="flex-grow flex justify-center">
-                <button type="button" id="nav-action" onclick="handleNavAction()" class="hidden px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer bg-white text-brand-orange shadow-sm border border-gray-100/50 hover:text-brand-dark">
-                </button>
-            </div>
-
-            <!-- Admin login (видим само за нелогнати) -->
-            <div class="relative shrink-0">
-                <button type="button" id="portal-admin-login-btn" onclick="openAdminLogin()" class="flex items-center gap-2 bg-white/90 border border-gray-200/50 px-3 py-2.5 rounded-full text-sm font-bold text-brand-dark shadow-sm hover:border-brand-orange transition-all duration-300 cursor-pointer" title="Вход за администратор">
-                    <i class="fa-solid fa-lock text-brand-orange"></i>
-                    <span class="hidden sm:inline">Админ</span>
-                </button>
-            </div>
-
-            <!-- Portal user menu (видим само след вход) -->
-            <div id="portal-user-menu-wrap" class="relative shrink-0 hidden">
-                <button type="button" id="portal-user-btn" onclick="togglePortalUserMenu()" class="flex items-center gap-2 bg-white/90 border border-gray-200/50 px-3 py-2.5 rounded-full text-sm font-bold text-brand-dark shadow-sm hover:border-brand-orange transition-all duration-300 cursor-pointer" title="Акаунт">
-                    <i class="fa-solid fa-user text-brand-orange"></i>
-                    <span id="portal-user-name" class="hidden sm:inline max-w-[120px] truncate"></span>
-                </button>
-                <div id="portal-user-menu" class="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 hidden z-50 overflow-hidden">
-                    <ul class="py-2 text-sm font-semibold text-brand-dark list-none m-0 p-0">
-                        <li id="portal-menu-admin-choice" class="hidden"><button type="button" onclick="openAdminChoice()" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange">Админ избор</button></li>
-                        <li id="portal-menu-admin-panel" class="hidden"><button type="button" onclick="enterAdminPanel()" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange">Администрация</button></li>
-                        <li><button type="button" onclick="handleLogout()" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange">Изход</button></li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Right Side: Language Dropdown -->
-            <div class="relative shrink-0">
-                <button type="button" id="lang-btn" onclick="toggleLangMenu()" class="flex items-center gap-2 bg-white/90 border border-gray-200/50 px-4 py-2.5 rounded-full text-sm font-bold text-brand-dark shadow-sm hover:border-brand-orange transition-all duration-300 cursor-pointer">
-                    <i class="fa-solid fa-globe text-brand-orange"></i>
-                    <span id="current-lang" class="hidden sm:inline">БГ | Български</span>
-                    <span id="current-lang-short" class="sm:hidden">БГ</span>
-                    <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
-                </button>
-                <div id="lang-menu" class="absolute right-0 mt-2 w-44 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 hidden transition-all duration-200 overflow-hidden z-50">
-                    <ul class="py-2 text-sm font-semibold text-brand-dark list-none m-0 p-0">
-                        <li><button type="button" onclick="setLang('bg')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">БГ | Български</button></li>
-                        <li><button type="button" onclick="setLang('en')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">EN | English</button></li>
-                    </ul>
-                </div>
-            </div>
-
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        
-        <div id="page-home" class="global-page space-y-10 sm:space-y-12 block">
+
+        <div id="page-welcome" class="global-page space-y-10 sm:space-y-12 block">
             <section class="bg-white border border-gray-200 rounded-[2rem] p-6 sm:p-10 shadow-sm relative overflow-hidden">
+                <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-orange opacity-10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute right-8 top-8 hidden lg:block text-brand-orange opacity-10 pointer-events-none"><i class="fa-solid fa-motorcycle text-[160px]"></i></div>
+                <div class="relative z-10 max-w-3xl space-y-4">
+                    <span class="bg-brand-orange/10 text-brand-orange text-xs sm:text-sm font-extrabold px-3 py-1.5 rounded-md uppercase tracking-wider border border-brand-orange/20 inline-block">TAKEAWAY BG</span>
+                    <h1 data-i18n="welcome_title" class="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark leading-tight">Добре дошли!</h1>
+                    <p data-i18n="welcome_desc" class="text-brand-slate text-base sm:text-lg leading-relaxed">Тук ще намерите основната информация за куриерите — стартови точки, плащания, графици, доходи и контакти. Изберете вашия град, за да видите актуалния наръчник.</p>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-6">
+                <div class="space-y-2 border-b border-gray-100 pb-6">
+                    <h2 data-i18n="welcome_cities_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">Изберете град</h2>
+                    <p data-i18n="welcome_cities_desc" class="text-brand-slate text-base sm:text-lg">Кликнете върху града, в който работите, за да отворите пълния наръчник.</p>
+                </div>
+                <div id="cities-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"></div>
+            </section>
+
+            <section id="smart-contact-helper" class="bg-white rounded-[2rem] shadow-sm border border-gray-200 overflow-hidden relative">
+                <div class="p-6 sm:p-10 relative z-10">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-brand-orange/10 text-brand-orange rounded-full flex items-center justify-center text-3xl mx-auto mb-4 border border-brand-orange/20 shadow-sm"><i class="fa-solid fa-magnifying-glass-location"></i></div>
+                        <h2 data-i18n="helper_title" class="text-2xl sm:text-3xl font-black text-brand-dark mb-2">Намери бързо това, което търсиш</h2>
+                        <p data-i18n="helper_desc" class="text-brand-slate text-sm sm:text-base max-w-2xl mx-auto">Не сте сигурни към кого да се обърнете? Напишете какво ви трябва по-долу и ние ще ви покажем точното място в приложението Scoober.</p>
+                    </div>
+                    <div class="relative max-w-3xl mx-auto mb-8">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none"><i class="fa-solid fa-magnifying-glass text-gray-400 text-xl"></i></div>
+                        <input type="text" id="searchInput" autocomplete="off" class="search-input block w-full pl-14 pr-12 py-4 sm:py-5 text-base sm:text-lg border-2 border-gray-200 rounded-2xl text-brand-dark bg-gray-50 focus:bg-white transition-all duration-300 shadow-sm">
+                        <button id="clearBtn" class="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-400 hover:text-brand-orange hidden transition-colors"><i class="fa-solid fa-circle-xmark text-2xl"></i></button>
+                    </div>
+                    <div id="resultsArea" class="max-w-3xl mx-auto hidden space-y-4"></div>
+                    <div id="quickCategories" class="max-w-4xl mx-auto text-center transition-all duration-300 mt-6">
+                        <p data-i18n="helper_quick" class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Бързи търсения (Кликни)</p>
+                        <div id="quickLinksContainer" class="flex flex-wrap justify-center gap-2 sm:gap-3"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div id="page-home" class="global-page space-y-8 sm:space-y-10 hidden">
+
+            <!-- Навигация по раздели -->
+            <nav id="guide-section-nav" class="sticky top-[4.25rem] z-[90] bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-sm p-2 overflow-x-auto custom-scrollbar">
+                <div class="flex items-center min-w-max gap-1.5 sm:gap-2">
+                    <button type="button" onclick="scrollToGuideSection('section-hero')" class="guide-nav-btn active flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-hero"><i class="fa-solid fa-circle-info text-brand-orange"></i><span data-i18n="nav_sec_intro">Въведение</span></button>
+                    <button type="button" onclick="scrollToGuideSection('zones')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="zones"><i class="fa-solid fa-map-location-dot text-brand-orange"></i><span data-i18n="nav_sec_map">Стартови точки</span></button>
+                    <button type="button" onclick="scrollToGuideSection('section-pay')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-pay"><i class="fa-solid fa-sack-dollar text-brand-orange"></i><span data-i18n="nav_sec_pay">Плащания</span></button>
+                    <button type="button" onclick="scrollToGuideSection('section-schedule')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-schedule"><i class="fa-solid fa-calendar-days text-brand-orange"></i><span data-i18n="nav_sec_schedule">Графици</span></button>
+                    <button type="button" onclick="scrollToGuideSection('methodology')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="methodology"><i class="fa-solid fa-chart-line text-brand-orange"></i><span data-i18n="nav_sec_income">Доходи</span></button>
+                    <button type="button" onclick="scrollToGuideSection('section-contacts')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-contacts"><i class="fa-solid fa-headset text-brand-orange"></i><span data-i18n="nav_sec_contacts">Контакти</span></button>
+                </div>
+            </nav>
+
+            <section id="section-hero" class="bg-white border border-gray-200 rounded-[2rem] p-6 sm:p-10 shadow-sm relative overflow-hidden scroll-mt-36">
                 <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-orange opacity-10 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute right-8 top-8 hidden lg:block text-brand-orange opacity-10 pointer-events-none"><i class="fa-solid fa-motorcycle text-[160px]"></i></div>
                 <div class="relative z-10 max-w-2xl space-y-4">
                     <span data-i18n="hero_badge" class="bg-brand-orange/10 text-brand-orange text-xs sm:text-sm font-extrabold px-3 py-1.5 rounded-md uppercase tracking-wider border border-brand-orange/20 inline-block">АКТУАЛЕН НАРЪЧНИК 2026</span>
                     <h2 data-i18n="hero_title" class="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark leading-tight">Всичко за твоя успешен старт в Takeaway</h2>
                     <p data-i18n="hero_desc" class="text-brand-slate text-base sm:text-lg leading-relaxed">Добре дошли в нашия портал! Тук сме събрали актуалната информация за стартовите точки, методологията на плащане и директни контакти към ключовите отдели.</p>
+                    <div id="city-topic-links" class="hidden pt-2">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3" data-i18n="city_topics_label">Раздели за този град</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button type="button" onclick="scrollToGuideSection('zones')" class="interactive-card text-left bg-brand-orange/5 border border-brand-orange/20 rounded-2xl p-4 sm:p-5 hover:border-brand-orange/50 transition-all">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-xl bg-brand-orange text-white flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-motorcycle"></i></div>
+                                    <div class="min-w-0">
+                                        <div class="font-black text-brand-dark" data-i18n="city_link_guide">Куриерски наръчник</div>
+                                        <div class="text-xs text-gray-500 font-medium" data-i18n="city_link_guide_desc">Стартови точки, плащания, графици</div>
+                                    </div>
+                                </div>
+                            </button>
+                            <button type="button" onclick="openCompanyCars()" class="interactive-card text-left bg-blue-50 border border-blue-200 rounded-2xl p-4 sm:p-5 hover:border-blue-400 transition-all">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-car-side"></i></div>
+                                    <div class="min-w-0">
+                                        <div class="font-black text-brand-dark" data-i18n="city_link_cars">Служебни коли</div>
+                                        <div class="text-xs text-gray-500 font-medium" data-i18n="city_link_cars_desc">Паркинг, поддръжка, аварии</div>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <section id="zones" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8">
+            <section id="zones" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8 scroll-mt-36">
                 <div class="space-y-2 border-b border-gray-100 pb-6">
                     <h3 data-i18n="map_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">1. Стартови точки (София)</h3>
-                    <p data-i18n="map_desc" class="text-brand-slate text-base sm:text-lg max-w-3xl">Интерактивна GPS карта с разпределение на официалните четири стартови зони в столицата.</p>
+                    <p id="map-desc-text" class="text-brand-slate text-base sm:text-lg max-w-3xl">Интерактивна GPS карта с разпределение на официалните четири стартови зони в столицата.</p>
                 </div>
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-                    <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
+                <div id="map-layout-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                    <div id="map-sidebar" class="lg:col-span-5 flex flex-col justify-between space-y-6">
                         <div class="space-y-4">
                             <h4 class="text-lg sm:text-xl font-bold text-brand-dark flex items-center gap-2"><i class="fa-solid fa-location-dot text-brand-orange"></i> <span data-i18n="map_subtitle">Ключови райони</span></h4>
-                            <p data-i18n="map_text" class="text-base text-brand-slate leading-relaxed">Официалните стартови точки са съобразени с гъстотата на поръчките и гарантират бърз старт на работния ви ден.</p>
-                            <div class="bg-brand-lightBg p-5 rounded-2xl border border-gray-200 space-y-3 shadow-inner">
+                            <p id="map-sidebar-text" class="text-base text-brand-slate leading-relaxed">Официалните стартови точки са съобразени с гъстотата на поръчките и гарантират бърз старт на работния ви ден.</p>
+                            <div id="map-zones-panel" class="bg-brand-lightBg p-5 rounded-2xl border border-gray-200 space-y-3 shadow-inner">
                                 <h5 data-i18n="map_list_title" class="text-sm font-bold text-brand-orange uppercase tracking-wide">Основни стартови точки:</h5>
                                 <ul class="text-sm sm:text-base text-brand-dark font-bold space-y-3 list-none p-0 m-0">
                                     <li class="flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-blue-600 block shadow-sm"></span> <span data-i18n="zone_1">1 — Зона Център</span></li>
@@ -340,23 +362,33 @@
                                     <li class="flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-red-600 block shadow-sm"></span> <span data-i18n="zone_4">4 — Зона Дървеница</span></li>
                                 </ul>
                             </div>
+                            <div id="map-generic-info" class="hidden bg-brand-lightBg p-5 rounded-2xl border border-gray-200 space-y-3 shadow-inner">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-brand-orange/10 text-brand-orange flex items-center justify-center text-lg"><i class="fa-solid fa-map"></i></div>
+                                    <div>
+                                        <p class="font-bold text-brand-dark text-sm" data-i18n="map_generic_title">Карта на града</p>
+                                        <p class="text-xs text-gray-500" data-i18n="map_generic_sub">Стартовите зони ще бъдат добавени скоро</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-brand-slate leading-relaxed" data-i18n="map_generic_text">Прегледайте интерактивната карта на града. Официалните стартови точки и зони ще бъдат публикувани тук, когато станат налични.</p>
+                            </div>
                         </div>
                         <div class="bg-brand-orange/10 border border-brand-orange/20 p-4 rounded-xl flex items-start gap-3">
                             <i class="fa-solid fa-bolt text-brand-orange mt-0.5"></i>
-                            <p data-i18n="map_start_info" class="text-sm text-brand-dark font-medium leading-snug">Винаги активирайте смяната си <strong>вътре в границите</strong> на вашата назначена стартова точка в приложението Scoober.</p>
+                            <p id="map-start-info-text" class="text-sm text-brand-dark font-medium leading-snug">Винаги активирайте смяната си <strong>вътре в границите</strong> на вашата назначена стартова точка в приложението Scoober.</p>
                         </div>
                     </div>
-                    <div class="lg:col-span-7 flex flex-col space-y-3">
+                    <div id="map-column" class="lg:col-span-7 flex flex-col space-y-3">
                         <div class="text-center sm:text-right"><span data-i18n="map_interactive" class="text-xs sm:text-sm font-black text-brand-orange uppercase tracking-widest bg-white py-1 px-3 rounded-lg border border-gray-100 shadow-sm inline-block">Интерактивна GPS Карта</span></div>
                         <div class="relative w-full h-[350px] sm:h-[450px] rounded-2xl border border-gray-200 shadow-sm overflow-hidden bg-gray-100">
                             <div id="main-map" class="absolute inset-0 w-full h-full z-10"></div>
                         </div>
-                        <p data-i18n="map_footer_info" class="text-xs sm:text-sm text-center text-gray-500 italic px-2">Това са official-ните стартови точки за пускане (започване на смяна), а не зони за каране.</p>
+                        <p id="map-footer-text" class="text-xs sm:text-sm text-center text-gray-500 italic px-2">Това са official-ните стартови точки за пускане (започване на смяна), а не зони за каране.</p>
                     </div>
                 </div>
             </section>
 
-            <section class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-6">
+            <section id="section-pay" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-6 scroll-mt-36">
                 <div class="space-y-2 border-b border-gray-100 pb-6">
                     <h4 data-i18n="pay_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">2. График на плащанията</h4>
                     <p data-i18n="pay_desc" class="text-brand-slate text-base sm:text-lg">Възнаграждението се разпределя в два транша всеки месец:</p>
@@ -386,7 +418,7 @@
                 </div>
             </section>
 
-            <section class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8 relative overflow-hidden">
+            <section id="section-schedule" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8 relative overflow-hidden scroll-mt-36">
                 <div class="absolute -right-20 -top-20 w-64 h-64 bg-blue-500 opacity-5 rounded-full blur-3xl z-0 pointer-events-none"></div>
                 <div class="space-y-2 border-b border-gray-100 pb-6 relative z-10">
                     <h4 data-i18n="schedule_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">3. Plan-иране на смените</h4>
@@ -429,7 +461,7 @@
                 </div>
             </section>
 
-            <section id="methodology" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8">
+            <section id="methodology" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8 scroll-mt-36">
                 <div class="space-y-2 border-b border-gray-100 pb-6">
                     <h3 data-i18n="matrix_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">4. Доходи и Бонусна схема</h3>
                     <p data-i18n="matrix_info_desc" class="text-brand-slate text-base sm:text-lg mt-2">Бонусът се трупа на месечна база. Посочените суми са брутни.</p>
@@ -497,32 +529,12 @@
                 </div>
             </section>
 
-            <section id="smart-contact-helper" class="bg-white rounded-[2rem] shadow-sm border border-gray-200 overflow-hidden relative">
-                <div class="p-6 sm:p-10 relative z-10">
-                    <div class="text-center mb-8">
-                        <div class="w-16 h-16 bg-brand-orange/10 text-brand-orange rounded-full flex items-center justify-center text-3xl mx-auto mb-4 border border-brand-orange/20 shadow-sm"><i class="fa-solid fa-magnifying-glass-location"></i></div>
-                        <h2 data-i18n="helper_title" class="text-2xl sm:text-3xl font-black text-brand-dark mb-2">5. Намери бързо това, което търсиш</h2>
-                        <p data-i18n="helper_desc" class="text-brand-slate text-sm sm:text-base max-w-2xl mx-auto">Не сте сигурни към кого да се обърнете? Напишете какво ви трябва по-долу и ние ще ви покажем точното място в приложението Scoober.</p>
-                    </div>
-                    <div class="relative max-w-3xl mx-auto mb-8">
-                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none"><i class="fa-solid fa-magnifying-glass text-gray-400 text-xl"></i></div>
-                        <input type="text" id="searchInput" autocomplete="off" class="search-input block w-full pl-14 pr-12 py-4 sm:py-5 text-base sm:text-lg border-2 border-gray-200 rounded-2xl text-brand-dark bg-gray-50 focus:bg-white transition-all duration-300 shadow-sm">
-                        <button id="clearBtn" class="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-400 hover:text-brand-orange hidden transition-colors"><i class="fa-solid fa-circle-xmark text-2xl"></i></button>
-                    </div>
-                    <div id="resultsArea" class="max-w-3xl mx-auto hidden space-y-4"></div>
-                    <div id="quickCategories" class="max-w-4xl mx-auto text-center transition-all duration-300 mt-6">
-                        <p data-i18n="helper_quick" class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Бързи търсения (Кликни)</p>
-                        <div id="quickLinksContainer" class="flex flex-wrap justify-center gap-2 sm:gap-3"></div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            <section id="section-contacts" class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 scroll-mt-36">
                 <div class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-6 flex flex-col justify-between hover:border-brand-orange/50 transition-colors">
                     <div class="space-y-4 border-b border-gray-100 pb-5">
                         <div class="w-14 h-14 bg-brand-orange/10 text-brand-orange rounded-2xl flex items-center justify-center text-2xl border border-brand-orange/20"><i class="fa-solid fa-headset"></i></div>
                         <div>
-                            <h4 data-i18n="contact_disp_title" class="text-xl sm:text-2xl font-black text-brand-dark">6. Връзка с Диспечери</h4>
+                            <h4 data-i18n="contact_disp_title" class="text-xl sm:text-2xl font-black text-brand-dark">5. Връзка с Диспечери</h4>
                             <p data-i18n="contact_disp_subtitle" class="text-xs sm:text-sm text-brand-orange font-bold tracking-widest uppercase mt-1">ПО ВРЕМЕ НА АКТИВНА СМЯНА</p>
                         </div>
                     </div>
@@ -539,7 +551,7 @@
                     <div class="space-y-4 border-b border-gray-100 pb-5">
                         <div class="w-14 h-14 bg-gray-100 text-gray-600 rounded-2xl flex items-center justify-center text-2xl border border-gray-200"><i class="fa-solid fa-file-contract"></i></div>
                         <div>
-                            <h4 data-i18n="contact_admin_title" class="text-xl sm:text-2xl font-black text-brand-dark">7. Директна Администрация</h4>
+                            <h4 data-i18n="contact_admin_title" class="text-xl sm:text-2xl font-black text-brand-dark">6. Директна Администрация</h4>
                             <p data-i18n="contact_admin_subtitle" class="text-xs sm:text-sm text-gray-500 font-bold tracking-widest uppercase mt-1">ИЗВЪН АКТИВНА СМЯНА</p>
                         </div>
                         <div data-i18n="contact_admin_important" class="p-3 bg-blue-50 border border-blue-100 rounded-xl text-sm text-brand-dark font-medium inline-block w-full">Отговор до следващия работен ден.</div>
@@ -556,7 +568,13 @@
             </section>
         </div>
 
-        <div id="page-cars" class="global-page space-y-10 sm:space-y-12 hidden">
+        <div id="page-cars" class="global-page space-y-8 sm:space-y-10 hidden">
+            <div class="flex flex-wrap items-center gap-3">
+                <button type="button" onclick="switchGlobalPage('home')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-brand-dark bg-white border border-gray-200 shadow-sm hover:border-brand-orange hover:text-brand-orange transition-all">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span data-i18n="cars_back_guide">Обратно към наръчника</span>
+                </button>
+            </div>
             <section class="bg-white border border-gray-200 rounded-[2rem] p-6 sm:p-10 shadow-sm relative overflow-hidden">
                 <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-orange opacity-10 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute right-8 top-8 hidden lg:block text-brand-orange opacity-10 pointer-events-none"><i class="fa-solid fa-car-side text-[160px]"></i></div>
@@ -579,28 +597,56 @@
             <div class="relative">
                 <section id="sec-car-map" class="car-tab-section bg-white rounded-[2rem] p-5 sm:p-8 border border-gray-200 space-y-6 block">
                     <div class="space-y-2 border-b border-gray-100 pb-5">
-                        <h3 data-i18n="car_map_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">1. Паркинг и Стартова зона</h3>
-                        <p data-i18n="car_map_desc" class="text-brand-slate text-sm sm:text-base">Локация на служебния паркинг и вашата задължителна стартова точка (Зона Център).</p>
+                        <h3 data-i18n="car_map_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">1. Карта на ключови локации</h3>
+                        <p data-i18n="car_map_desc" class="text-brand-slate text-sm sm:text-base">Паркинг, стартова зона, автомивка, сервиз и пунктове за завеждане на щети.</p>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                         <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
                             <div class="space-y-4">
                                 <h4 class="text-base sm:text-lg font-bold text-brand-dark flex items-center gap-2"><i class="fa-solid fa-route text-brand-orange"></i> <span data-i18n="car_map_subtitle">Ключови локации</span></h4>
                                 <p data-i18n="car_map_text" class="text-sm text-brand-slate leading-relaxed">За куриерите със служебни автомобили процесът започва от фирмения паркинг, но смяната стартира официално едва когато достигнете определената зона.</p>
-                                <div class="space-y-4 mt-4">
+                                <div class="space-y-3 mt-4 max-h-[420px] overflow-y-auto custom-scrollbar pr-1">
                                     <div class="bg-brand-lightBg p-4 rounded-2xl border border-gray-200">
                                         <div class="flex items-center gap-3 mb-1">
-                                            <div class="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-square-parking text-sm"></i></div>
+                                            <div class="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center shrink-0 text-xs font-black">P</div>
                                             <h5 data-i18n="car_loc_parking_title" class="font-bold text-brand-dark text-sm">Паркинг Западен Парк</h5>
                                         </div>
                                         <p data-i18n="car_loc_parking_desc" class="text-xs text-brand-slate ml-11">От тук взимате и тук връщате служебния автомобил. (бул. Сливница / Суходолска река)</p>
                                     </div>
                                     <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
                                         <div class="flex items-center gap-3 mb-1">
-                                            <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-location-crosshairs text-sm"></i></div>
+                                            <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 text-xs font-black">1</div>
                                             <h5 data-i18n="car_loc_zone_title" class="font-bold text-brand-dark text-sm">Стартова Зона (Център)</h5>
                                         </div>
                                         <p data-i18n="car_loc_zone_desc" class="text-xs text-brand-slate ml-11">Единствената стартова точка за служебни автомобили. Тук се очаква най-голям брой поръчки.</p>
+                                    </div>
+                                    <div class="bg-cyan-50 p-4 rounded-2xl border border-cyan-100">
+                                        <div class="flex items-center gap-3 mb-1">
+                                            <div class="w-8 h-8 rounded-full bg-cyan-600 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-shower text-sm"></i></div>
+                                            <h5 data-i18n="car_loc_wash_title" class="font-bold text-brand-dark text-sm">Автомивка Рико</h5>
+                                        </div>
+                                        <p data-i18n="car_loc_wash_desc" class="text-xs text-brand-slate ml-11">кв. Модерно предградие, ул. „Адам Мицкевич“, 1360 София</p>
+                                    </div>
+                                    <div class="bg-purple-50 p-4 rounded-2xl border border-purple-100">
+                                        <div class="flex items-center gap-3 mb-1">
+                                            <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-screwdriver-wrench text-sm"></i></div>
+                                            <h5 data-i18n="car_loc_service_title" class="font-bold text-brand-dark text-sm">SEAT Ауто техника / Hertz</h5>
+                                        </div>
+                                        <p data-i18n="car_loc_service_desc" class="text-xs text-brand-slate ml-11">Сервиз — бул. Искърско шосе 13, София</p>
+                                    </div>
+                                    <div class="bg-amber-50 p-4 rounded-2xl border border-amber-100">
+                                        <div class="flex items-center gap-3 mb-1">
+                                            <div class="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-file-circle-exclamation text-sm"></i></div>
+                                            <h5 data-i18n="car_loc_claim1_title" class="font-bold text-brand-dark text-sm">Завеждане на щети — Булстрад</h5>
+                                        </div>
+                                        <p data-i18n="car_loc_claim1_desc" class="text-xs text-brand-slate ml-11">Горубляне, ул. Георги Белов 4</p>
+                                    </div>
+                                    <div class="bg-amber-50/70 p-4 rounded-2xl border border-amber-100">
+                                        <div class="flex items-center gap-3 mb-1">
+                                            <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-file-circle-exclamation text-sm"></i></div>
+                                            <h5 data-i18n="car_loc_claim2_title" class="font-bold text-brand-dark text-sm">Завеждане на щети — Булстрад</h5>
+                                        </div>
+                                        <p data-i18n="car_loc_claim2_desc" class="text-xs text-brand-slate ml-11">г.к. Разсадника – Коньовица, ул. „Хъшове“ 3, 1330 София</p>
                                     </div>
                                 </div>
                             </div>
@@ -609,7 +655,7 @@
                                 <p data-i18n="car_map_start_info" class="text-xs text-brand-dark font-medium leading-snug"><strong>Внимание:</strong> Активирайте смяната си в приложението <strong>САМО</strong> след като физически навлезете в границите на Зона Център.</p>
                             </div>
                         </div>
-                        <div class="lg:col-span-7 bg-brand-lightBg border border-gray-200 rounded-[2rem] p-3 shadow-inner relative flex flex-col min-h-[350px]">
+                        <div class="lg:col-span-7 bg-brand-lightBg border border-gray-200 rounded-[2rem] p-3 shadow-inner relative flex flex-col min-h-[420px] sm:min-h-[480px]">
                             <div class="flex-1 rounded-2xl overflow-hidden relative shadow-sm border border-gray-300">
                                 <div id="company-map" class="w-full h-full absolute inset-0 z-10"></div>
                             </div>
@@ -631,12 +677,23 @@
                         <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 flex flex-col items-center text-center space-y-3 hover:border-blue-500 transition-colors">
                             <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-shower"></i></div>
                             <h4 data-i18n="car_maint_wash_title" class="font-bold text-brand-dark">Служебна Автомивка</h4>
-                            <p data-i18n="car_maint_wash_desc" class="text-xs text-gray-500">Колата трябва да се предава чиста. Използвайте партньорската автомивка на адрес: [Адрес на мивката].</p>
+                            <p data-i18n="car_maint_wash_desc" class="text-xs text-gray-500">Колата трябва да се предава чиста. Партньорска автомивка: <strong>Автомивка Рико</strong> — кв. Модерно предградие, ул. „Адам Мицкевич“, 1360 София.</p>
                         </div>
                         <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 flex flex-col items-center text-center space-y-3 hover:border-green-500 transition-colors">
                             <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-check"></i></div>
                             <h4 data-i18n="car_maint_clean_title" class="font-bold text-brand-dark">Правила за автомобила</h4>
                             <p data-i18n="car_maint_clean_desc" class="text-xs text-gray-500">В колата <strong>не се пуши, не се яде</strong> и не се пият напитки без капачка. Забранено е возенето на други лица! Предавайте колата чиста и по възможност заредена.</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 space-y-2">
+                            <div class="flex items-center gap-2 text-amber-700 font-bold text-sm"><i class="fa-solid fa-file-circle-exclamation"></i> <span data-i18n="car_maint_claims_title">Завеждане на щети</span></div>
+                            <p class="text-xs text-gray-600"><strong>Булстрад — Горубляне</strong><br><span data-i18n="car_loc_claim1_desc">ул. Георги Белов 4</span></p>
+                            <p class="text-xs text-gray-600"><strong>Булстрад — Красна поляна</strong><br><span data-i18n="car_loc_claim2_desc">ул. Хъшове 3</span></p>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-200 rounded-2xl p-5 space-y-2 md:col-span-2">
+                            <div class="flex items-center gap-2 text-purple-700 font-bold text-sm"><i class="fa-solid fa-screwdriver-wrench"></i> <span data-i18n="car_maint_service_title">Официален сервиз</span></div>
+                            <p data-i18n="car_maint_service_desc" class="text-xs text-gray-600"><strong>SEAT Ауто техника ЕООД</strong> / Hertz — бул. Искърско шосе 13, София. Данните за сервиза се попълват в <strong>т. 6</strong> на двустранния протокол.</p>
                         </div>
                     </div>
                 </section>
@@ -687,6 +744,58 @@
                         
                         <div id="protocol-image-container" class="hidden max-w-2xl mx-auto border border-gray-200 rounded-xl overflow-hidden bg-white p-2 shadow-inner mt-4 transition-all duration-300">
                             <img src="protokol.jpg" alt="Protocol" class="w-full h-auto rounded-lg object-contain">
+                        </div>
+
+                        <div class="mt-6 bg-white border border-blue-200 rounded-2xl p-5 sm:p-6 space-y-4">
+                            <div class="flex items-center gap-3 border-b border-blue-100 pb-4">
+                                <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black">?</div>
+                                <div>
+                                    <h4 data-i18n="car_protocol_guide_title" class="text-lg font-black text-brand-dark">Как се попълва протоколът</h4>
+                                    <p data-i18n="car_protocol_guide_intro" class="text-xs text-gray-500 mt-0.5">Точки 1–5 са елементарни. По-долу са най-важните полета:</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-1">
+                                    <span class="text-xs font-black text-blue-600 uppercase">Т. 6 — ВАЖНО</span>
+                                    <p data-i18n="car_protocol_p6" class="text-brand-dark font-medium leading-snug">Попълват се данните на <strong>Аутотехника</strong> (SEAT Ауто техника ЕООД).</p>
+                                </div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-1">
+                                    <span class="text-xs font-black text-gray-500 uppercase">Т. 7</span>
+                                    <p data-i18n="car_protocol_p7" class="text-brand-slate leading-snug">Рег. № на нашата служебна кола.</p>
+                                </div>
+                                <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 space-y-1 sm:col-span-2">
+                                    <span class="text-xs font-black text-brand-orange uppercase">Т. 8 — ВАЖНО</span>
+                                    <p data-i18n="car_protocol_p8" class="text-brand-dark leading-snug">Нашият застраховател + полицата (бял лист при документите на колата, започва с <strong>BG/03/12600...</strong>). Най-отдолу в полето отбелязват с <strong>„Х“</strong> опция <strong>„ДА“</strong>.</p>
+                                </div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-1">
+                                    <span class="text-xs font-black text-gray-500 uppercase">Т. 9</span>
+                                    <p data-i18n="car_protocol_p9" class="text-brand-slate leading-snug">Данни за водача (нашия шофьор).</p>
+                                </div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-1">
+                                    <span class="text-xs font-black text-gray-500 uppercase">Т. 10</span>
+                                    <p data-i18n="car_protocol_p10" class="text-brand-slate leading-snug">Маркират с <strong>„Х“</strong> къде има удари/щети.</p>
+                                </div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-1 sm:col-span-2">
+                                    <span class="text-xs font-black text-gray-500 uppercase">Т. 11</span>
+                                    <p data-i18n="car_protocol_p11" class="text-brand-slate leading-snug">Кратко описание на щетите.</p>
+                                </div>
+                                <div class="bg-red-50 border border-red-200 rounded-xl p-4 space-y-1 sm:col-span-2">
+                                    <span class="text-xs font-black text-red-600 uppercase">Т. 12 — Обстоятелства</span>
+                                    <p data-i18n="car_protocol_p12" class="text-brand-dark leading-snug">С <strong>„Х“</strong> маркират валидните обстоятелства. За <strong>нашия шофьор</strong> обикновено е <strong>1</strong> обстоятелство, за <strong>другия водач</strong> — <strong>2</strong>. В края на т. 12 задължително отбелязват <strong>колко</strong> обстоятелства са маркирали.</p>
+                                </div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-1">
+                                    <span class="text-xs font-black text-gray-500 uppercase">Т. 13</span>
+                                    <p data-i18n="car_protocol_p13" class="text-brand-slate leading-snug">Чертаят схема на инцидента.</p>
+                                </div>
+                                <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 space-y-1">
+                                    <span class="text-xs font-black text-brand-orange uppercase">Т. 14 — ВАЖНО</span>
+                                    <p data-i18n="car_protocol_p14" class="text-brand-dark leading-snug">В забележката пишат: <strong>НЕВИНЕН</strong> или <strong>ВИНОВЕН</strong> съм.</p>
+                                </div>
+                                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-1 sm:col-span-2">
+                                    <span class="text-xs font-black text-gray-500 uppercase">Т. 15</span>
+                                    <p data-i18n="car_protocol_p15" class="text-brand-slate leading-snug">Подписи в бялото поле от двамата водачи.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -744,151 +853,153 @@
             </div>
         </div>
     </footer>
-    </div>
 
     <script>
-        // =============================================================================
-        // ВАШИЯТ FIREBASE CONFIG — ПОПЪЛНЕТЕ ОТ FIREBASE CONSOLE → Project Settings → Web app
-        // =============================================================================
-        const firebaseConfig = {
-            apiKey: 'AIzaSyD96aMeyypnRVpfBmtrIofyakufz4Jdpwc',
-            authDomain: 'takeaway-hub-d2c26.firebaseapp.com',
-            projectId: 'takeaway-hub-d2c26',
-            storageBucket: 'takeaway-hub-d2c26.firebasestorage.app',
-            messagingSenderId: '312920909259',
-            appId: '1:312920909259:web:27eba32c28b9a72750c24e',
-            measurementId: 'G-DBCDSHJXPL'
+        const CITIES_LIST = [
+            { name: 'София', short: 'СФ' },
+            { name: 'Пловдив', short: 'ПЛ' },
+            { name: 'Варна', short: 'ВР' },
+            { name: 'Бургас', short: 'БГ' },
+            { name: 'Русе', short: 'РС' },
+            { name: 'Стара Загора', short: 'СЗ' },
+            { name: 'Плевен', short: 'ПН' },
+            { name: 'Перник', short: 'ПК' },
+            { name: 'Благоевград', short: 'БЛ' },
+            { name: 'Велико Търново', short: 'ВТ' },
+            { name: 'Казанлък', short: 'КЗ' },
+            { name: 'Габрово', short: 'ГБ' }
+        ];
+
+        const CITY_INCOME_CONFIG = {
+            'София': { isSofia: true, hasTierBonus: true, specialAmort: false, vehicles: ['personal_car', 'company_car', 'personal_bike'] },
+            'Пловдив': { isSofia: false, hasTierBonus: true, specialAmort: false, vehicles: ['personal_car', 'personal_bike', 'company_bike'] },
+            'Варна': { isSofia: false, hasTierBonus: true, specialAmort: false, vehicles: ['personal_car', 'personal_bike', 'company_bike'] },
+            'Бургас': { isSofia: false, hasTierBonus: true, specialAmort: false, vehicles: ['personal_car', 'personal_bike'] },
+            'Русе': { isSofia: false, hasTierBonus: true, specialAmort: false, vehicles: ['personal_car', 'company_car', 'personal_bike'] },
+            'Стара Загора': { isSofia: false, hasTierBonus: true, specialAmort: false, vehicles: ['personal_car', 'personal_bike'] },
+            'Плевен': { isSofia: false, hasTierBonus: true, specialAmort: true, vehicles: ['personal_car', 'personal_bike'] },
+            'Перник': { isSofia: false, hasTierBonus: true, specialAmort: false, vehicles: ['personal_car', 'company_car'] },
+            'Благоевград': { isSofia: false, hasTierBonus: true, specialAmort: false, vehicles: ['personal_car', 'company_car', 'personal_bike'] },
+            'Велико Търново': { isSofia: false, hasTierBonus: true, specialAmort: false, vehicles: ['personal_car', 'personal_bike'] },
+            'Казанлък': { isSofia: false, hasTierBonus: false, specialAmort: true, vehicles: ['personal_car', 'personal_bike'] },
+            'Габрово': { isSofia: false, hasTierBonus: false, specialAmort: true, vehicles: ['personal_car', 'personal_bike'] }
         };
 
-        const ALL_PERMISSIONS = ['view_portal', 'view_company_cars', 'manage_users', 'manage_content'];
-        const CONTENT_SECTIONS = {
-            hero: { label: 'Начало', keys: ['hero_badge', 'hero_title', 'hero_desc'] },
-            map: { label: 'Стартови точки', keys: ['map_title', 'map_desc', 'map_subtitle', 'map_text', 'map_list_title', 'zone_1', 'zone_2', 'zone_3', 'zone_4', 'map_start_info', 'map_footer_info'] },
-            pay: { label: 'Плащания', keys: ['pay_title', 'pay_desc', 'pay_30_title', 'pay_30_bul1', 'pay_30_bul2', 'pay_15_title', 'pay_15_bul1', 'pay_15_bul2', 'pay_15_bul3'] },
-            schedule: { label: 'Графици', keys: ['schedule_title', 'schedule_subtitle', 'schedule_important_title', 'schedule_important_desc', 'schedule_edit_title', 'schedule_edit_desc', 'schedule_how', 'schedule_step1', 'schedule_step2', 'schedule_step3'] },
-            matrix: { label: 'Доходи (виж отделния редактор)', keys: [] },
-            helper: { label: 'Търсачка', keys: ['helper_title', 'helper_desc', 'helper_quick', 'helper_ph', 'helper_notfound', 'helper_path'] },
-            contact: { label: 'Контакти', keys: ['contact_disp_title', 'contact_disp_subtitle', 'contact_how_title', 'contact_step1', 'contact_step2', 'contact_step3', 'contact_admin_title', 'contact_admin_subtitle', 'contact_admin_important', 'contact_admin_how', 'admin_step1', 'admin_step2', 'admin_step3'] },
-            cars: { label: 'Служебни коли', keys: ['car_hero_badge', 'car_hero_title', 'car_hero_desc', 'car_map_title', 'car_map_desc', 'car_maint_title', 'car_maint_fuel_title', 'car_maint_fuel_desc', 'car_sos_title', 'car_sos_step1_desc'] },
-            footer: { label: 'Футър', keys: ['footer_rights', 'footer_info'] }
+        const BONUS_THRESHOLDS = { 8: [100, 200, 300], 6: [75, 150, 225], 4: [50, 100, 150], 2: [25, 50, 75] };
+        const BONUS_RATES = { base: 0.25, mid: 1.0, high: 1.5, super: 3.0 };
+        const FIXED_BONUS_RATE = 0.87;
+        const AVG_WORK_DAYS = 22;
+        const AVG_EFFICIENCY = 2;
+
+        const VEHICLE_LABELS = {
+            bg: { personal_car: 'Лична кола', company_car: 'Служебна кола', personal_bike: 'Лично колело', company_bike: 'Служебно колело' },
+            en: { personal_car: 'Personal Car', company_car: 'Company Car', personal_bike: 'Personal Bike', company_bike: 'Company Bike' }
         };
 
-        let auth = null;
-        let db = null;
-        let secondaryAuth = null;
-        let currentProfile = null;
-
-        function isFirebaseConfigured() {
-            return firebaseConfig.apiKey && firebaseConfig.apiKey !== 'YOUR_API_KEY';
+        function getBaseSalary(isSofia) {
+            return isSofia ? { 8: 820, 6: 615, 4: 410, 2: 205 } : { 8: 625, 6: 470, 4: 315, 2: 165 };
         }
 
-        function initFirebase() {
-            if (!isFirebaseConfigured() || typeof firebase === 'undefined') {
-                const hint = document.getElementById('login-config-hint');
-                if (hint) hint.textContent = 'Добавете firebaseConfig от Firebase Console, за да активирате облачното запазване.';
-                return false;
+        function getKmPerOrder(cityConfig, vehicle) {
+            if (cityConfig.isSofia && (vehicle === 'personal_car' || vehicle === 'company_car')) return 5.5;
+            return 3.5;
+        }
+
+        function computeSalary(cityConfig, contract, vehicle, days, eff) {
+            const baseSalary = getBaseSalary(cityConfig.isSofia);
+            const hours = contract * days;
+            const orders = Math.round(eff * hours);
+            const km = orders * getKmPerOrder(cityConfig, vehicle);
+
+            let bonusGross = 0;
+            if (cityConfig.hasTierBonus) {
+                const th = BONUS_THRESHOLDS[contract];
+                const n = [
+                    Math.min(orders, th[0]),
+                    Math.max(0, Math.min(orders, th[1]) - th[0]),
+                    Math.max(0, Math.min(orders, th[2]) - th[1]),
+                    Math.max(0, orders - th[2])
+                ];
+                bonusGross = (n[0] * BONUS_RATES.base) + (n[1] * BONUS_RATES.mid) + (n[2] * BONUS_RATES.high) + (n[3] * BONUS_RATES.super);
+            } else {
+                bonusGross = orders * FIXED_BONUS_RATE;
             }
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            auth = firebase.auth();
-            db = firebase.firestore();
-            const hint = document.getElementById('login-config-hint');
-            if (hint) hint.textContent = 'Свързано с Firebase (Auth + Firestore).';
-            return true;
-        }
 
-        function getSecondaryAuth() {
-            if (!isFirebaseConfigured()) throw new Error('Firebase не е конфигуриран.');
-            if (!secondaryAuth) {
-                const secondaryApp = firebase.apps.find((app) => app.name === 'Secondary')
-                    || firebase.initializeApp(firebaseConfig, 'Secondary');
-                secondaryAuth = secondaryApp.auth();
-            }
-            return secondaryAuth;
-        }
-
-        function usersCollection() {
-            return db.collection('siteData').doc('profiles').collection('users');
-        }
-
-        function hasPermission(perm) {
-            if (!currentProfile || !currentProfile.is_active) {
-                return ['view_portal', 'view_company_cars'].includes(perm);
-            }
-            if (currentProfile.role === 'admin') return true;
-            return Array.isArray(currentProfile.permissions) && currentProfile.permissions.includes(perm);
-        }
-
-        function isAdmin() {
-            return currentProfile && currentProfile.role === 'admin' && currentProfile.is_active;
-        }
-
-        function canManageAdminPanel() {
-            return isAdmin() || hasPermission('manage_users') || hasPermission('manage_content');
-        }
-
-        function showScreen(screenId) {
-            ['screen-login', 'screen-admin-choice', 'screen-admin', 'screen-admin-matrix', 'screen-portal'].forEach((id) => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                el.classList.toggle('hidden', id !== screenId);
-            });
-        }
-
-        async function fetchProfile(userId) {
-            if (!db) return null;
-            const doc = await usersCollection().doc(userId).get();
-            return doc.exists ? doc.data() : null;
-        }
-
-        async function loadPortalContentFromDb() {
-            if (!db) return;
-            try {
-                const doc = await db.collection('siteData').doc('main').get();
-                if (doc.exists && doc.data().content) {
-                    applyPortalContent(doc.data().content);
+            let amortGross = 0;
+            if (vehicle !== 'company_car' && vehicle !== 'company_bike') {
+                if (cityConfig.specialAmort) {
+                    amortGross = hours * 1.38;
+                } else {
+                    amortGross = km * (vehicle.includes('bike') ? 0.11 : 0.17);
                 }
-            } catch (err) {
-                console.error('Грешка при зареждане от Firestore:', err);
             }
+
+            const totalGross = baseSalary[contract] + bonusGross + amortGross;
+            return Math.round(totalGross * (1 - 0.224));
         }
 
-        function applyPortalContent(payload) {
-            if (payload.translations) {
-                translations = deepMerge(translations, payload.translations);
+        function buildContractTiers(contractHours, hasTierBonus) {
+            if (!hasTierBonus) {
+                return [{ label: 'Фиксиран бонус', price: '€0.87 / поръчка', labelEn: 'Fixed bonus', priceEn: '€0.87 / order' }];
             }
-            if (payload.helperContactData) {
-                helperContactData = deepMerge(helperContactData, payload.helperContactData);
-            }
-            if (payload.helperQuickLinks) {
-                helperQuickLinks = deepMerge(helperQuickLinks, payload.helperQuickLinks);
-            }
-            if (payload.incomeMatrix) {
-                incomeMatrix = deepMerge(getDefaultIncomeMatrix(), payload.incomeMatrix);
-                syncIncomeMatrixTextsToTranslations();
-            }
+            const th = BONUS_THRESHOLDS[contractHours];
+            const levels = [
+                { label: `Base (0-${th[0]})`, price: '€0.25', labelEn: `Base (0-${th[0]})`, priceEn: '€0.25' },
+                { label: `Mid (${th[0] + 1}-${th[1]})`, price: '€1.00', labelEn: `Mid (${th[0] + 1}-${th[1]})`, priceEn: '€1.00' },
+                { label: `High (${th[1] + 1}-${th[2]})`, price: '€1.50', labelEn: `High (${th[1] + 1}-${th[2]})`, priceEn: '€1.50' },
+                { label: `Super (${th[2] + 1}+)`, price: '€3.00', labelEn: `Super (${th[2] + 1}+)`, priceEn: '€3.00' }
+            ];
+            return levels;
         }
 
-        function getDefaultIncomeMatrix() {
+        function buildIncomeMatrixForCity(cityName) {
+            const city = CITY_INCOME_CONFIG[cityName] || CITY_INCOME_CONFIG['София'];
+            const baseSalary = getBaseSalary(city.isSofia);
+            const personalVehicle = city.vehicles.find((v) => v.startsWith('personal_'));
+            const companyVehicle = city.vehicles.find((v) => v.startsWith('company_'));
+            const contracts = {};
+
+            [8, 6, 4, 2].forEach((hours) => {
+                const avgPersonal = personalVehicle
+                    ? `~${computeSalary(city, hours, personalVehicle, AVG_WORK_DAYS, AVG_EFFICIENCY)} €`
+                    : '';
+                const avgCompany = companyVehicle
+                    ? `~${computeSalary(city, hours, companyVehicle, AVG_WORK_DAYS, AVG_EFFICIENCY)} €`
+                    : '';
+                contracts[hours] = {
+                    label: { bg: `${hours}-Hour (${hours}ч)`, en: `${hours}-Hour` },
+                    avgNetLabel: {
+                        bg: 'Средно нето месечно* (при 2 ефект., 22 дни)',
+                        en: 'Avg. net monthly* (at 2 eff., 22 days)'
+                    },
+                    avgPersonal,
+                    avgCompany,
+                    tiers: buildContractTiers(hours, city.hasTierBonus)
+                };
+            });
+
             return {
                 tax: 0.224,
-                baseSalary: { 8: 820, 6: 615, 4: 410, 2: 205 },
-                bonusRates: { base: 0.25, mid: 1.0, high: 1.5, super: 3.0 },
-                bonusThresholds: { 8: [100, 200, 300], 6: [75, 150, 225], 4: [50, 100, 150], 2: [25, 50, 75] },
-                kmPerOrder: { car: 5.5, bike: 3.5 },
-                amortPerKm: { car: 0.17, bike: 0.11 },
-                vehicles: ['personal_car', 'company_car', 'personal_bike'],
-                vehicleLabels: {
-                    bg: { personal_car: 'Лична кола', company_car: 'Служебна кола', personal_bike: 'Лично колело' },
-                    en: { personal_car: 'Personal Car', company_car: 'Company Car', personal_bike: 'Personal Bike' }
-                },
+                cityName,
+                baseSalary,
+                hasTierBonus: city.hasTierBonus,
+                specialAmort: city.specialAmort,
+                isSofia: city.isSofia,
+                bonusRates: BONUS_RATES,
+                bonusThresholds: BONUS_THRESHOLDS,
+                fixedBonusRate: FIXED_BONUS_RATE,
+                vehicles: city.vehicles,
+                personalVehicle,
+                companyVehicle,
+                vehicleLabels: VEHICLE_LABELS,
                 texts: {
                     bg: {
                         matrix_title: '4. Доходи и Бонусна схема',
-                        matrix_info_desc: 'Бонусът се трупа на месечна база. Посочените суми са брутни.',
-                        tab_personal: 'С лична кола',
-                        tab_company: 'Със служебна',
+                        matrix_info_desc: city.hasTierBonus
+                            ? 'Бонусът се трупа на месечна база. Средните суми са при ефективност 2 и 22 работни дни. Посочените ставки са брутни.'
+                            : 'За този град се прилага фиксиран бонус €0.87 на поръчка. Средните суми са при ефективност 2 и 22 работни дни.',
+                        tab_personal: 'С лично превозно',
+                        tab_company: 'Със служебно',
                         sim_title: 'Симулатор',
                         sim_desc: 'Симулирай заплатата си спрямо очакваното представяне.',
                         sim_net: 'Очаквано Нето',
@@ -903,9 +1014,11 @@
                     },
                     en: {
                         matrix_title: '4. Income and Bonus Scheme',
-                        matrix_info_desc: 'The bonus is accumulated on a monthly basis. The amounts are gross.',
-                        tab_personal: 'Personal Car',
-                        tab_company: 'Company Car',
+                        matrix_info_desc: city.hasTierBonus
+                            ? 'The bonus is accumulated monthly. Averages are at 2 efficiency and 22 work days. Rates are gross.'
+                            : 'This city uses a fixed €0.87 bonus per order. Averages are at 2 efficiency and 22 work days.',
+                        tab_personal: 'Personal vehicle',
+                        tab_company: 'Company vehicle',
                         sim_title: 'Simulator',
                         sim_desc: 'Simulate your salary based on expected performance.',
                         sim_net: 'Expected Net',
@@ -919,62 +1032,12 @@
                         calc_eff_tooltip: 'Average number of orders you deliver per 1 hour.'
                     }
                 },
-                contracts: {
-                    8: {
-                        label: { bg: '8-Hour (8ч)', en: '8-Hour' },
-                        avgNetLabel: { bg: 'Средно Нето Месечно* (заплата плюс бонус)', en: 'Avg. Net Monthly* (salary plus bonus)' },
-                        avgPersonal: '1110 - 1300 €',
-                        avgCompany: '920 - 1020 €',
-                        tiers: [
-                            { label: 'Base (0-100)', price: '€0.25' },
-                            { label: 'Mid (101-200)', price: '€1.00' },
-                            { label: 'High (201-300)', price: '€1.50' },
-                            { label: 'Super (301+)', price: '€3.00' }
-                        ]
-                    },
-                    6: {
-                        label: { bg: '6-Hour (6ч)', en: '6-Hour' },
-                        avgNetLabel: { bg: 'Средно Нето Месечно* (заплата плюс бонус)', en: 'Avg. Net Monthly* (salary plus bonus)' },
-                        avgPersonal: '800 - 900 €',
-                        avgCompany: '',
-                        tiers: [
-                            { label: 'Base (0-75)', price: '€0.25' },
-                            { label: 'Mid (76-150)', price: '€1.00' },
-                            { label: 'High (151-225)', price: '€1.50' },
-                            { label: 'Super (226+)', price: '€3.00' }
-                        ]
-                    },
-                    4: {
-                        label: { bg: '4-Hour (4ч)', en: '4-Hour' },
-                        avgNetLabel: { bg: 'Средно Нето Месечно* (заплата плюс бонус)', en: 'Avg. Net Monthly* (salary plus bonus)' },
-                        avgPersonal: '510 - 620 €',
-                        avgCompany: '400 - 500 €',
-                        tiers: [
-                            { label: 'Base (0-50)', price: '€0.25' },
-                            { label: 'Mid (51-100)', price: '€1.00' },
-                            { label: 'High (101-150)', price: '€1.50' },
-                            { label: 'Super (151+)', price: '€3.00' }
-                        ]
-                    },
-                    2: {
-                        label: { bg: '2-Hour (2ч)', en: '2-Hour' },
-                        avgNetLabel: { bg: 'Средно Нето Месечно* (заплата плюс бонус)', en: 'Avg. Net Monthly* (salary plus bonus)' },
-                        avgPersonal: '~260 €',
-                        avgCompany: '',
-                        tiers: [
-                            { label: 'Base (0-25)', price: '€0.25' },
-                            { label: 'Mid (26-50)', price: '€1.00' },
-                            { label: 'High (51-75)', price: '€1.50' },
-                            { label: 'Super (76+)', price: '€3.00' }
-                        ]
-                    }
-                }
+                contracts
             };
         }
 
-        let incomeMatrix = getDefaultIncomeMatrix();
+        let incomeMatrix = buildIncomeMatrixForCity('София');
         let currentVehicleTab = 'personal';
-        let matrixAdminLang = 'bg';
 
         const MATRIX_TEXT_KEYS = [
             'matrix_title', 'matrix_info_desc', 'tab_personal', 'tab_company',
@@ -1010,9 +1073,19 @@
             if (tooltip && incomeMatrix.texts?.[lang]?.calc_eff_tooltip) {
                 tooltip.textContent = incomeMatrix.texts[lang].calc_eff_tooltip;
             }
+            updateCompanyTabVisibility();
             renderContractCards();
             initCalculator();
             updateUI();
+        }
+
+        function updateCompanyTabVisibility() {
+            const tabCompany = document.getElementById('tab-company');
+            const hasCompany = !!incomeMatrix.companyVehicle;
+            tabCompany?.classList.toggle('hidden', !hasCompany);
+            if (!hasCompany && currentVehicleTab === 'company') {
+                switchVehicleTab('personal');
+            }
         }
 
         function renderContractCards() {
@@ -1036,11 +1109,13 @@
                 const avgValue = currentVehicleTab === 'personal' ? contract.avgPersonal : contract.avgCompany;
                 const avgColor = isPrimary ? 'text-brand-orange' : 'text-brand-dark';
                 const tiersHtml = (contract.tiers || []).map((tier, tierIndex) => {
-                    const isSuper = tierIndex === (contract.tiers.length - 1);
+                    const isSuper = tierIndex === (contract.tiers.length - 1) && incomeMatrix.hasTierBonus;
+                    const tierLabel = lang === 'en' ? (tier.labelEn || tier.label) : tier.label;
+                    const tierPrice = lang === 'en' ? (tier.priceEn || tier.price) : tier.price;
                     const labelClass = isSuper ? 'font-black text-brand-orange' : `font-bold text-gray-${500 + tierIndex * 100}`.replace('gray-700', 'gray-700').replace('gray-900', 'gray-700');
                     const priceClass = isSuper ? 'font-black text-brand-orange' : 'font-black text-brand-dark';
                     const rowBorder = tierIndex < contract.tiers.length - 1 ? `border-b ${borderClass} pb-2` : 'pb-1';
-                    return `<div class="flex justify-between ${rowBorder}"><span class="${labelClass}">${tier.label}</span><span class="${priceClass}">${tier.price}</span></div>`;
+                    return `<div class="flex justify-between ${rowBorder}"><span class="${labelClass}">${tierLabel}</span><span class="${priceClass}">${tierPrice}</span></div>`;
                 }).join('');
                 return `
                     <div class="${cardBg} border border-gray-200 hover:border-brand-orange hover:shadow-md transition-all duration-300 rounded-2xl p-5 flex flex-col justify-between space-y-5">
@@ -1056,535 +1131,103 @@
             }).join('');
         }
 
-        function openMatrixEditor() {
-            if (!isAdmin() && !hasPermission('manage_content')) {
-                alert('Нямате право за редакция на съдържание.');
-                return;
-            }
-            matrixAdminLang = 'bg';
-            renderMatrixAdminForm();
-            document.getElementById('screen-admin').classList.add('hidden');
-            document.getElementById('screen-admin-matrix').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        var currentPage = 'welcome';
+
+        function updateHeaderForPage() {
+            const onWelcome = currentPage === 'welcome';
+            document.getElementById('main-header')?.classList.toggle('hidden', onWelcome);
+            updateCityTopicLinks();
         }
 
-        function closeMatrixEditor() {
-            document.getElementById('screen-admin-matrix').classList.add('hidden');
-            document.getElementById('screen-admin').classList.remove('hidden');
-            showAdminSection('content');
+        function updateCityTopicLinks() {
+            const box = document.getElementById('city-topic-links');
+            if (!box) return;
+            const show = currentPage === 'home' && CITIES_WITH_CARS.includes(currentCityName);
+            box.classList.toggle('hidden', !show);
         }
 
-        function matrixField(label, html) {
-            return `<div><label class="admin-field-label">${label}</label><div class="mt-1">${html}</div></div>`;
+        function openCompanyCars(city, shortCity) {
+            if (city) setCity(city, shortCity);
+            if (!CITIES_WITH_CARS.includes(currentCityName)) return;
+            switchGlobalPage('cars');
         }
 
-        function matrixInput(path, value, type = 'text') {
-            const escaped = String(value ?? '').replace(/"/g, '&quot;');
-            return `<input type="${type}" data-matrix-path="${path}" value="${escaped}" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium">`;
+        const GUIDE_SECTIONS = ['section-hero', 'zones', 'section-pay', 'section-schedule', 'methodology', 'section-contacts'];
+
+        function scrollToGuideSection(sectionId) {
+            const el = document.getElementById(sectionId);
+            if (!el) return;
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.querySelectorAll('.guide-nav-btn').forEach((btn) => {
+                btn.classList.toggle('active', btn.getAttribute('data-section') === sectionId);
+            });
         }
 
-        function matrixTextarea(path, value) {
-            return `<textarea data-matrix-path="${path}" rows="2" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium">${value ?? ''}</textarea>`;
+        function updateGuideNavActive() {
+            if (currentPage !== 'home') return;
+            const offset = 200;
+            let current = GUIDE_SECTIONS[0];
+            GUIDE_SECTIONS.forEach((id) => {
+                const el = document.getElementById(id);
+                if (el && el.getBoundingClientRect().top <= offset) current = id;
+            });
+            document.querySelectorAll('.guide-nav-btn').forEach((btn) => {
+                btn.classList.toggle('active', btn.getAttribute('data-section') === current);
+            });
         }
 
-        function typeOfMatrixPath(path) {
-            if (path === 'tax') return 'number';
-            if (path.startsWith('baseSalary.')) return 'number';
-            if (path.startsWith('bonusRates.')) return 'number';
-            if (path.startsWith('kmPerOrder.') || path.startsWith('amortPerKm.')) return 'number';
-            return 'text';
-        }
-
-        function setMatrixValueByPath(path, value) {
-            const parts = path.split('.');
-            let ref = incomeMatrix;
-            for (let i = 0; i < parts.length - 1; i += 1) {
-                const key = /^\d+$/.test(parts[i]) ? Number(parts[i]) : parts[i];
-                if (ref[key] === undefined) {
-                    ref[key] = /^\d+$/.test(parts[i + 1]) ? {} : {};
-                }
-                ref = ref[key];
-            }
-            const last = parts[parts.length - 1];
-            const lastKey = /^\d+$/.test(last) ? Number(last) : last;
-            ref[lastKey] = value;
-        }
-
-        function getMatrixValueByPath(path) {
-            return path.split('.').reduce((acc, key) => (acc == null ? undefined : acc[key]), incomeMatrix);
-        }
-
-        function renderMatrixAdminForm() {
-            const lang = matrixAdminLang;
-            const form = document.getElementById('matrix-admin-form');
-            const t = incomeMatrix.texts[lang];
-            let html = `
-                <div class="bg-white rounded-[2rem] border border-gray-200 p-6 space-y-4">
-                    <div class="flex flex-wrap gap-2 items-center justify-between">
-                        <h2 class="text-lg font-black text-brand-dark">Език за редакция</h2>
-                        <select id="matrix-admin-lang" onchange="matrixAdminLang=this.value; renderMatrixAdminForm()" class="rounded-xl border border-gray-200 px-3 py-2 font-semibold">
-                            <option value="bg" ${lang === 'bg' ? 'selected' : ''}>Български</option>
-                            <option value="en" ${lang === 'en' ? 'selected' : ''}>English</option>
-                        </select>
+        function renderCitiesGrid() {
+            const grid = document.getElementById('cities-grid');
+            if (!grid) return;
+            const guideLabel = currentLangCode === 'en' ? 'Courier guide' : 'Куриерски наръчник';
+            const carsLabel = currentLangCode === 'en' ? 'Company cars' : 'Служебни коли';
+            grid.innerHTML = CITIES_LIST.map((city) => {
+                const carsBtn = CITIES_WITH_CARS.includes(city.name) ? `
+                        <button type="button" onclick="openCompanyCars('${city.name}', '${city.short}')" class="flex items-center gap-2.5 w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-brand-dark bg-blue-50 border border-blue-100 hover:border-blue-300 hover:bg-blue-100/80 transition-all">
+                            <i class="fa-solid fa-car-side text-blue-600"></i>
+                            <span>${carsLabel}</span>
+                        </button>` : '';
+                return `
+                <div class="interactive-card bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 hover:border-brand-orange/40 transition-all space-y-3">
+                    <div class="flex items-center gap-3 pb-1 border-b border-gray-100">
+                        <div class="w-10 h-10 rounded-xl bg-brand-orange/10 text-brand-orange flex items-center justify-center font-black text-sm">${city.short}</div>
+                        <div class="font-black text-brand-dark text-base sm:text-lg">${city.name}</div>
                     </div>
-                </div>
-                <div class="bg-white rounded-[2rem] border border-gray-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <h2 class="md:col-span-2 text-lg font-black text-brand-dark">Заглавие и табове</h2>
-                    ${matrixField('Заглавие на раздела', matrixInput(`texts.${lang}.matrix_title`, t.matrix_title))}
-                    ${matrixField('Описание под заглавието', matrixTextarea(`texts.${lang}.matrix_info_desc`, t.matrix_info_desc))}
-                    ${matrixField('Таб: лична кола', matrixInput(`texts.${lang}.tab_personal`, t.tab_personal))}
-                    ${matrixField('Таб: служебна кола', matrixInput(`texts.${lang}.tab_company`, t.tab_company))}
+                    <div class="grid grid-cols-1 gap-2">
+                        <button type="button" onclick="openCityGuide('${city.name}', '${city.short}')" class="flex items-center gap-2.5 w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-brand-dark bg-brand-orange/5 border border-brand-orange/15 hover:border-brand-orange/40 hover:bg-brand-orange/10 transition-all">
+                            <i class="fa-solid fa-motorcycle text-brand-orange"></i>
+                            <span>${guideLabel}</span>
+                        </button>${carsBtn}
+                    </div>
                 </div>`;
-
-            [8, 6, 4, 2].forEach((hours) => {
-                const c = incomeMatrix.contracts[hours];
-                html += `<div class="bg-white rounded-[2rem] border border-gray-200 p-6 space-y-4">
-                    <h2 class="text-lg font-black text-brand-dark">Договор ${hours} часа</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${matrixField('Етикет на картата', matrixInput(`contracts.${hours}.label.${lang}`, c.label[lang]))}
-                        ${matrixField('Етикет „Средно нето“', matrixInput(`contracts.${hours}.avgNetLabel.${lang}`, c.avgNetLabel[lang]))}
-                        ${matrixField('Средно нето – лична кола', matrixInput(`contracts.${hours}.avgPersonal`, c.avgPersonal))}
-                        ${matrixField('Средно нето – служебна кола', matrixInput(`contracts.${hours}.avgCompany`, c.avgCompany))}
-                    </div>
-                    <div class="space-y-3">
-                        <p class="admin-field-label">Бонус нива (етикет + цена)</p>`;
-                c.tiers.forEach((tier, index) => {
-                    html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                        ${matrixField(`Ниво ${index + 1} – етикет`, matrixInput(`contracts.${hours}.tiers.${index}.label`, tier.label))}
-                        ${matrixField(`Ниво ${index + 1} – цена`, matrixInput(`contracts.${hours}.tiers.${index}.price`, tier.price))}
-                    </div>`;
-                });
-                html += `</div></div>`;
-            });
-
-            html += `<div class="bg-white rounded-[2rem] border border-gray-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <h2 class="md:col-span-2 text-lg font-black text-brand-dark">Симулатор – текстове (${lang === 'bg' ? 'БГ' : 'EN'})</h2>
-                ${matrixField('Заглавие', matrixInput(`texts.${lang}.sim_title`, t.sim_title))}
-                ${matrixField('Описание', matrixTextarea(`texts.${lang}.sim_desc`, t.sim_desc))}
-                ${matrixField('Етикет нето', matrixInput(`texts.${lang}.sim_net`, t.sim_net))}
-                ${matrixField('Етикет бруто', matrixInput(`texts.${lang}.sim_gross`, t.sim_gross))}
-                ${matrixField('Етикет поръчки', matrixInput(`texts.${lang}.sim_orders`, t.sim_orders))}
-                ${matrixField('Етикет часове', matrixInput(`texts.${lang}.sim_hours`, t.sim_hours))}
-                ${matrixField('Поле договор', matrixInput(`texts.${lang}.calc_contract_lbl`, t.calc_contract_lbl))}
-                ${matrixField('Поле превозно', matrixInput(`texts.${lang}.calc_vehicle_lbl`, t.calc_vehicle_lbl))}
-                ${matrixField('Поле работни дни', matrixInput(`texts.${lang}.calc_days_lbl`, t.calc_days_lbl))}
-                ${matrixField('Поле ефективност', matrixInput(`texts.${lang}.calc_eff_lbl`, t.calc_eff_lbl))}
-                ${matrixField('Подсказка ефективност', matrixTextarea(`texts.${lang}.calc_eff_tooltip`, t.calc_eff_tooltip))}
-            </div>`;
-
-            html += `<div class="bg-white rounded-[2rem] border border-gray-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <h2 class="md:col-span-2 text-lg font-black text-brand-dark">Симулатор – числа и формули</h2>
-                ${matrixField('Данък/удръжка (0.224 = 22.4%)', matrixInput('tax', incomeMatrix.tax, 'number'))}
-                ${matrixField('Базова заплата 8ч (€)', matrixInput('baseSalary.8', incomeMatrix.baseSalary[8], 'number'))}
-                ${matrixField('Базова заплата 6ч (€)', matrixInput('baseSalary.6', incomeMatrix.baseSalary[6], 'number'))}
-                ${matrixField('Базова заплата 4ч (€)', matrixInput('baseSalary.4', incomeMatrix.baseSalary[4], 'number'))}
-                ${matrixField('Базова заплата 2ч (€)', matrixInput('baseSalary.2', incomeMatrix.baseSalary[2], 'number'))}
-                ${matrixField('Бонус Base (€/поръчка)', matrixInput('bonusRates.base', incomeMatrix.bonusRates.base, 'number'))}
-                ${matrixField('Бонус Mid (€/поръчка)', matrixInput('bonusRates.mid', incomeMatrix.bonusRates.mid, 'number'))}
-                ${matrixField('Бонус High (€/поръчка)', matrixInput('bonusRates.high', incomeMatrix.bonusRates.high, 'number'))}
-                ${matrixField('Бонус Super (€/поръчка)', matrixInput('bonusRates.super', incomeMatrix.bonusRates.super, 'number'))}
-                ${matrixField('Прагове 8ч (3 числа, запетая)', matrixInput('bonusThresholds.8', incomeMatrix.bonusThresholds[8].join(', ')))}
-                ${matrixField('Прагове 6ч', matrixInput('bonusThresholds.6', incomeMatrix.bonusThresholds[6].join(', ')))}
-                ${matrixField('Прагове 4ч', matrixInput('bonusThresholds.4', incomeMatrix.bonusThresholds[4].join(', ')))}
-                ${matrixField('Прагове 2ч', matrixInput('bonusThresholds.2', incomeMatrix.bonusThresholds[2].join(', ')))}
-                ${matrixField('Км на поръчка (кола)', matrixInput('kmPerOrder.car', incomeMatrix.kmPerOrder.car, 'number'))}
-                ${matrixField('Км на поръчка (колело)', matrixInput('kmPerOrder.bike', incomeMatrix.kmPerOrder.bike, 'number'))}
-                ${matrixField('Амортизация €/км (кола)', matrixInput('amortPerKm.car', incomeMatrix.amortPerKm.car, 'number'))}
-                ${matrixField('Амортизация €/км (колело)', matrixInput('amortPerKm.bike', incomeMatrix.amortPerKm.bike, 'number'))}
-                ${matrixField('Етикет лична кола (БГ)', matrixInput('vehicleLabels.bg.personal_car', incomeMatrix.vehicleLabels.bg.personal_car))}
-                ${matrixField('Етикет служебна кола (БГ)', matrixInput('vehicleLabels.bg.company_car', incomeMatrix.vehicleLabels.bg.company_car))}
-                ${matrixField('Етикет лично колело (БГ)', matrixInput('vehicleLabels.bg.personal_bike', incomeMatrix.vehicleLabels.bg.personal_bike))}
-                ${matrixField('Етикет personal car (EN)', matrixInput('vehicleLabels.en.personal_car', incomeMatrix.vehicleLabels.en.personal_car))}
-                ${matrixField('Етикет company car (EN)', matrixInput('vehicleLabels.en.company_car', incomeMatrix.vehicleLabels.en.company_car))}
-                ${matrixField('Етикет personal bike (EN)', matrixInput('vehicleLabels.en.personal_bike', incomeMatrix.vehicleLabels.en.personal_bike))}
-            </div>`;
-
-            form.innerHTML = html;
-            form.querySelectorAll('[data-matrix-path]').forEach((el) => {
-                el.addEventListener('input', () => {
-                    const path = el.getAttribute('data-matrix-path');
-                    let val = el.value;
-                    if (path.startsWith('bonusThresholds.')) {
-                        const hours = Number(path.split('.')[1]);
-                        incomeMatrix.bonusThresholds[hours] = val.split(',').map((x) => Number(x.trim())).filter((x) => !Number.isNaN(x));
-                        return;
-                    }
-                    if (typeOfMatrixPath(path) === 'number') val = val === '' ? 0 : Number(val);
-                    setMatrixValueByPath(path, val);
-                });
-            });
+            }).join('');
         }
 
-        async function saveMatrixFromAdmin() {
-            document.querySelectorAll('#matrix-admin-form [data-matrix-path]').forEach((el) => {
-                const path = el.getAttribute('data-matrix-path');
-                let val = el.value;
-                if (path.startsWith('bonusThresholds.')) {
-                    const hours = Number(path.split('.')[1]);
-                    incomeMatrix.bonusThresholds[hours] = val.split(',').map((x) => Number(x.trim())).filter((x) => !Number.isNaN(x));
-                    return;
-                }
-                if (typeOfMatrixPath(path) === 'number') val = val === '' ? 0 : Number(val);
-                setMatrixValueByPath(path, val);
-            });
-            syncIncomeMatrixTextsToTranslations();
-            await savePortalContent();
-            renderIncomeMatrixSection();
-            const status = document.getElementById('matrix-save-status');
-            if (status) {
-                status.textContent = 'Раздел „4. Доходи и Бонусна схема“ е запазен. Промените са видими в потребителския портал.';
-                status.classList.remove('hidden');
-                setTimeout(() => status.classList.add('hidden'), 4000);
-            }
-            if (!document.getElementById('screen-portal').classList.contains('hidden')) {
-                setLang(currentLangCode || 'bg');
-            }
-        }
-
-        function deepMerge(target, source) {
-            const out = Array.isArray(target) ? [...target] : { ...target };
-            if (!source || typeof source !== 'object') return out;
-            Object.keys(source).forEach((key) => {
-                if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-                    out[key] = deepMerge(out[key] || {}, source[key]);
-                } else {
-                    out[key] = source[key];
-                }
-            });
-            return out;
-        }
-
-        function getPortalContentSnapshot() {
-            syncIncomeMatrixTextsToTranslations();
-            return {
-                translations: JSON.parse(JSON.stringify(translations)),
-                helperContactData: JSON.parse(JSON.stringify(helperContactData)),
-                helperQuickLinks: JSON.parse(JSON.stringify(helperQuickLinks)),
-                incomeMatrix: JSON.parse(JSON.stringify(incomeMatrix))
-            };
-        }
-
-        async function savePortalContent() {
-            if (!db || !auth || !auth.currentUser) {
-                alert('Нямате права за запис. Влезте като администратор.');
-                return;
-            }
-            const payload = getPortalContentSnapshot();
-            const status = document.getElementById('content-save-status');
-            try {
-                await db.collection('siteData').doc('main').set({
-                    content: payload,
-                    updated_at: firebase.firestore.FieldValue.serverTimestamp(),
-                    updated_by: auth.currentUser.uid
-                }, { merge: true });
-                if (status) {
-                    status.textContent = 'Съдържанието е запазено успешно във Firestore.';
-                    status.classList.remove('hidden');
-                    setTimeout(() => status.classList.add('hidden'), 3000);
-                }
-                if (!document.getElementById('screen-portal').classList.contains('hidden')) {
-                    setLang(currentLangCode || 'bg');
-                }
-            } catch (err) {
-                alert('Грешка при запис: ' + (err.message || err));
-            }
-        }
-
-        function updateAuthUI() {
-            const isLoggedIn = !!currentProfile;
-            const admin = isAdmin();
-            const canManage = canManageAdminPanel();
-
-            document.getElementById('portal-admin-login-btn')?.classList.toggle('hidden', isLoggedIn);
-            document.getElementById('portal-user-menu-wrap')?.classList.toggle('hidden', !isLoggedIn);
-
-            if (isLoggedIn) {
-                const label = currentProfile.display_name || currentProfile.email || currentProfile.username || 'Акаунт';
-                document.getElementById('portal-user-name').textContent = label;
-                document.getElementById('admin-choice-name').textContent = label;
-                document.getElementById('admin-user-label').textContent = label + ' · ' + (currentProfile.role === 'admin' ? 'Администратор' : 'Потребител');
-            }
-
-            document.getElementById('portal-menu-admin-choice')?.classList.toggle('hidden', !admin);
-            document.getElementById('portal-menu-admin-panel')?.classList.toggle('hidden', !canManage);
-        }
-
-        function openAdminLogin() {
-            document.getElementById('login-error')?.classList.add('hidden');
-            showScreen('screen-login');
-        }
-
-        async function handleLoginSubmit(event) {
-            event.preventDefault();
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-            const errEl = document.getElementById('login-error');
-            errEl.classList.add('hidden');
-            try {
-                if (!auth) throw new Error('Firebase не е конфигуриран. Попълнете firebaseConfig.');
-                const { user } = await auth.signInWithEmailAndPassword(email, password);
-                currentProfile = await fetchProfile(user.uid);
-                if (!currentProfile || !currentProfile.is_active) {
-                    await auth.signOut();
-                    throw new Error('Профилът е неактивен или липсва в Firestore.');
-                }
-                await afterLogin();
-            } catch (err) {
-                errEl.textContent = err.message || 'Грешка при вход.';
-                errEl.classList.remove('hidden');
-            }
-            return false;
-        }
-
-        async function afterLogin() {
-            await loadPortalContentFromDb();
-            updateAuthUI();
-            if (isAdmin()) {
-                showScreen('screen-admin-choice');
-            } else if (canManageAdminPanel()) {
-                enterAdminPanel();
-            } else {
-                enterPortalView();
-            }
-        }
-
-        function enterPortalView() {
-            if (!hasPermission('view_portal')) {
-                alert('Нямате право за достъп до портала.');
-                return;
-            }
-            showScreen('screen-portal');
-            renderIncomeMatrixSection();
-            setLang(currentLangCode || 'bg');
-            setCity(currentCityName || 'София', document.getElementById('current-city-short')?.innerText || 'СФ');
+        function openCityGuide(city, shortCity) {
+            setCity(city, shortCity);
             switchGlobalPage('home');
-            updateAuthUI();
-            if (map) setTimeout(() => map.invalidateSize(), 200);
         }
 
-        function enterAdminPanel() {
-            if (!canManageAdminPanel()) {
-                alert('Нямате административни права.');
-                return;
-            }
-            showScreen('screen-admin');
-            document.getElementById('admin-tab-users').classList.toggle('hidden', !isAdmin() && !hasPermission('manage_users'));
-            document.getElementById('admin-tab-content').classList.toggle('hidden', !isAdmin() && !hasPermission('manage_content'));
-            if (isAdmin() || hasPermission('manage_users')) {
-                showAdminSection('users');
-                loadUsersTable();
-            } else {
-                showAdminSection('content');
-            }
-            initContentEditor();
-        }
-
-        function openAdminChoice() {
-            if (!isAdmin()) return;
-            showScreen('screen-admin-choice');
-        }
-
-        async function handleLogout() {
-            if (auth) await auth.signOut();
-            currentProfile = null;
-            document.getElementById('login-form')?.reset();
-            enterPortalView();
-        }
-
-        function togglePortalUserMenu() {
-            document.getElementById('portal-user-menu').classList.toggle('hidden');
-            document.getElementById('lang-menu')?.classList.add('hidden');
-            document.getElementById('city-menu')?.classList.add('hidden');
-        }
-
-        function showAdminSection(section) {
-            document.getElementById('admin-section-users').classList.toggle('hidden', section !== 'users');
-            document.getElementById('admin-section-content').classList.toggle('hidden', section !== 'content');
-            document.getElementById('admin-tab-users').className = section === 'users'
-                ? 'px-4 py-2 rounded-xl text-sm font-bold bg-brand-orange text-white'
-                : 'px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600';
-            document.getElementById('admin-tab-content').className = section === 'content'
-                ? 'px-4 py-2 rounded-xl text-sm font-bold bg-brand-orange text-white'
-                : 'px-4 py-2 rounded-xl text-sm font-bold bg-gray-100 text-gray-600';
-        }
-
-        function getSelectedPermissions(prefix) {
-            return Array.from(document.querySelectorAll(`input[name="${prefix}"]:checked`)).map((el) => el.value);
-        }
-
-        async function handleCreateUser(event) {
-            event.preventDefault();
-            const email = document.getElementById('new-email').value.trim().toLowerCase();
-            const password = document.getElementById('new-password').value;
-            const displayName = document.getElementById('new-display-name').value.trim() || email.split('@')[0];
-            const role = document.getElementById('new-role').value;
-            let permissions = getSelectedPermissions('new-perm');
-            if (role === 'admin') permissions = [...ALL_PERMISSIONS];
-            if (!permissions.includes('view_portal')) permissions.unshift('view_portal');
-            const errEl = document.getElementById('create-user-error');
-            errEl.classList.add('hidden');
-            try {
-                if (!db || !auth || !auth.currentUser) throw new Error('Нямате права за създаване на потребители.');
-                const signupAuth = getSecondaryAuth();
-                const { user } = await signupAuth.createUserWithEmailAndPassword(email, password);
-                await signupAuth.signOut();
-                await usersCollection().doc(user.uid).set({
-                    id: user.uid,
-                    email,
-                    username: email.split('@')[0],
-                    display_name: displayName,
-                    role,
-                    permissions,
-                    is_active: true,
-                    updated_at: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                await db.collection('siteData').doc('profiles').set({ _type: 'meta' }, { merge: true });
-                document.getElementById('create-user-form').reset();
-                loadUsersTable();
-            } catch (err) {
-                errEl.textContent = err.message || 'Грешка при създаване.';
-                errEl.classList.remove('hidden');
-            }
-            return false;
-        }
-
-        async function loadUsersTable() {
-            const tbody = document.getElementById('users-table-body');
-            tbody.innerHTML = '';
-            try {
-                const snap = await usersCollection().orderBy('email').get();
-                snap.forEach((doc) => {
-                    const user = doc.data();
-                    const tr = document.createElement('tr');
-                    tr.className = 'border-b border-gray-100';
-                    const perms = (user.permissions || []).join(', ');
-                    const userKey = user.email || user.username;
-                    tr.innerHTML = `
-                        <td class="py-3 pr-3 font-semibold">${user.display_name || user.username}<br><span class="text-xs text-gray-400">${userKey}</span></td>
-                        <td class="py-3 pr-3">${user.role}</td>
-                        <td class="py-3 pr-3 text-xs text-gray-500 max-w-[200px]">${perms}</td>
-                        <td class="py-3 pr-3">${user.is_active ? 'Да' : 'Не'}</td>
-                        <td class="py-3">
-                            <button type="button" class="text-brand-orange font-bold text-xs mr-2" onclick="toggleUserActive('${doc.id}', ${user.is_active ? 'false' : 'true'})">${user.is_active ? 'Спри' : 'Активирай'}</button>
-                        </td>`;
-                    tbody.appendChild(tr);
-                });
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-sm text-red-600">${err.message || err}</td></tr>`;
-            }
-        }
-
-        async function toggleUserActive(userId, active) {
-            try {
-                await usersCollection().doc(userId).update({
-                    is_active: active,
-                    updated_at: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                loadUsersTable();
-            } catch (err) {
-                alert(err.message || err);
-            }
-        }
-
-        function initContentEditor() {
-            const select = document.getElementById('content-section-select');
-            select.innerHTML = Object.entries(CONTENT_SECTIONS).map(([key, sec]) => `<option value="${key}">${sec.label}</option>`).join('');
-            renderContentEditor();
-        }
-
-        function renderContentEditor() {
-            const sectionKey = document.getElementById('content-section-select').value;
-            const lang = document.getElementById('content-lang-select').value;
-            const section = CONTENT_SECTIONS[sectionKey];
-            const container = document.getElementById('content-editor-fields');
-            container.innerHTML = '';
-            if (!section || !section.keys || !section.keys.length) {
-                container.innerHTML = '<p class="text-sm text-gray-500">За раздел „4. Доходи и Бонусна схема“ използвайте отделния бутон за пълен редактор.</p>';
-                return;
-            }
-            (section.keys || []).forEach((key) => {
-                const value = (translations[lang] && translations[lang][key]) || '';
-                const wrap = document.createElement('div');
-                wrap.innerHTML = `
-                    <label class="admin-field-label">${key}</label>
-                    <textarea data-content-key="${key}" rows="3" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium">${value.replace(/</g, '&lt;')}</textarea>`;
-                const textarea = wrap.querySelector('textarea');
-                textarea.value = value;
-                textarea.addEventListener('input', (e) => {
-                    if (!translations[lang]) translations[lang] = {};
-                    translations[lang][key] = e.target.value;
-                });
-                container.appendChild(wrap);
-            });
-        }
-
-        async function bootstrapApp() {
-            initFirebase();
-            await loadPortalContentFromDb();
-            enterPortalView();
-
-            if (auth) {
-                auth.onAuthStateChanged(async (user) => {
-                    if (user) {
-                        try {
-                            currentProfile = await fetchProfile(user.uid);
-                            if (!currentProfile || !currentProfile.is_active) {
-                                await auth.signOut();
-                                currentProfile = null;
-                            }
-                        } catch (err) {
-                            console.error(err);
-                            currentProfile = null;
-                        }
-                    } else {
-                        currentProfile = null;
-                    }
-                    updateAuthUI();
-                });
-            }
-        }
-
-        var currentPage = 'home';
-
-        function updateNavbar() {
-            const navAction = document.getElementById('nav-action');
-            if (!navAction) return;
-
-            if (currentPage === 'cars') {
-                navAction.classList.remove('hidden');
-                navAction.innerHTML = `<i class="fa-solid fa-house"></i> <span>${currentLangCode === 'en' ? 'Home' : '🏠 Начало'}</span>`;
-            } else {
-                if (CITIES_WITH_CARS.includes(currentCityName) && hasPermission('view_company_cars')) {
-                    navAction.classList.remove('hidden');
-                    navAction.innerHTML = `<i class="fa-solid fa-car"></i> <span>${currentLangCode === 'en' ? 'Company Cars' : '🚗 Служебни коли'}</span>`;
-                } else {
-                    navAction.classList.add('hidden');
-                }
-            }
-        }
-
-        function handleNavAction() {
-            if (currentPage === 'home') {
-                switchGlobalPage('cars');
-            } else {
-                switchGlobalPage('home');
-            }
+        function goToWelcome() {
+            switchGlobalPage('welcome');
         }
 
         function switchGlobalPage(pageId) {
-            if (pageId === 'cars' && !hasPermission('view_company_cars')) {
-                alert('Нямате достъп до секцията за служебни коли.');
-                return;
-            }
             document.querySelectorAll('.global-page').forEach(page => page.classList.replace('block', 'hidden'));
             document.getElementById('page-' + pageId).classList.replace('hidden', 'block');
             
             currentPage = pageId;
-            updateNavbar();
+            updateHeaderForPage();
 
             if (pageId === 'home') {
+                renderIncomeMatrixSection();
+                updateMapSectionForCity(currentCityName);
+                showCityOnMap(currentCityName);
                 if (map) setTimeout(() => map.invalidateSize(), 150);
-            } else {
+                document.querySelectorAll('.guide-nav-btn').forEach((btn) => {
+                    btn.classList.toggle('active', btn.getAttribute('data-section') === 'section-hero');
+                });
+            } else if (pageId === 'cars') {
                 if (carMap) setTimeout(() => carMap.invalidateSize(), 150);
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1592,11 +1235,11 @@
 
         window.addEventListener('scroll', () => {
             const header = document.getElementById('main-header');
-            if (window.scrollY > 50) {
-                header.classList.add('opacity-30', 'scale-90', 'hover:opacity-100', 'hover:scale-100');
-            } else {
-                header.classList.remove('opacity-30', 'scale-90', 'hover:opacity-100', 'hover:scale-100');
+            if (header && !header.classList.contains('hidden')) {
+                header.classList.toggle('opacity-95', window.scrollY > 20);
+                header.classList.toggle('shadow-md', window.scrollY > 20);
             }
+            updateGuideNavActive();
         });
 
         function openCarTab(tabName) {
@@ -1617,60 +1260,112 @@
 
         let translations = {
             bg: {
-                lang_name: "БГ | Български", nav_home: "🏠 Начало", nav_cars: "🚗 Служебни коли",
+                lang_name: "БГ | Български", nav_home: "Начало",
+                city_topics_label: "Раздели за този град", city_link_guide: "Куриерски наръчник", city_link_guide_desc: "Стартови точки, плащания, графици", city_link_cars: "Служебни коли", city_link_cars_desc: "Паркинг, поддръжка, аварии", cars_back_guide: "Обратно към наръчника",
+                welcome_title: "Добре дошли!", welcome_desc: "Тук ще намерите основната информация за куриерите — стартови точки, плащания, графици, доходи и контакти. Изберете вашия град, за да видите актуалния наръчник.", welcome_cities_title: "Изберете град", welcome_cities_desc: "Кликнете върху града, в който работите, за да отворите пълния наръчник.",
+                nav_sec_intro: "Въведение", nav_sec_map: "Стартови точки", nav_sec_pay: "Плащания", nav_sec_schedule: "Графици", nav_sec_income: "Доходи", nav_sec_contacts: "Контакти",
                 hero_badge: "АКТУАЛЕН НАРЪЧНИК 2026", hero_title: "Всичко за твоя успешен старт в Takeaway", hero_desc: "Добре дошли в нашия портал! Тук сме събрали актуалната информация за стартовите точки, методологията на плащане и директни контакти към ключовите отдели.",
                 map_title: "1. Стартови точки (София)", map_desc: "Интерактивна GPS карта с разпределение на официалните четири стартови зони в столицата.",
                 map_subtitle: "Ключови райони", map_text: "Официалните стартови точки са съобразени с гъстотата на поръчките и гарантират бърз старт на работния ви ден.",
                 map_list_title: "Основни стартови точки:", zone_1: "1 — Зона Център", zone_2: "2 — Зона Лозенец", zone_3: "3 — Зона Борово", zone_4: "4 — Зона Дървеница",
                 map_start_info: "Винаги активирайте смяната си <strong>вътре в границите</strong> на вашата назначена стартова точка в приложението Scoober.",
                 map_interactive: "Интерактивна GPS Карта", map_footer_info: "Това са официалните стартови точки за пускане (започване на смяна), а не зони за каране.",
+                map_desc_generic: "Интерактивна GPS карта на града. Стартовите зони ще бъдат добавени скоро.",
+                map_text_generic: "Прегледайте картата на града. Официалните стартови точки ще бъдат публикувани тук.",
+                map_generic_title: "Карта на града", map_generic_sub: "Стартовите зони ще бъдат добавени скоро",
+                map_generic_text: "Прегледайте интерактивната карта на града. Официалните стартови точки и зони ще бъдат публикувани тук, когато станат налични.",
+                map_start_info_generic: "Активирайте смяната си в приложението Scoober <strong>след като сте на място</strong> в определената стартова точка за вашия град.",
+                map_footer_generic: "Интерактивна карта на града. Стартовите зони ще бъдат добавени скоро.",
+                map_city_popup: "Локация на града",
                 pay_title: "2. График на плащанията", pay_desc: "Възнаграждението се разпределя в два транша всеки месец:", pay_30_title: "30-то число", pay_30_bul1: "Часове (1-ва половина на текущ месец).", pay_30_bul2: "Амортизация (1-ва половина на текущ месец).", pay_15_title: "15-то число", pay_15_bul1: "Остатък часове (2-ра половина на предходен месец).", pay_15_bul2: "Амортизация (2-ра половина на предходен месец).", pay_15_bul3: "Бонус поръчки за целия месец.",
                 schedule_title: "3. Планиране на смените", schedule_subtitle: "ГРАФИЦИ И КОРЕКЦИИ", schedule_important_title: "Краен срок за подаване", schedule_important_desc: "Всеки куриер трябва да подаде своите часове за следващата седмица <strong>най-късно до Вторник 23:59 ч.</strong>", schedule_edit_title: "Корекции след Вторник", schedule_edit_desc: "Корекции могат да се правят <strong>до Петък най-късно</strong>, и то <strong>само след изрично разрешение</strong> и връзка с отдел PAS. След публикуване на графика в петък, промени не са възможни.", schedule_how: "Как се подава график в приложението:", schedule_step1: "Отворете <strong>менюто вляво</strong> в приложението Scoober.", schedule_step2: "Изберете секция <strong>Планиране на график (Schedule)</strong>.", schedule_step3: "Маркирайте часовете, в които сте на разположение за новата седмица.",
                 matrix_title: "4. Доходи и Бонусна схема", matrix_info_desc: "Бонусът се трупа на месечна база. Посочените суми са брутни.", tab_personal: "С лична кола", tab_company: "Със служебна", contract_8h: "8-Hour (8ч)", contract_6h: "6-Hour (6ч)", contract_4h: "4-Hour (4ч)", contract_2h: "2-Hour (2ч)", avg_net_title: "Средно Нето Месечно* (заплата плюс бонус)", avg_net_title_2: "Средно Нето Месечно* (заплата плюс бонус)", avg_net_title_3: "Средно Нето Месечно* (заплата плюс бонус)", avg_net_title_4: "Средно Нето Месечно* (заплата плюс бонус)",
                 sim_title: "Симулатор", sim_desc: "Симулирай заплатата си спрямо очакваното представяне.", sim_net: "Очаквано Нето", sim_gross: "Бруто", sim_orders: "Поръчки", sim_hours: "Часове", calc_contract_lbl: "Договор", calc_vehicle_lbl: "Превозно", calc_days_lbl: "Раб. дни", calc_eff_lbl: "Ефект. (ч)", calc_eff_tooltip: "Среден брой поръчки за 1 час.",
-                helper_title: "5. Намери бързо това, което търсиш", helper_desc: "Не сте сигурни към кого да се обърнете? Напишете какво ви трябва по-долу и ние ще ви покажем точното място в приложението Scoober.", helper_quick: "Бързи търсения (Кликни)", helper_ph: "Напр. 'ресторант', 'болничен', 'заплата', 'график'...", helper_notfound: "Не открихме точна категория за", helper_try: "Опитайте с друга дума.", helper_path: "Как да стигна до там:",
-                contact_disp_title: "6. Връзка с Диспечери", contact_disp_subtitle: "ПО ВРЕМЕ НА АКТИВНА СМЯНА", contact_how_title: "Как да се свържете:", contact_step1: "Отворете приложението <strong>Scoober</strong>.", contact_step2: "Кликнете на <strong>иконата за чат</strong> в горния десен ъгъл.", contact_step3: "Опишете ясно казуса си в чата.",
-                contact_admin_title: "7. Директна Администрация", contact_admin_subtitle: "ИЗВЪН АКТИВНА СМЯНА", contact_admin_important: "<i class='fa-solid fa-envelope text-blue-500 mr-2'></i>Отговор до следващия работен ден.", contact_admin_how: "Къде е контактната форма:", admin_step1: "Отворете <strong>менюто вляво</strong> в Scoober.", admin_step2: "Изберете секция <strong>Профил (Profile)</strong>.", admin_step3: "Изберете <strong>Contact Form</strong>.",
+                helper_title: "Намери бързо това, което търсиш", helper_desc: "Не сте сигурни към кого да се обърнете? Напишете какво ви трябва по-долу и ние ще ви покажем точното място в приложението Scoober.", helper_quick: "Бързи търсения (Кликни)", helper_ph: "Напр. 'ресторант', 'болничен', 'заплата', 'график'...", helper_notfound: "Не открихме точна категория за", helper_try: "Опитайте с друга дума.", helper_path: "Как да стигна до там:",
+                contact_disp_title: "5. Връзка с Диспечери", contact_disp_subtitle: "ПО ВРЕМЕ НА АКТИВНА СМЯНА", contact_how_title: "Как да се свържете:", contact_step1: "Отворете приложението <strong>Scoober</strong>.", contact_step2: "Кликнете на <strong>иконата за чат</strong> в горния десен ъгъл.", contact_step3: "Опишете ясно казуса си в чата.",
+                contact_admin_title: "6. Директна Администрация", contact_admin_subtitle: "ИЗВЪН АКТИВНА СМЯНА", contact_admin_important: "<i class='fa-solid fa-envelope text-blue-500 mr-2'></i>Отговор до следващия работен ден.", contact_admin_how: "Къде е контактната форма:", admin_step1: "Отворете <strong>менюто вляво</strong> в Scoober.", admin_step2: "Изберете секция <strong>Профил (Profile)</strong>.", admin_step3: "Изберете <strong>Contact Form</strong>.",
                 footer_rights: "© 2026 Всички права запазени.", footer_info: "Вътрешна информационна платформа", select_contract: "Договор...", select_vehicle: "Избери...", hours: "ч",
                 map_popup_title: "(Стартова Точка)", map_popup_desc1: "Стартирайте смяната си вътре в този кръг.", map_popup_desc2: "Зона в границите на София.",
                 car_hero_badge: "СЛУЖЕБНИ АВТОМОБИЛИ 2026", car_hero_title: "Твоят служебен автомобил", car_hero_desc: "Пълен наръчник за експлоатация: локации на паркинга, правила за поддръжка, правилно зареждане с гориво и протоколи за действие при аварии.",
                 car_tab_map: "1. Карта & Старт", car_tab_maint: "2. Поддръжка", car_tab_sos: "3. Аварии & ПТП", car_tab_contacts: "4. Указател",
-                car_map_title: "1. Паркинг и Стартова зона", car_map_desc: "Локация на служебния паркинг и вашата задължителна стартова точка (Зона Център).", car_map_subtitle: "Ключови локации", car_map_text: "За куриерите със служебни автомобили процесът започва от фирмения паркинг, но смяната стартира официално едва когато достигнете определената зона.",
+                car_map_title: "1. Карта на ключови локации", car_map_desc: "Паркинг, стартова зона, автомивка, сервиз и пунктове за завеждане на щети.", car_map_subtitle: "Ключови локации", car_map_text: "За куриерите със служебни автомобили процесът започва от фирмения паркинг, но смяната стартира официално едва когато достигнете определената зона.",
                 car_loc_parking_title: "Паркинг Западен Парк", car_loc_parking_desc: "От тук взимате и тук връщате служебния автомобил. (бул. Сливница / Суходолска река)", car_loc_zone_title: "Стартова Зона (Център)", car_loc_zone_desc: "Единствената стартова точка за служебни автомобили. Тук се очаква най-голям брой поръчки.",
+                car_loc_wash_title: "Автомивка Рико", car_loc_wash_desc: "кв. Модерно предградие, ул. „Адам Мицкевич“, 1360 София",
+                car_loc_service_title: "SEAT Ауто техника / Hertz", car_loc_service_desc: "Сервиз — бул. Искърско шосе 13, София",
+                car_loc_claim1_title: "Завеждане на щети — Булстрад", car_loc_claim1_desc: "Горубляне, ул. Георги Белов 4",
+                car_loc_claim2_title: "Завеждане на щети — Булстрад", car_loc_claim2_desc: "г.к. Разсадника – Коньовица, ул. „Хъшове“ 3, 1330 София",
                 car_map_start_info: "<strong>Внимание:</strong> Активирайте смяната си в приложението <strong>САМО</strong> след като физически навлезете в границите на Зона Център.",
                 car_maint_title: "2. Експлоатация и Поддръжка", car_maint_desc: "Основни правила за грижа към служебния автомобил.",
-                car_maint_fuel_title: "Зареждане с гориво", car_maint_fuel_desc: "Зареждаме само на бензиностанции <strong>Лукойл</strong>. Фирмената карта е в жабката на колата, а ПИН кодът е написан на самата нея.", car_maint_wash_title: "Служебна Автомивка", car_maint_wash_desc: "Колата трябва да се предава чиста. Използвайте партньорската автомивка на адрес: [Адрес на мивката].", car_maint_clean_title: "Правила за автомобила", car_maint_clean_desc: "В колата <strong>не се пуши, не се яде</strong> и не се пият напитки без капачка. Забранено е возенето на други лица! Предавайте колата чиста и по възможност заредена.",
+                car_maint_fuel_title: "Зареждане с гориво", car_maint_fuel_desc: "Зареждаме само на бензиностанции <strong>Лукойл</strong>. Фирмената карта е в жабката на колата, а ПИН кодът е написан на самата нея.", car_maint_wash_title: "Служебна Автомивка", car_maint_wash_desc: "Колата трябва да се предава чиста. Партньорска автомивка: <strong>Автомивка Рико</strong> — кв. Модерно предградие, ул. „Адам Мицкевич“, 1360 София.", car_maint_clean_title: "Правила за автомобила", car_maint_clean_desc: "В колата <strong>не се пуши, не се яде</strong> и не се пият напитки без капачка. Забранено е возенето на други лица! Предавайте колата чиста и по възможност заредена.",
+                car_maint_claims_title: "Завеждане на щети", car_maint_service_title: "Официален сервиз", car_maint_service_desc: "<strong>SEAT Ауто техника ЕООД</strong> / Hertz — бул. Искърско шосе 13, София. Данните за сервиза се попълват в <strong>т. 6</strong> на двустранния протокол.",
                 car_sos_title: "3. Действия при ПТП или Авария", car_sos_desc: "Задължителни стъпки при инцидент на пътя или повреда на автомобила.", car_sos_step1_title: "Установяване на щетите", car_sos_step1_desc: "Първо, огледайте внимателно щетите. При ПТП и спор за вина, веднага позвънете на <strong>112</strong>.", car_sos_step2_title: "Попълване на двустранен протокол", car_sos_step2_desc: "Ако вината е установена от един от участниците и няма пострадали, попълнете двустранен констативен протокол по образеца по-долу.", car_sos_step3_title: "Уведомяване на Капитан", car_sos_step3_desc: "Уведомете <a href=\"tel:+359889627470\" class=\"text-blue-700 underline\">Владимир Ненков</a> за инцидента. Той ще ви даде последващи действия и указания.", car_sos_step4_title: "Репатрак (при нужда)", car_sos_step4_desc: "Ако колата не е в движение и има нужда от репатрак, Капитанът ще ви инструктира.",
                 car_protocol_title: "Двустранен констативен протокол", car_protocol_desc: "При леки материални щети, <strong>без пострадали хора</strong> и при пълно съгласие между двамата водачи за обстоятелствата, се попълва Двустранен протокол.",
+                car_protocol_guide_title: "Как се попълва протоколът", car_protocol_guide_intro: "Точки 1–5 са елементарни. По-долу са най-важните полета:",
+                car_protocol_p6: "Попълват се данните на <strong>Аутотехника</strong> (SEAT Ауто техника ЕООД).",
+                car_protocol_p7: "Рег. № на нашата служебна кола.",
+                car_protocol_p8: "Нашият застраховател + полицата (бял лист при документите на колата, започва с <strong>BG/03/12600...</strong>). Най-отдолу в полето отбелязват с <strong>„Х“</strong> опция <strong>„ДА“</strong>.",
+                car_protocol_p9: "Данни за водача (нашия шофьор).",
+                car_protocol_p10: "Маркират с <strong>„Х“</strong> къде има удари/щети.",
+                car_protocol_p11: "Кратко описание на щетите.",
+                car_protocol_p12: "С <strong>„Х“</strong> маркират валидните обстоятелства. За <strong>нашия шофьор</strong> обикновено е <strong>1</strong> обстоятелство, за <strong>другия водач</strong> — <strong>2</strong>. В края на т. 12 задължително отбелязват <strong>колко</strong> обстоятелства са маркирали.",
+                car_protocol_p13: "Чертаят схема на инцидента.",
+                car_protocol_p14: "В забележката пишат: <strong>НЕВИНЕН</strong> или <strong>ВИНОВЕН</strong> съм.",
+                car_protocol_p15: "Подписи в бялото поле от двамата водачи.",
                 car_contact_title: "4. Телефонен указател", car_contact_desc: "Списък с отговорниците за автопарка. Използвайте бутоните за директно набиране.", car_c1_role: "Капитан", car_c1_desc: "За въпроси, свързани с промяна в графика и разпределението на колите.", car_c2_role: "Капитан", car_c2_desc: "За спешни въпроси, свързани с повреда по автомобила или при възникнало ПТП.", car_c3_title: "Пътна помощ", car_c3_role: "Денонощен репатрак", car_c3_desc: "Звънете на този номер само след предварително съгласуване с Капитан.", car_btn_call: "Позвъни", car_cap_hours: "Пон-Пет | 10:00 - 18:00",
                 btn_show_sample: "Виж примерния протокол"
             },
             en: {
-                lang_name: "EN | English", nav_home: "🏠 Home", nav_cars: "🚗 Company Cars",
+                lang_name: "EN | English", nav_home: "Home",
+                city_topics_label: "Sections for this city", city_link_guide: "Courier guide", city_link_guide_desc: "Starting points, payments, schedules", city_link_cars: "Company cars", city_link_cars_desc: "Parking, maintenance, accidents", cars_back_guide: "Back to city guide",
+                welcome_title: "Welcome!", welcome_desc: "Here you will find essential information for couriers — starting points, payments, schedules, income and contacts. Select your city to open the full guide.", welcome_cities_title: "Choose your city", welcome_cities_desc: "Click on the city where you work to open the full guide.",
+                nav_sec_intro: "Introduction", nav_sec_map: "Starting points", nav_sec_pay: "Payments", nav_sec_schedule: "Schedules", nav_sec_income: "Income", nav_sec_contacts: "Contacts",
                 hero_badge: "LATEST GUIDE 2026", hero_title: "Everything for your successful start at Takeaway", hero_desc: "Welcome to our portal! Here we have gathered the latest information about the starting points, payment methodology, and direct contacts to key departments.",
                 map_title: "1. Starting Points (Sofia)", map_desc: "Interactive GPS map with the distribution of the official four starting zones in the capital.",
                 map_subtitle: "Key Areas", map_text: "The official starting points are tailored to order density and guarantee a quick start to your working day.",
                 map_list_title: "Main starting points:", zone_1: "1 — Zone Center", zone_2: "2 — Zone Lozenets", zone_3: "3 — Zone Borovo", zone_4: "4 — Zone Darvenitsa",
                 map_start_info: "Always activate your shift <strong>within the boundaries</strong> of your assigned starting point in the Scoober app.",
                 map_interactive: "Interactive GPS Map", map_footer_info: "These are the official starting points for starting a shift, not riding zones.",
+                map_desc_generic: "Interactive GPS map of the city. Starting zones will be added soon.",
+                map_text_generic: "Browse the city map. Official starting points will be published here.",
+                map_generic_title: "City map", map_generic_sub: "Starting zones coming soon",
+                map_generic_text: "Browse the interactive city map. Official starting points and zones will be published here when available.",
+                map_start_info_generic: "Activate your shift in the Scoober app <strong>once you are at</strong> your designated starting point for your city.",
+                map_footer_generic: "Interactive city map. Starting zones will be added soon.",
+                map_city_popup: "City location",
                 pay_title: "2. Payment Schedule", pay_desc: "The remuneration is distributed in two tranches every month:", pay_30_title: "30th of the month", pay_30_bul1: "Hours (1st half of the current month).", pay_30_bul2: "Amortization (1st half of the current month).", pay_15_title: "15th of the month", pay_15_bul1: "Remaining hours (2nd half of the previous month).", pay_15_bul2: "Amortization (2nd half of the previous month).", pay_15_bul3: "Order bonus for the whole month.",
                 schedule_title: "3. Shift Planning", schedule_subtitle: "SCHEDULES & CORRECTIONS", schedule_important_title: "Submission Deadline", schedule_important_desc: "Every courier must submit their hours for the next week <strong>by Tuesday 23:59 at the latest</strong>.", schedule_edit_title: "Corrections after Tuesday", schedule_edit_desc: "Corrections can be made <strong>until Friday at the latest</strong>, and <strong>only after explicit permission</strong> and contact with the PAS department. Once the schedule is published on Friday, no changes are possible.", schedule_how: "How to submit a schedule:", schedule_step1: "Open the <strong>left menu</strong> in the Scoober app.", schedule_step2: "Select the <strong>Schedule Planning</strong> section.", schedule_step3: "Mark the hours you are available for the new week.",
                 matrix_title: "4. Income and Bonus Scheme", matrix_info_desc: "The bonus is accumulated on a monthly basis. The amounts are gross.", tab_personal: "Personal Car", tab_company: "Company Car", contract_8h: "8-Hour", contract_6h: "6-Hour", contract_4h: "4-Hour", contract_2h: "2-Hour", avg_net_title: "Avg. Net Monthly* (salary plus bonus)", avg_net_title_2: "Avg. Net Monthly* (salary plus bonus)", avg_net_title_3: "Avg. Net Monthly* (salary plus bonus)", avg_net_title_4: "Avg. Net Monthly* (salary plus bonus)",
                 sim_title: "Simulator", sim_desc: "Simulate your salary based on expected performance.", sim_net: "Expected Net", sim_gross: "Gross", sim_orders: "Orders", sim_hours: "Hours", calc_contract_lbl: "Contract", calc_vehicle_lbl: "Vehicle", calc_days_lbl: "Work days", calc_eff_lbl: "Efficiency (h)", calc_eff_tooltip: "Average number of orders you deliver per 1 hour.",
-                helper_title: "5. Find what you need quickly", helper_desc: "Not sure who to contact? Type what you need below and we will show you exactly where to go in the Scoober app.", helper_quick: "Quick searches (Click)", helper_ph: "E.g. 'restaurant', 'sick', 'salary', 'schedule'...", helper_notfound: "We couldn't find an exact match for", helper_try: "Try another word.", helper_path: "Where to click in the app:",
-                contact_disp_title: "6. Contact Dispatchers", contact_disp_subtitle: "DURING AN ACTIVE SHIFT", contact_how_title: "How to connect:", contact_step1: "Open the <strong>Scoober</strong> app.", contact_step2: "Click on the <strong>chat icon</strong> in the top right corner.", contact_step3: "Clearly describe your issue in the chat.",
-                contact_admin_title: "7. Direct Administration", contact_admin_subtitle: "OUTSIDE ACTIVE SHIFT", contact_admin_important: "<i class='fa-solid fa-envelope text-blue-500 mr-2'></i>Answer within the next working day.", contact_admin_how: "Where is the contact form:", admin_step1: "Open the <strong>left menu</strong> in Scoober.", admin_step2: "Select the <strong>Profile</strong> section.", admin_step3: "Select <strong>Contact Form</strong>.",
+                helper_title: "Find what you need quickly", helper_desc: "Not sure who to contact? Type what you need below and we will show you exactly where to go in the Scoober app.", helper_quick: "Quick searches (Click)", helper_ph: "E.g. 'restaurant', 'sick', 'salary', 'schedule'...", helper_notfound: "We couldn't find an exact match for", helper_try: "Try another word.", helper_path: "Where to click in the app:",
+                contact_disp_title: "5. Contact Dispatchers", contact_disp_subtitle: "DURING AN ACTIVE SHIFT", contact_how_title: "How to connect:", contact_step1: "Open the <strong>Scoober</strong> app.", contact_step2: "Click on the <strong>chat icon</strong> in the top right corner.", contact_step3: "Clearly describe your issue in the chat.",
+                contact_admin_title: "6. Direct Administration", contact_admin_subtitle: "OUTSIDE ACTIVE SHIFT", contact_admin_important: "<i class='fa-solid fa-envelope text-blue-500 mr-2'></i>Answer within the next working day.", contact_admin_how: "Where is the contact form:", admin_step1: "Open the <strong>left menu</strong> in Scoober.", admin_step2: "Select the <strong>Profile</strong> section.", admin_step3: "Select <strong>Contact Form</strong>.",
                 footer_rights: "© 2026 All rights reserved.", footer_info: "Internal Information Platform", select_contract: "Select...", select_vehicle: "Select...", hours: "h",
                 map_popup_title: "(Starting Point)", map_popup_desc1: "Start your shift inside this circle.", map_popup_desc2: "Zone within Sofia boundaries.",
                 car_hero_badge: "COMPANY CARS 2026", car_hero_title: "Your Company Car", car_hero_desc: "Complete operational handbook: locations, maintenance, refueling, and emergency protocols.",
                 car_tab_map: "Map & Start", car_tab_maint: "Maintenance", car_tab_sos: "Accidents & SOS", car_tab_contacts: "Contacts",
-                car_map_title: "1. Parking & Starting Zone", car_map_desc: "Location of the company parking and your mandatory starting point (Zone Center).", car_map_subtitle: "Key Locations", car_map_text: "For couriers with company cars, the process starts at the company parking lot, but the shift officially begins only when you reach the designated zone.",
-                car_loc_parking_title: "Parking Zapaden Park", car_loc_parking_desc: "Pick up and drop off the company car here. (Slivnitsa Blvd / Suhodolska River)", car_loc_zone_title: "Starting Zone (Center)", car_loc_zone_desc: "The only starting point for company cars. The highest volume of orders is expected here.",
+                car_map_title: "1. Key Locations Map", car_map_desc: "Parking, starting zone, car wash, service center and insurance claim offices.", car_map_subtitle: "Key Locations", car_map_text: "For company car couriers, the process starts at the company parking lot, but the shift officially begins only when you reach the designated zone.",
+                car_loc_parking_title: "Zapaden Park Parking", car_loc_parking_desc: "Pick up and return the company car here. (Slivnitsa Blvd / Suhodolska River)", car_loc_zone_title: "Starting Zone (Center)", car_loc_zone_desc: "The only starting point for company cars. Highest order volume expected here.",
+                car_loc_wash_title: "Riko Car Wash", car_loc_wash_desc: "Moderno Predgradie, Adam Mickiewicz St., 1360 Sofia",
+                car_loc_service_title: "SEAT Auto Technika / Hertz", car_loc_service_desc: "Service — 13 Iskarsko Shose Blvd., Sofia",
+                car_loc_claim1_title: "Insurance Claims — Bulstrad", car_loc_claim1_desc: "Gorubliane, 4 Georgi Belov St.",
+                car_loc_claim2_title: "Insurance Claims — Bulstrad", car_loc_claim2_desc: "Razsadnika – Konyovitsa, 3 Hashove St., 1330 Sofia",
                 car_map_start_info: "<strong>Attention:</strong> Activate your shift in the app <strong>ONLY</strong> after physically entering the boundaries of Zone Center.",
                 car_maint_title: "2. Maintenance & Operation", car_maint_desc: "Basic rules for taking care of the company car.",
-                car_maint_fuel_title: "Refueling", car_maint_fuel_desc: "Refuel only at <strong>Lukoil</strong> stations. The company card is in the glove box, and the PIN code is written on it.", car_maint_wash_title: "Company Car Wash", car_maint_wash_desc: "The car must be returned clean. Use the partner car wash at: [Car Wash Address].", car_maint_clean_title: "Car Rules", car_maint_clean_desc: "<strong>No smoking, no eating</strong>, and no open drinks. Transporting other people is strictly forbidden! Return the car clean and preferably refueled.",
+                car_maint_fuel_title: "Refueling", car_maint_fuel_desc: "Refuel only at <strong>Lukoil</strong> stations. The company card is in the glove box, and the PIN code is written on it.", car_maint_wash_title: "Company Car Wash", car_maint_wash_desc: "The car must be returned clean. Partner wash: <strong>Riko Car Wash</strong> — Moderno Predgradie, Adam Mickiewicz St., 1360 Sofia.", car_maint_clean_title: "Car Rules", car_maint_clean_desc: "<strong>No smoking, no eating</strong>, and no open drinks. Transporting other people is strictly forbidden! Return the car clean and preferably refueled.",
+                car_maint_claims_title: "Insurance Claims", car_maint_service_title: "Official Service", car_maint_service_desc: "<strong>SEAT Auto Technika EOOD</strong> / Hertz — 13 Iskarsko Shose Blvd., Sofia. Service details go in <strong>section 6</strong> of the bilateral protocol.",
                 car_sos_title: "3. Accidents & Emergencies", car_sos_desc: "Mandatory steps in case of a road accident or vehicle breakdown.", car_sos_step1_title: "Secure the area", car_sos_step1_desc: "Put on a reflective vest and place a triangle. If anyone is injured, call <strong>112</strong> immediately.", car_sos_step2_title: "Police Protocol", car_sos_step2_desc: "In case of an accident, you must call the police (112) for a protocol, even if the damage is minor.", car_sos_step3_title: "Inform Us", car_sos_step3_desc: "Message Dispatch immediately via Scoober to remove the order. Then call your <strong>Captain</strong>.", car_sos_step4_title: "Tow Truck", car_sos_step4_desc: "If the car is not drivable, the Captain will instruct you to call the partner tow truck.",
                 car_protocol_title: "Bilateral Accident Protocol", car_protocol_desc: "For minor material damages, with no injured people and full agreement between drivers, fill out a Bilateral Protocol.",
+                car_protocol_guide_title: "How to fill in the protocol", car_protocol_guide_intro: "Sections 1–5 are straightforward. Key fields below:",
+                car_protocol_p6: "Enter <strong>Auto Technika</strong> (SEAT Auto Technika EOOD) details.",
+                car_protocol_p7: "Registration number of our company car.",
+                car_protocol_p8: "Our insurer + policy (white sheet in car documents, starts with <strong>BG/03/12600...</strong>). At the bottom, mark <strong>\"X\"</strong> on <strong>\"YES\"</strong>.",
+                car_protocol_p9: "Driver details (our driver).",
+                car_protocol_p10: "Mark with <strong>\"X\"</strong> where damage occurred.",
+                car_protocol_p11: "Brief description of damage.",
+                car_protocol_p12: "Mark valid circumstances with <strong>\"X\"</strong>. Our driver usually has <strong>1</strong>, the other driver <strong>2</strong>. At the end of section 12, state <strong>how many</strong> circumstances were marked.",
+                car_protocol_p13: "Draw an accident diagram.",
+                car_protocol_p14: "In remarks write: I am <strong>NOT AT FAULT</strong> / <strong>AT FAULT</strong>.",
+                car_protocol_p15: "Signatures in the white field by both drivers.",
                 car_contact_title: "4. Phone Directory", car_contact_desc: "List of fleet managers. Use the buttons for direct calling.", car_c1_role: "Schedule Captain", car_c1_desc: "For questions related to schedule changes and car distribution.", car_c2_role: "Emergency Captain", car_c2_desc: "For urgent questions related to car breakdowns or accidents.", car_c3_title: "Tow Truck / Assistance", car_c3_role: "24/7 Service", car_c3_desc: "Call this number only after prior consultation with a Captain.", car_btn_call: "Call Now", car_cap_hours: "Mon-Fri | 10:00 - 18:00",
                 btn_show_sample: "View sample sheet"
             }
@@ -1706,7 +1401,7 @@
 
         function toggleLangMenu() {
             document.getElementById('lang-menu').classList.toggle('hidden');
-            document.getElementById('city-menu').classList.add('hidden');
+            document.getElementById('city-menu')?.classList.add('hidden');
         }
 
         const CITIES_WITH_CARS = ['София', 'Перник', 'Благоевград'];
@@ -1714,7 +1409,6 @@
         function setCity(city, shortCity) {
             currentCityName = city;
             document.getElementById('current-city').innerText = city;
-            document.getElementById('current-city-short').innerText = shortCity || city.substring(0, 2).toUpperCase();
             document.getElementById('city-menu').classList.add('hidden');
             
             const mapTitleEl = document.querySelector('[data-i18n="map_title"]');
@@ -1732,7 +1426,36 @@
                     switchGlobalPage('home');
                 }
             }
-            updateNavbar();
+            incomeMatrix = buildIncomeMatrixForCity(city);
+            updateCityTopicLinks();
+            updateMapSectionForCity(city);
+            showCityOnMap(city);
+            if (currentPage === 'home') {
+                renderIncomeMatrixSection();
+                if (map) setTimeout(() => map.invalidateSize(), 150);
+            }
+        }
+
+        function updateMapSectionForCity(city) {
+            const config = CITY_MAP_CONFIG[city] || CITY_MAP_CONFIG['София'];
+            const hasZones = !!config.hasZones;
+            const lang = currentLangCode || 'bg';
+            const t = translations[lang];
+
+            document.getElementById('map-zones-panel')?.classList.toggle('hidden', !hasZones);
+            document.getElementById('map-generic-info')?.classList.toggle('hidden', hasZones);
+
+            const descEl = document.getElementById('map-desc-text');
+            if (descEl) descEl.innerHTML = hasZones ? t.map_desc : t.map_desc_generic;
+
+            const sidebarText = document.getElementById('map-sidebar-text');
+            if (sidebarText) sidebarText.innerHTML = hasZones ? t.map_text : t.map_text_generic;
+
+            const startInfo = document.getElementById('map-start-info-text');
+            if (startInfo) startInfo.innerHTML = hasZones ? t.map_start_info : t.map_start_info_generic;
+
+            const footerEl = document.getElementById('map-footer-text');
+            if (footerEl) footerEl.innerHTML = hasZones ? t.map_footer_info : t.map_footer_generic;
         }
 
         window.addEventListener('click', (e) => {
@@ -1743,13 +1466,9 @@
             }
             const langBtn = document.getElementById('lang-btn');
             const langMenu = document.getElementById('lang-menu');
-            if (langBtn && langMenu && !langBtn.contains(e.target) && !langMenu.contains(e.target)) {
+            const langFixed = document.getElementById('lang-fixed');
+            if (langBtn && langMenu && langFixed && !langFixed.contains(e.target)) {
                 langMenu.classList.add('hidden');
-            }
-            const portalUserBtn = document.getElementById('portal-user-btn');
-            const portalUserMenu = document.getElementById('portal-user-menu');
-            if (portalUserBtn && portalUserMenu && !portalUserBtn.contains(e.target) && !portalUserMenu.contains(e.target)) {
-                portalUserMenu.classList.add('hidden');
             }
         });
 
@@ -1769,9 +1488,12 @@
             });
             initCalculator(); updateUI();
             renderContractCards();
-            if (map) showSofiaOnMap(); if (carMap) showCompanyLocationsOnMap();
+            updateMapSectionForCity(currentCityName);
+            showCityOnMap(currentCityName);
+            if (carMap) showCompanyLocationsOnMap();
             document.getElementById('searchInput').placeholder = translations[lang].helper_ph;
             renderHelperQuickLinks();
+            renderCitiesGrid();
             const searchVal = document.getElementById('searchInput').value.trim();
             if(searchVal !== "") performHelperSearch(searchVal.toLowerCase());
             
@@ -1803,68 +1525,78 @@
             renderContractCards();
         }
 
-        const CONFIG = { CITIES: { "София": { hasTierBonus: true, vehicles: ["personal_car", "company_car", "personal_bike"] } } };
         function initCalculator() {
-            const city = CONFIG.CITIES["София"];
             const sal = incomeMatrix.baseSalary;
             const t = translations[currentLangCode];
             const labels = incomeMatrix.vehicleLabels[currentLangCode] || incomeMatrix.vehicleLabels.bg;
-            const conSel = document.getElementById("contract");
-            const savedContract = conSel ? conSel.value : "";
+            const conSel = document.getElementById('contract');
+            const savedContract = conSel ? conSel.value : '';
             if (conSel) {
                 conSel.innerHTML = `<option value="" disabled ${!savedContract ? 'selected' : ''}>${t.select_contract}</option>`;
-                [8, 6, 4, 2].forEach(h => {
+                [8, 6, 4, 2].forEach((h) => {
                     conSel.innerHTML += `<option value="${h}" ${savedContract == h ? 'selected' : ''}>${h} ${t.hours} (${sal[h]} €)</option>`;
                 });
             }
-            const vSel = document.getElementById("vehicle");
-            const savedVehicle = vSel ? vSel.value : "";
+            const vSel = document.getElementById('vehicle');
+            const savedVehicle = vSel ? vSel.value : '';
             if (vSel) {
                 vSel.innerHTML = `<option value="" disabled ${!savedVehicle ? 'selected' : ''}>${t.select_vehicle}</option>`;
-                incomeMatrix.vehicles.forEach(v => {
+                incomeMatrix.vehicles.forEach((v) => {
                     vSel.innerHTML += `<option value="${v}" ${savedVehicle === v ? 'selected' : ''}>${labels[v] || v}</option>`;
                 });
             }
         }
+
         function updateUI() {
-            const contractVal = document.getElementById("contract")?.value;
-            const vehicleVal = document.getElementById("vehicle")?.value;
-            const daysVal = document.getElementById("days")?.value;
-            const effVal = document.getElementById("eff")?.value;
+            const contractVal = document.getElementById('contract')?.value;
+            const vehicleVal = document.getElementById('vehicle')?.value;
+            const daysVal = document.getElementById('days')?.value;
+            const effVal = document.getElementById('eff')?.value;
             if (!contractVal || !vehicleVal || !daysVal || !effVal) {
-                document.getElementById("outNet").textContent = "0.00 €";
-                document.getElementById("outGross").textContent = "0.00 €";
-                document.getElementById("outOrders").textContent = "0";
-                document.getElementById("outMonthlyHours").textContent = "0";
+                document.getElementById('outNet').textContent = '0.00 €';
+                document.getElementById('outGross').textContent = '0.00 €';
+                document.getElementById('outOrders').textContent = '0';
+                document.getElementById('outMonthlyHours').textContent = '0';
                 return;
             }
+            const city = CITY_INCOME_CONFIG[currentCityName] || CITY_INCOME_CONFIG['София'];
             const contract = Number(contractVal);
             const workedDays = Math.max(0, Number(daysVal));
             const eff = Number(effVal);
             const hours = contract * workedDays;
             const orders = Math.round(eff * hours);
-            const isCar = vehicleVal === "personal_car" || vehicleVal === "company_car";
-            const kmPerOrder = isCar ? incomeMatrix.kmPerOrder.car : incomeMatrix.kmPerOrder.bike;
-            const km = orders * kmPerOrder;
+            const km = orders * getKmPerOrder(city, vehicleVal);
             const baseGross = incomeMatrix.baseSalary[contract];
+
             let bonusGross = 0;
-            const th = incomeMatrix.bonusThresholds[contract];
-            const rates = incomeMatrix.bonusRates;
-            const n = [
-                Math.min(orders, th[0]),
-                Math.max(0, Math.min(orders, th[1]) - th[0]),
-                Math.max(0, Math.min(orders, th[2]) - th[1]),
-                Math.max(0, orders - th[2])
-            ];
-            bonusGross = (n[0] * rates.base) + (n[1] * rates.mid) + (n[2] * rates.high) + (n[3] * rates.super);
-            const amortRate = vehicleVal === "company_car" ? 0 : (vehicleVal.includes("bike") ? incomeMatrix.amortPerKm.bike : incomeMatrix.amortPerKm.car);
-            const amortGross = vehicleVal === "company_car" ? 0 : (km * amortRate);
+            if (city.hasTierBonus) {
+                const th = BONUS_THRESHOLDS[contract];
+                const n = [
+                    Math.min(orders, th[0]),
+                    Math.max(0, Math.min(orders, th[1]) - th[0]),
+                    Math.max(0, Math.min(orders, th[2]) - th[1]),
+                    Math.max(0, orders - th[2])
+                ];
+                bonusGross = (n[0] * BONUS_RATES.base) + (n[1] * BONUS_RATES.mid) + (n[2] * BONUS_RATES.high) + (n[3] * BONUS_RATES.super);
+            } else {
+                bonusGross = orders * FIXED_BONUS_RATE;
+            }
+
+            let amortGross = 0;
+            if (vehicleVal !== 'company_car' && vehicleVal !== 'company_bike') {
+                if (city.specialAmort) {
+                    amortGross = hours * 1.38;
+                } else {
+                    amortGross = km * (vehicleVal.includes('bike') ? 0.11 : 0.17);
+                }
+            }
+
             const totalGross = baseGross + bonusGross + amortGross;
             const totalNet = totalGross - (totalGross * incomeMatrix.tax);
-            document.getElementById("outNet").textContent = totalNet.toFixed(2) + " €";
-            document.getElementById("outGross").textContent = totalGross.toFixed(2) + " €";
-            document.getElementById("outOrders").textContent = orders;
-            document.getElementById("outMonthlyHours").textContent = hours;
+            document.getElementById('outNet').textContent = totalNet.toFixed(2) + ' €';
+            document.getElementById('outGross').textContent = totalGross.toFixed(2) + ' €';
+            document.getElementById('outOrders').textContent = orders;
+            document.getElementById('outMonthlyHours').textContent = hours;
         }
 
         // --- УМЕН ПОМОЩНИК ТЪРСЕНЕ ---
@@ -1920,13 +1652,47 @@
         }
 
         var map, carMap; var mapLayers = [], carMapLayers = [];
-        const MAP_ZONES = { sofia: { center: [42.680, 23.325], zoom: 12.4, circles: [{ coords: [42.6975, 23.3320], color: '#2563eb', fillColor: '#3b82f6', fillOpacity: 0.22, weight: 3.5, radius: 2100, label: '1 — Зона Център', labelEn: '1 — Zone Center', pinColor: '#2563eb' }, { coords: [42.6705, 23.3195], color: '#7c3aed', fillColor: '#a855f7', fillOpacity: 0.22, weight: 3.5, radius: 1800, label: '2 — Зона Лозенец', labelEn: '2 — Zone Lozenets', pinColor: '#7c3aed' }, { coords: [42.6730, 23.2925], color: '#16a34a', fillColor: '#22c55e', fillOpacity: 0.22, weight: 3.5, radius: 1950, label: '3 — Зона Борово', labelEn: '3 — Zone Borovo', pinColor: '#16a34a' }, { coords: [42.6560, 23.3610], color: '#dc2626', fillColor: '#ef4444', fillOpacity: 0.22, weight: 3.5, radius: 3850, label: '4 — Зона Дървеница', labelEn: '4 — Zone Darvenitsa', pinColor: '#dc2626' }] } };
-        const CAR_MAP_LOCATIONS = { center: [42.70607, 23.30569], zoom: 13, parking: [42.715471, 23.279151], zoneCenter: [42.6975, 23.3320], radius: 2100 };
+
+        const SOFIA_MAP_ZONES = [
+            { coords: [42.6975, 23.3320], color: '#2563eb', fillColor: '#3b82f6', fillOpacity: 0.22, weight: 3.5, radius: 2100, label: '1 — Зона Център', labelEn: '1 — Zone Center', pinColor: '#2563eb' },
+            { coords: [42.6705, 23.3195], color: '#7c3aed', fillColor: '#a855f7', fillOpacity: 0.22, weight: 3.5, radius: 1800, label: '2 — Зона Лозенец', labelEn: '2 — Zone Lozenets', pinColor: '#7c3aed' },
+            { coords: [42.6730, 23.2925], color: '#16a34a', fillColor: '#22c55e', fillOpacity: 0.22, weight: 3.5, radius: 1950, label: '3 — Зона Борово', labelEn: '3 — Zone Borovo', pinColor: '#16a34a' },
+            { coords: [42.6560, 23.3610], color: '#dc2626', fillColor: '#ef4444', fillOpacity: 0.22, weight: 3.5, radius: 3850, label: '4 — Зона Дървеница', labelEn: '4 — Zone Darvenitsa', pinColor: '#dc2626' }
+        ];
+
+        const CITY_MAP_CONFIG = {
+            'София': { center: [42.680, 23.325], zoom: 12.4, hasZones: true, circles: SOFIA_MAP_ZONES },
+            'Пловдив': { center: [42.1354, 24.7453], zoom: 12.5 },
+            'Варна': { center: [43.2141, 27.9147], zoom: 12.5 },
+            'Бургас': { center: [42.5048, 27.4626], zoom: 12.5 },
+            'Русе': { center: [43.8356, 25.9657], zoom: 12.5 },
+            'Стара Загора': { center: [42.4258, 25.6345], zoom: 12.5 },
+            'Плевен': { center: [43.4170, 24.6067], zoom: 12.5 },
+            'Перник': { center: [42.6052, 23.0370], zoom: 13 },
+            'Благоевград': { center: [42.0208, 23.0945], zoom: 12.5 },
+            'Велико Търново': { center: [43.0757, 25.6172], zoom: 12.5 },
+            'Казанлък': { center: [42.6194, 25.3930], zoom: 13 },
+            'Габрово': { center: [42.8742, 25.3187], zoom: 13 }
+        };
+
+        const CAR_MAP_LOCATIONS = {
+            center: [42.685, 23.33],
+            zoom: 11.2,
+            places: [
+                { id: 'parking', coords: [42.715471, 23.279151], color: '#FF7A00', icon: 'fa-car', label: 'P', pulse: true, titleKey: 'car_loc_parking_title', descKey: 'car_loc_parking_desc' },
+                { id: 'zone', coords: [42.6975, 23.3320], color: '#2563eb', icon: '1', circle: true, radius: 2100, titleKey: 'car_loc_zone_title', descKey: 'car_loc_zone_desc' },
+                { id: 'wash', coords: [42.719681, 23.279531], color: '#0891b2', icon: 'fa-shower', label: 'M', titleKey: 'car_loc_wash_title', descKey: 'car_loc_wash_desc' },
+                { id: 'service', coords: [42.671523, 23.399063], color: '#7c3aed', icon: 'fa-wrench', label: 'S', titleKey: 'car_loc_service_title', descKey: 'car_loc_service_desc' },
+                { id: 'claim1', coords: [42.636752, 23.402626], color: '#d97706', icon: 'fa-file', label: 'B1', titleKey: 'car_loc_claim1_title', descKey: 'car_loc_claim1_desc' },
+                { id: 'claim2', coords: [42.695249, 23.292427], color: '#f59e0b', icon: 'fa-file', label: 'B2', titleKey: 'car_loc_claim2_title', descKey: 'car_loc_claim2_desc' }
+            ]
+        };
 
         function initMaps() {
             if (typeof L === 'undefined') return;
+            const defaultConfig = CITY_MAP_CONFIG['София'];
             if (document.getElementById('main-map')) {
-                map = L.map('main-map', { zoomControl: true, scrollWheelZoom: false }).setView(MAP_ZONES.sofia.center, MAP_ZONES.sofia.zoom);
+                map = L.map('main-map', { zoomControl: true, scrollWheelZoom: false }).setView(defaultConfig.center, defaultConfig.zoom);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(map);
             }
             if (document.getElementById('company-map')) {
@@ -1936,32 +1702,96 @@
             }
         }
 
-        function showSofiaOnMap() {
-            if (!map) return; mapLayers.forEach(layer => map.removeLayer(layer)); mapLayers = []; const t = translations[currentLangCode];
-            MAP_ZONES.sofia.circles.forEach((c, index) => {
-                const lbl = currentLangCode === 'en' ? c.labelEn : c.label;
-                const circle = L.circle(c.coords, { color: c.color, fillColor: c.fillColor, fillOpacity: c.fillOpacity, weight: c.weight, radius: c.radius }).addTo(map).bindPopup(`<strong>${lbl} ${t.map_popup_title}</strong><br><span style="font-size:11px;">${t.map_popup_desc1}</span>`); mapLayers.push(circle);
-                const marker = L.marker(c.coords, { icon: L.divIcon({ className: 'custom-div-icon', html: `<div class="flex items-center justify-center w-8 h-8 rounded-full shadow-lg border-2 border-white text-white font-black text-sm" style="background-color: ${c.pinColor};">${index + 1}</div>`, iconSize: [32, 32], iconAnchor: [16, 16] }) }).addTo(map).bindPopup(`<strong>${lbl} ${t.map_popup_title}</strong><br><span style="font-size:11px;">${t.map_popup_desc2}</span>`); mapLayers.push(marker);
-            });
+        function showCityOnMap(cityName) {
+            if (!map) return;
+            mapLayers.forEach((layer) => map.removeLayer(layer));
+            mapLayers = [];
+            const config = CITY_MAP_CONFIG[cityName] || CITY_MAP_CONFIG['София'];
+            const t = translations[currentLangCode];
+            map.setView(config.center, config.zoom, { animate: true });
+
+            if (config.hasZones && config.circles) {
+                config.circles.forEach((c, index) => {
+                    const lbl = currentLangCode === 'en' ? c.labelEn : c.label;
+                    const circle = L.circle(c.coords, { color: c.color, fillColor: c.fillColor, fillOpacity: c.fillOpacity, weight: c.weight, radius: c.radius }).addTo(map).bindPopup(`<strong>${lbl} ${t.map_popup_title}</strong><br><span style="font-size:11px;">${t.map_popup_desc1}</span>`);
+                    mapLayers.push(circle);
+                    const marker = L.marker(c.coords, { icon: L.divIcon({ className: 'custom-div-icon', html: `<div class="flex items-center justify-center w-8 h-8 rounded-full shadow-lg border-2 border-white text-white font-black text-sm" style="background-color: ${c.pinColor};">${index + 1}</div>`, iconSize: [32, 32], iconAnchor: [16, 16] }) }).addTo(map).bindPopup(`<strong>${lbl} ${t.map_popup_title}</strong><br><span style="font-size:11px;">${t.map_popup_desc2}</span>`);
+                    mapLayers.push(marker);
+                });
+            } else {
+                const marker = L.marker(config.center, {
+                    icon: L.divIcon({
+                        className: 'custom-div-icon',
+                        html: '<div class="pulse-marker flex items-center justify-center w-10 h-10 rounded-full shadow-xl border-2 border-white text-white text-lg" style="background-color:#FF7A00;"><i class="fa-solid fa-location-dot"></i></div>',
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 20]
+                    })
+                }).addTo(map).bindPopup(`<strong>${cityName}</strong><br><span style="font-size:11px;">${t.map_city_popup}</span>`);
+                mapLayers.push(marker);
+            }
         }
 
         function showCompanyLocationsOnMap() {
-            if (!carMap) return; carMapLayers.forEach(layer => carMap.removeLayer(layer)); carMapLayers = []; const t = translations[currentLangCode];
-            const zoneCircle = L.circle(CAR_MAP_LOCATIONS.zoneCenter, { color: '#2563eb', fillColor: '#3b82f6', fillOpacity: 0.22, weight: 3.5, radius: CAR_MAP_LOCATIONS.radius }).addTo(carMap).bindPopup(`<strong>1 — ${t.car_loc_zone_title}</strong>`); carMapLayers.push(zoneCircle);
-            const zoneMarker = L.marker(CAR_MAP_LOCATIONS.zoneCenter, { icon: L.divIcon({ className: 'custom-div-icon', html: `<div class="flex items-center justify-center w-8 h-8 rounded-full shadow-lg border-2 border-white text-white font-black text-sm" style="background-color: #2563eb;">1</div>`, iconSize: [32, 32], iconAnchor: [16, 16] }) }).addTo(carMap).bindPopup(`<strong>1 — ${t.car_loc_zone_title}</strong>`); carMapLayers.push(zoneMarker);
-            const parkingMarker = L.marker(CAR_MAP_LOCATIONS.parking, { icon: L.divIcon({ className: 'custom-div-icon', html: `<div class="pulse-marker flex items-center justify-center w-10 h-10 rounded-full shadow-xl border-2 border-white text-white text-lg bg-brand-orange"><i class="fa-solid fa-car"></i></div>`, iconSize: [40, 40], iconAnchor: [20, 20] }) }).addTo(carMap).bindPopup(`<strong>${t.car_loc_parking_title}</strong>`); carMapLayers.push(parkingMarker);
+            if (!carMap) return;
+            carMapLayers.forEach((layer) => carMap.removeLayer(layer));
+            carMapLayers = [];
+            const t = translations[currentLangCode];
+            const bounds = [];
+
+            CAR_MAP_LOCATIONS.places.forEach((place) => {
+                const title = t[place.titleKey] || '';
+                const desc = t[place.descKey] || '';
+                const popup = `<strong>${title}</strong><br><span style="font-size:11px;">${desc}</span>`;
+
+                if (place.circle) {
+                    const circle = L.circle(place.coords, {
+                        color: place.color,
+                        fillColor: place.color,
+                        fillOpacity: 0.18,
+                        weight: 3,
+                        radius: place.radius
+                    }).addTo(carMap).bindPopup(popup);
+                    carMapLayers.push(circle);
+                }
+
+                const iconHtml = place.icon.startsWith('fa-')
+                    ? `<div class="${place.pulse ? 'pulse-marker ' : ''}flex items-center justify-center w-10 h-10 rounded-full shadow-xl border-2 border-white text-white text-sm" style="background-color:${place.color};"><i class="fa-solid ${place.icon}"></i></div>`
+                    : `<div class="flex items-center justify-center w-8 h-8 rounded-full shadow-lg border-2 border-white text-white font-black text-sm" style="background-color:${place.color};">${place.label || place.icon}</div>`;
+                const size = place.icon.startsWith('fa-') ? [40, 40] : [32, 32];
+                const anchor = place.icon.startsWith('fa-') ? [20, 20] : [16, 16];
+
+                const marker = L.marker(place.coords, {
+                    icon: L.divIcon({ className: 'custom-div-icon', html: iconHtml, iconSize: size, iconAnchor: anchor })
+                }).addTo(carMap).bindPopup(popup);
+                carMapLayers.push(marker);
+                bounds.push(place.coords);
+            });
+
+            if (bounds.length) {
+                carMap.fitBounds(L.latLngBounds(bounds), { padding: [36, 36], maxZoom: 13 });
+            }
+        }
+
+        function dismissSiteSplash() {
+            const splash = document.getElementById('site-splash');
+            if (!splash || splash.classList.contains('splash-exit')) return;
+            splash.classList.add('splash-exit');
+            splash.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('splash-active');
+            document.body.classList.add('splash-revealed');
+            setTimeout(() => splash.remove(), 800);
         }
 
         window.onload = function() {
             initMaps();
-            bootstrapApp().then(() => {
-                if (document.getElementById('screen-portal') && !document.getElementById('screen-portal').classList.contains('hidden')) {
-                    setLang('bg');
-                    setCity('София', 'СФ');
-                    switchGlobalPage('home');
-                    openCarTab('car-map');
-                }
-            });
+            setLang('bg');
+            renderCitiesGrid();
+            renderHelperQuickLinks();
+            showCityOnMap(currentCityName);
+            updateMapSectionForCity(currentCityName);
+            showCompanyLocationsOnMap();
+            switchGlobalPage('welcome');
+            setTimeout(dismissSiteSplash, 2200);
         }
     </script>
 </body>
