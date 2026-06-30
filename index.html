@@ -215,6 +215,97 @@
         .ptp-detail-box { border-radius: 1rem; padding: 1rem; font-size: 0.8125rem; line-height: 1.5; }
         .ptp-check-item { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6; }
         .ptp-check-item:last-child { border-bottom: none; }
+
+        /* Mobile-first navigation */
+        .scroll-mt-sticky { scroll-margin-top: 5.5rem; }
+        @media (min-width: 640px) { .scroll-mt-sticky { scroll-margin-top: 9.5rem; } }
+
+        .mobile-tab-bar {
+            position: fixed; left: 0; right: 0; bottom: 0; z-index: 95;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border-top: 1px solid #e5e7eb;
+            padding: 0.35rem 0.4rem calc(0.4rem + env(safe-area-inset-bottom, 0px));
+            box-shadow: 0 -6px 24px rgba(17, 24, 39, 0.08);
+        }
+        .mobile-tab-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.15rem; flex: 1; min-width: 0; min-height: 3.25rem;
+            padding: 0.3rem 0.15rem; border-radius: 0.75rem;
+            font-size: 0.625rem; font-weight: 800; line-height: 1.15;
+            color: #6b7280; background: transparent; border: none;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .mobile-tab-btn i { font-size: 1.05rem; color: #FF7A00; transition: color 0.2s; }
+        .mobile-tab-btn.active {
+            color: #fff; background: #FF7A00;
+            box-shadow: 0 3px 10px -2px rgba(255, 122, 0, 0.45);
+        }
+        .mobile-tab-btn.active i { color: #fff !important; }
+        .mobile-tab-btn:active:not(.active) { background: #f3f4f6; transform: scale(0.97); }
+
+        #mobile-location-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid #f3f4f6;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        #mobile-location-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        body.has-mobile-nav main { padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px)); }
+        body.has-mobile-nav footer { margin-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)); }
+
+        #menu-backdrop {
+            position: fixed; inset: 0; z-index: 115;
+            background: rgba(17, 24, 39, 0.45);
+            opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s;
+        }
+        #menu-backdrop.visible { opacity: 1; visibility: visible; }
+
+        #mobile-location-bar { display: none; }
+
+        @media (max-width: 639px) {
+            #mobile-location-bar.is-visible {
+                display: block;
+                position: sticky;
+                z-index: 90;
+                top: calc(3.1rem + env(safe-area-inset-top, 0px));
+            }
+            #lang-fixed { top: max(0.5rem, env(safe-area-inset-top)); right: 0.5rem; }
+            #lang-btn { padding: 0.5rem 0.65rem; font-size: 0.75rem; }
+
+            #main-header {
+                top: 0; left: 0; right: 0; max-width: none;
+                padding-top: max(0.25rem, env(safe-area-inset-top));
+                padding-left: 0.5rem; padding-right: 3.75rem;
+            }
+            #main-header > div { border-radius: 0 0 1rem 1rem; border-top: none; }
+
+            main { padding-top: 0.75rem; padding-left: 0.75rem; padding-right: 0.75rem; }
+
+            .global-page > section,
+            .car-tab-section { border-radius: 1.25rem !important; }
+
+            #city-menu {
+                position: fixed; left: 0; right: 0; bottom: 0; top: auto !important;
+                margin: 0; max-height: min(70vh, 520px);
+                border-radius: 1.25rem 1.25rem 0 0;
+                z-index: 120; box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.15);
+            }
+            #city-menu::before {
+                content: ''; display: block; width: 2.5rem; height: 0.25rem;
+                background: #d1d5db; border-radius: 999px; margin: 0.5rem auto 0.25rem;
+            }
+
+            .ptp-choice-btn { font-size: 0.8125rem; padding: 0.75rem 0.875rem; }
+            #ptp-wizard { border-radius: 1.25rem; }
+
+            .interactive-card:hover { transform: none; }
+
+            #vehicle-tabs-wrap { display: grid; grid-template-columns: repeat(2, 1fr); width: 100%; }
+            #tab-personal, #tab-company { padding: 0.75rem 0.5rem; font-size: 0.75rem; }
+        }
     </style>
 </head>
 <body class="bg-[#F3F4F6] text-gray-800 font-sans antialiased min-h-screen relative selection:bg-brand-orange selection:text-white splash-active">
@@ -237,6 +328,8 @@
         </div>
     </div>
 
+    <div id="menu-backdrop" onclick="closeAllMenus()" aria-hidden="true"></div>
+
     <!-- Език – фиксиран горе вдясно -->
     <div id="lang-fixed" class="fixed top-4 right-4 z-[110]">
         <button type="button" id="lang-btn" onclick="toggleLangMenu()" class="flex items-center gap-2 bg-white/95 backdrop-blur-md border border-gray-200/80 px-3.5 py-2.5 rounded-full text-sm font-bold text-brand-dark shadow-lg hover:border-brand-orange transition-all duration-300 cursor-pointer">
@@ -253,7 +346,7 @@
         </div>
     </div>
 
-    <header id="main-header" class="sticky top-4 z-[100] mx-auto px-4 max-w-2xl transition-all duration-300 hidden">
+    <header id="main-header" class="sticky top-0 sm:top-4 z-[100] mx-auto px-3 sm:px-4 max-w-2xl w-full transition-all duration-300 hidden">
         <div class="bg-white/90 backdrop-blur-md rounded-2xl px-3 sm:px-4 py-2.5 shadow-lg border border-gray-200/80 flex items-center gap-2 sm:gap-3">
             <button type="button" onclick="goToWelcome()" class="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-gray-500 hover:text-brand-orange hover:bg-brand-orange/5 transition-all" title="Начало">
                 <i class="fa-solid fa-house"></i>
@@ -288,7 +381,11 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    <div id="mobile-location-bar" class="px-3 py-2">
+        <p id="mobile-location-text" class="text-xs font-bold text-brand-dark text-center">София · Въведение</p>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
 
         <div id="page-welcome" class="global-page space-y-10 sm:space-y-12 block">
             <section class="bg-white border border-gray-200 rounded-[2rem] p-6 sm:p-10 shadow-sm relative overflow-hidden">
@@ -306,7 +403,7 @@
                     <h2 data-i18n="welcome_cities_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">Изберете град</h2>
                     <p data-i18n="welcome_cities_desc" class="text-brand-slate text-base sm:text-lg">Кликнете върху града, в който работите, за да отворите пълния наръчник.</p>
                 </div>
-                <div id="cities-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"></div>
+                <div id="cities-grid" class="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"></div>
             </section>
 
             <section id="smart-contact-helper" class="bg-white rounded-[2rem] shadow-sm border border-gray-200 overflow-hidden relative">
@@ -333,7 +430,7 @@
         <div id="page-home" class="global-page space-y-8 sm:space-y-10 hidden">
 
             <!-- Навигация по раздели -->
-            <nav id="guide-section-nav" class="sticky top-[4.25rem] z-[90] bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-sm p-2 overflow-x-auto custom-scrollbar">
+            <nav id="guide-section-nav" class="hidden sm:block sticky top-[4.25rem] z-[90] bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-sm p-2 overflow-x-auto custom-scrollbar">
                 <div class="flex items-center min-w-max gap-1.5 sm:gap-2">
                     <button type="button" onclick="scrollToGuideSection('section-hero')" class="guide-nav-btn active flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-hero"><i class="fa-solid fa-circle-info text-brand-orange"></i><span data-i18n="nav_sec_intro">Въведение</span></button>
                     <button type="button" onclick="scrollToGuideSection('zones')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="zones"><i class="fa-solid fa-map-location-dot text-brand-orange"></i><span data-i18n="nav_sec_map">Стартови точки</span></button>
@@ -344,7 +441,7 @@
                 </div>
             </nav>
 
-            <section id="section-hero" class="bg-white border border-gray-200 rounded-[2rem] p-6 sm:p-10 shadow-sm relative overflow-hidden scroll-mt-36">
+            <section id="section-hero" class="bg-white border border-gray-200 rounded-[2rem] p-6 sm:p-10 shadow-sm relative overflow-hidden scroll-mt-sticky">
                 <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-orange opacity-10 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute right-8 top-8 hidden lg:block text-brand-orange opacity-10 pointer-events-none"><i class="fa-solid fa-motorcycle text-[160px]"></i></div>
                 <div class="relative z-10 max-w-2xl space-y-4">
@@ -377,7 +474,7 @@
                 </div>
             </section>
 
-            <section id="zones" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8 scroll-mt-36">
+            <section id="zones" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8 scroll-mt-sticky">
                 <div class="space-y-2 border-b border-gray-100 pb-6">
                     <h3 data-i18n="map_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">1. Стартови точки (София)</h3>
                     <p id="map-desc-text" class="text-brand-slate text-base sm:text-lg max-w-3xl">Интерактивна GPS карта с разпределение на официалните четири стартови зони в столицата.</p>
@@ -422,7 +519,7 @@
                 </div>
             </section>
 
-            <section id="section-pay" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-6 scroll-mt-36">
+            <section id="section-pay" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-6 scroll-mt-sticky">
                 <div class="space-y-2 border-b border-gray-100 pb-6">
                     <h4 data-i18n="pay_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">2. График на плащанията</h4>
                     <p data-i18n="pay_desc" class="text-brand-slate text-base sm:text-lg">Възнаграждението се разпределя в два транша всеки месец:</p>
@@ -452,7 +549,7 @@
                 </div>
             </section>
 
-            <section id="section-schedule" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8 relative overflow-hidden scroll-mt-36">
+            <section id="section-schedule" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8 relative overflow-hidden scroll-mt-sticky">
                 <div class="absolute -right-20 -top-20 w-64 h-64 bg-blue-500 opacity-5 rounded-full blur-3xl z-0 pointer-events-none"></div>
                 <div class="space-y-2 border-b border-gray-100 pb-6 relative z-10">
                     <h4 data-i18n="schedule_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">3. Plan-иране на смените</h4>
@@ -495,16 +592,16 @@
                 </div>
             </section>
 
-            <section id="methodology" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8 scroll-mt-36">
+            <section id="methodology" class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-8 scroll-mt-sticky">
                 <div class="space-y-2 border-b border-gray-100 pb-6">
                     <h3 data-i18n="matrix_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">4. Доходи и Бонусна схема</h3>
                     <p data-i18n="matrix_info_desc" class="text-brand-slate text-base sm:text-lg mt-2">Бонусът се трупа на месечна база. Посочените суми са брутни.</p>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     <div class="lg:col-span-8 space-y-6">
-                        <div class="bg-gray-100 p-1.5 rounded-2xl inline-flex shadow-inner border border-gray-200 w-full sm:w-auto overflow-x-auto custom-scrollbar">
-                            <button id="tab-personal" onclick="switchVehicleTab('personal')" class="px-6 py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 bg-white text-brand-orange shadow-md border border-gray-100 whitespace-nowrap"><i class="fa-solid fa-car-side mr-2"></i><span data-i18n="tab_personal">С лична кола</span></button>
-                            <button id="tab-company" onclick="switchVehicleTab('company')" class="px-6 py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 text-gray-500 hover:text-gray-700 whitespace-nowrap"><i class="fa-solid fa-car mr-2"></i><span data-i18n="tab_company">Със служебна</span></button>
+                        <div id="vehicle-tabs-wrap" class="bg-gray-100 p-1.5 rounded-2xl flex sm:inline-flex shadow-inner border border-gray-200 w-full sm:w-auto gap-1 sm:gap-0">
+                            <button id="tab-personal" onclick="switchVehicleTab('personal')" class="flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 bg-white text-brand-orange shadow-md border border-gray-100 whitespace-nowrap"><i class="fa-solid fa-car-side mr-1 sm:mr-2"></i><span data-i18n="tab_personal">С лична кола</span></button>
+                            <button id="tab-company" onclick="switchVehicleTab('company')" class="flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 text-gray-500 hover:text-gray-700 whitespace-nowrap"><i class="fa-solid fa-car mr-1 sm:mr-2"></i><span data-i18n="tab_company">Със служебна</span></button>
                         </div>
                         <div id="contracts-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6"></div>
                     </div>
@@ -563,7 +660,7 @@
                 </div>
             </section>
 
-            <section id="section-contacts" class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 scroll-mt-36">
+            <section id="section-contacts" class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 scroll-mt-sticky">
                 <div class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-6 flex flex-col justify-between hover:border-brand-orange/50 transition-colors">
                     <div class="space-y-4 border-b border-gray-100 pb-5">
                         <div class="w-14 h-14 bg-brand-orange/10 text-brand-orange rounded-2xl flex items-center justify-center text-2xl border border-brand-orange/20"><i class="fa-solid fa-headset"></i></div>
@@ -602,9 +699,9 @@
             </section>
         </div>
 
-        <div id="page-cars" class="global-page space-y-8 sm:space-y-10 hidden">
-            <div class="flex flex-wrap items-center gap-3">
-                <button type="button" onclick="switchGlobalPage('home')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-brand-dark bg-white border border-gray-200 shadow-sm hover:border-brand-orange hover:text-brand-orange transition-all">
+        <div id="page-cars" class="global-page space-y-5 sm:space-y-10 hidden">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button type="button" onclick="switchGlobalPage('home')" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl text-sm font-bold text-brand-dark bg-white border border-gray-200 shadow-sm hover:border-brand-orange hover:text-brand-orange transition-all w-full sm:w-auto justify-center sm:justify-start">
                     <i class="fa-solid fa-arrow-left"></i>
                     <span data-i18n="cars_back_guide">Обратно към наръчника</span>
                 </button>
@@ -619,12 +716,12 @@
                 </div>
             </section>
 
-            <nav class="bg-white rounded-2xl p-2 shadow-sm border border-gray-200 overflow-x-auto custom-scrollbar">
-                <div class="flex items-center min-w-max gap-2">
-                    <button id="btn-car-map" onclick="openCarTab('car-map')" class="car-tab-btn flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all shadow-sm"><i class="fa-solid fa-map-location-dot"></i> <span data-i18n="car_tab_map">1. Карта & Старт</span></button>
-                    <button id="btn-car-maint" onclick="openCarTab('car-maint')" class="car-tab-btn flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all"><i class="fa-solid fa-wrench"></i> <span data-i18n="car_tab_maint">2. Поддръжка</span></button>
-                    <button id="btn-car-sos" onclick="openCarTab('car-sos')" class="car-tab-btn flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all"><i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="car_tab_sos">3. Аварии & ПТП</span></button>
-                    <button id="btn-car-contacts" onclick="openCarTab('car-contacts')" class="car-tab-btn flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all"><i class="fa-solid fa-address-book"></i> <span data-i18n="car_tab_contacts">4. Указател</span></button>
+            <nav id="car-tabs-nav" class="hidden sm:block bg-white rounded-2xl p-2 shadow-sm border border-gray-200">
+                <div class="flex items-center gap-2">
+                    <button id="btn-car-map" data-car-tab="car-map" onclick="openCarTab('car-map')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all shadow-sm bg-brand-orange text-white"><i class="fa-solid fa-map-location-dot"></i> <span data-i18n="car_tab_map">1. Карта & Старт</span></button>
+                    <button id="btn-car-maint" data-car-tab="car-maint" onclick="openCarTab('car-maint')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all bg-white text-gray-500 hover:bg-gray-50 hover:text-brand-dark"><i class="fa-solid fa-wrench"></i> <span data-i18n="car_tab_maint">2. Поддръжка</span></button>
+                    <button id="btn-car-sos" data-car-tab="car-sos" onclick="openCarTab('car-sos')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all bg-white text-gray-500 hover:bg-gray-50 hover:text-brand-dark"><i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="car_tab_sos">3. Аварии & ПТП</span></button>
+                    <button id="btn-car-contacts" data-car-tab="car-contacts" onclick="openCarTab('car-contacts')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all bg-white text-gray-500 hover:bg-gray-50 hover:text-brand-dark"><i class="fa-solid fa-address-book"></i> <span data-i18n="car_tab_contacts">4. Указател</span></button>
                 </div>
             </nav>
 
@@ -1068,6 +1165,26 @@
 
     </main>
 
+    <nav id="guide-mobile-nav" class="mobile-tab-bar sm:hidden hidden" aria-label="Навигация по раздели">
+        <div class="flex items-stretch gap-0.5 max-w-lg mx-auto">
+            <button type="button" onclick="scrollToGuideSection('section-hero')" class="mobile-tab-btn guide-nav-btn active" data-section="section-hero"><i class="fa-solid fa-circle-info"></i><span>Въвед.</span></button>
+            <button type="button" onclick="scrollToGuideSection('zones')" class="mobile-tab-btn guide-nav-btn" data-section="zones"><i class="fa-solid fa-map-location-dot"></i><span>Карта</span></button>
+            <button type="button" onclick="scrollToGuideSection('section-pay')" class="mobile-tab-btn guide-nav-btn" data-section="section-pay"><i class="fa-solid fa-sack-dollar"></i><span>Плащ.</span></button>
+            <button type="button" onclick="scrollToGuideSection('section-schedule')" class="mobile-tab-btn guide-nav-btn" data-section="section-schedule"><i class="fa-solid fa-calendar-days"></i><span>График</span></button>
+            <button type="button" onclick="scrollToGuideSection('methodology')" class="mobile-tab-btn guide-nav-btn" data-section="methodology"><i class="fa-solid fa-chart-line"></i><span>Доход</span></button>
+            <button type="button" onclick="scrollToGuideSection('section-contacts')" class="mobile-tab-btn guide-nav-btn" data-section="section-contacts"><i class="fa-solid fa-headset"></i><span>Контакт</span></button>
+        </div>
+    </nav>
+
+    <nav id="car-mobile-nav" class="mobile-tab-bar sm:hidden hidden" aria-label="Навигация служебни коли">
+        <div class="flex items-stretch gap-0.5 max-w-md mx-auto">
+            <button type="button" data-car-tab="car-map" onclick="openCarTab('car-map')" class="mobile-tab-btn car-nav-btn active"><i class="fa-solid fa-map-location-dot"></i><span>Карта</span></button>
+            <button type="button" data-car-tab="car-maint" onclick="openCarTab('car-maint')" class="mobile-tab-btn car-nav-btn"><i class="fa-solid fa-wrench"></i><span>Поддр.</span></button>
+            <button type="button" data-car-tab="car-sos" onclick="openCarTab('car-sos')" class="mobile-tab-btn car-nav-btn"><i class="fa-solid fa-triangle-exclamation"></i><span>ПТП</span></button>
+            <button type="button" data-car-tab="car-contacts" onclick="openCarTab('car-contacts')" class="mobile-tab-btn car-nav-btn"><i class="fa-solid fa-address-book"></i><span>Указ.</span></button>
+        </div>
+    </nav>
+
     <footer class="bg-white mt-12 py-8 border-t border-gray-200 shadow-inner">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm">
             <div class="flex items-center gap-3">
@@ -1363,6 +1480,7 @@
             const onWelcome = currentPage === 'welcome';
             document.getElementById('main-header')?.classList.toggle('hidden', onWelcome);
             updateCityTopicLinks();
+            updateMobileNavVisibility();
         }
 
         function updateCityTopicLinks() {
@@ -1379,27 +1497,117 @@
         }
 
         const GUIDE_SECTIONS = ['section-hero', 'zones', 'section-pay', 'section-schedule', 'methodology', 'section-contacts'];
+        const GUIDE_SECTION_LABELS = {
+            'section-hero': 'Въведение',
+            'zones': 'Стартови точки',
+            'section-pay': 'Плащания',
+            'section-schedule': 'Графици',
+            'methodology': 'Доходи',
+            'section-contacts': 'Контакти'
+        };
+        const CAR_TAB_LABELS = {
+            'car-map': 'Карта & Старт',
+            'car-maint': 'Поддръжка',
+            'car-sos': 'Аварии & ПТП',
+            'car-contacts': 'Указател'
+        };
+
+        function isMobileView() {
+            return window.innerWidth < 640;
+        }
+
+        function getScrollOffset() {
+            const header = document.getElementById('main-header');
+            let offset = 12;
+            if (header && !header.classList.contains('hidden')) {
+                offset += header.offsetHeight;
+            }
+            if (!isMobileView()) {
+                const topNav = document.getElementById('guide-section-nav');
+                if (topNav && currentPage === 'home') offset += topNav.offsetHeight + 8;
+            } else {
+                const locBar = document.getElementById('mobile-location-bar');
+                if (locBar?.classList.contains('is-visible')) offset += locBar.offsetHeight;
+            }
+            return offset;
+        }
+
+        function setGuideNavActive(sectionId) {
+            document.querySelectorAll('.guide-nav-btn').forEach((btn) => {
+                btn.classList.toggle('active', btn.getAttribute('data-section') === sectionId);
+            });
+            updateMobileLocationBar(sectionId);
+        }
+
+        function setCarNavActive(tabName) {
+            document.querySelectorAll('.car-nav-btn').forEach((btn) => {
+                const isActive = btn.getAttribute('data-car-tab') === tabName;
+                btn.classList.toggle('active', isActive);
+                if (btn.classList.contains('car-tab-btn-desktop')) {
+                    btn.classList.toggle('bg-brand-orange', isActive);
+                    btn.classList.toggle('text-white', isActive);
+                    btn.classList.toggle('shadow-sm', isActive);
+                    btn.classList.toggle('bg-white', !isActive);
+                    btn.classList.toggle('text-gray-500', !isActive);
+                    btn.classList.toggle('hover:bg-gray-50', !isActive);
+                    btn.classList.toggle('hover:text-brand-dark', !isActive);
+                }
+            });
+            updateMobileLocationBar(null, tabName);
+        }
+
+        function updateMobileLocationBar(sectionId, carTab) {
+            const bar = document.getElementById('mobile-location-bar');
+            const text = document.getElementById('mobile-location-text');
+            if (!bar || !text) return;
+            if (currentPage === 'home' && sectionId) {
+                const label = GUIDE_SECTION_LABELS[sectionId] || 'Наръчник';
+                text.textContent = `${currentCityName} · ${label}`;
+            } else if (currentPage === 'cars' && carTab) {
+                const label = CAR_TAB_LABELS[carTab] || 'Служебни коли';
+                text.textContent = `Служебни коли · ${label}`;
+            }
+        }
+
+        function updateMobileNavVisibility() {
+            const onGuide = currentPage === 'home';
+            const onCars = currentPage === 'cars';
+            const mobile = isMobileView();
+            document.body.classList.toggle('has-mobile-nav', mobile && (onGuide || onCars));
+            document.getElementById('guide-mobile-nav')?.classList.toggle('hidden', !(mobile && onGuide));
+            document.getElementById('car-mobile-nav')?.classList.toggle('hidden', !(mobile && onCars));
+            const locBar = document.getElementById('mobile-location-bar');
+            if (locBar) {
+                const showLoc = mobile && (onGuide || onCars);
+                locBar.classList.toggle('is-visible', showLoc);
+                if (onGuide) updateMobileLocationBar(GUIDE_SECTIONS[0]);
+                if (onCars) updateMobileLocationBar(null, 'car-map');
+            }
+        }
+
+        function closeAllMenus() {
+            document.getElementById('city-menu')?.classList.add('hidden');
+            document.getElementById('lang-menu')?.classList.add('hidden');
+            document.getElementById('menu-backdrop')?.classList.remove('visible');
+        }
 
         function scrollToGuideSection(sectionId) {
             const el = document.getElementById(sectionId);
             if (!el) return;
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            document.querySelectorAll('.guide-nav-btn').forEach((btn) => {
-                btn.classList.toggle('active', btn.getAttribute('data-section') === sectionId);
-            });
+            const y = el.getBoundingClientRect().top + window.scrollY - getScrollOffset();
+            window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+            setGuideNavActive(sectionId);
         }
 
         function updateGuideNavActive() {
             if (currentPage !== 'home') return;
-            const offset = 200;
+            const offset = getScrollOffset() + 40;
             let current = GUIDE_SECTIONS[0];
             GUIDE_SECTIONS.forEach((id) => {
                 const el = document.getElementById(id);
                 if (el && el.getBoundingClientRect().top <= offset) current = id;
             });
-            document.querySelectorAll('.guide-nav-btn').forEach((btn) => {
-                btn.classList.toggle('active', btn.getAttribute('data-section') === current);
-            });
+            setGuideNavActive(current);
         }
 
         function renderCitiesGrid() {
@@ -1450,14 +1658,17 @@
                 updateMapSectionForCity(currentCityName);
                 showCityOnMap(currentCityName);
                 if (map) setTimeout(() => map.invalidateSize(), 150);
-                document.querySelectorAll('.guide-nav-btn').forEach((btn) => {
-                    btn.classList.toggle('active', btn.getAttribute('data-section') === 'section-hero');
-                });
+                setGuideNavActive('section-hero');
             } else if (pageId === 'cars') {
                 if (carMap) setTimeout(() => carMap.invalidateSize(), 150);
+                setCarNavActive('car-map');
             }
+            updateMobileNavVisibility();
+            updateCityMenuActive();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        window.addEventListener('resize', () => updateMobileNavVisibility());
 
         window.addEventListener('scroll', () => {
             const header = document.getElementById('main-header');
@@ -1470,18 +1681,11 @@
 
         function openCarTab(tabName) {
             document.querySelectorAll('.car-tab-section').forEach(el => { el.classList.add('hidden'); el.classList.remove('block'); });
-            document.querySelectorAll('.car-tab-btn').forEach(btn => {
-                btn.classList.remove('bg-brand-orange', 'text-white', 'shadow-sm');
-                btn.classList.add('bg-white', 'text-gray-500', 'hover:bg-gray-50', 'hover:text-brand-dark');
-            });
             document.getElementById('sec-' + tabName).classList.remove('hidden');
             document.getElementById('sec-' + tabName).classList.add('block');
-            
-            const activeBtn = document.getElementById('btn-' + tabName);
-            activeBtn.classList.remove('bg-white', 'text-gray-500', 'hover:bg-gray-50', 'hover:text-brand-dark');
-            activeBtn.classList.add('bg-brand-orange', 'text-white', 'shadow-sm');
-            
+            setCarNavActive(tabName);
             if (tabName === 'car-map' && carMap) setTimeout(() => carMap.invalidateSize(), 150);
+            if (isMobileView()) window.scrollTo({ top: 0, behavior: 'smooth' });
             if (tabName === 'car-sos') ptpReset();
         }
 
@@ -1688,22 +1892,38 @@
         var currentCityName = 'София';
 
         function toggleCityMenu() {
-            document.getElementById('city-menu').classList.toggle('hidden');
-            document.getElementById('lang-menu').classList.add('hidden');
+            const menu = document.getElementById('city-menu');
+            const willOpen = menu.classList.contains('hidden');
+            closeAllMenus();
+            if (willOpen) {
+                menu.classList.remove('hidden');
+                if (isMobileView()) document.getElementById('menu-backdrop')?.classList.add('visible');
+            }
         }
 
         function toggleLangMenu() {
-            document.getElementById('lang-menu').classList.toggle('hidden');
-            document.getElementById('city-menu')?.classList.add('hidden');
+            const menu = document.getElementById('lang-menu');
+            const willOpen = menu.classList.contains('hidden');
+            closeAllMenus();
+            if (willOpen) menu.classList.remove('hidden');
         }
 
         const CITIES_WITH_CARS = ['София', 'Перник', 'Благоевград'];
 
+        function updateCityMenuActive() {
+            document.querySelectorAll('#city-menu button').forEach((btn) => {
+                const isActive = btn.textContent.trim() === currentCityName;
+                btn.classList.toggle('bg-brand-orange/10', isActive);
+                btn.classList.toggle('text-brand-orange', isActive);
+                btn.classList.toggle('font-black', isActive);
+            });
+        }
+
         function setCity(city, shortCity) {
             currentCityName = city;
             document.getElementById('current-city').innerText = city;
-            document.getElementById('city-menu').classList.add('hidden');
-            
+            closeAllMenus();
+            updateCityMenuActive();
             const mapTitleEl = document.querySelector('[data-i18n="map_title"]');
             if (mapTitleEl) {
                 if (currentLangCode === 'en') {
@@ -1726,6 +1946,7 @@
             if (currentPage === 'home') {
                 renderIncomeMatrixSection();
                 if (map) setTimeout(() => map.invalidateSize(), 150);
+                updateGuideNavActive();
             }
         }
 
@@ -1755,7 +1976,7 @@
             const cityBtn = document.getElementById('city-btn');
             const cityMenu = document.getElementById('city-menu');
             if (cityBtn && cityMenu && !cityBtn.contains(e.target) && !cityMenu.contains(e.target)) {
-                cityMenu.classList.add('hidden');
+                if (!cityMenu.classList.contains('hidden')) closeAllMenus();
             }
             const langBtn = document.getElementById('lang-btn');
             const langMenu = document.getElementById('lang-menu');
@@ -2091,6 +2312,7 @@
             showCityOnMap(currentCityName);
             updateMapSectionForCity(currentCityName);
             showCompanyLocationsOnMap();
+            updateCityMenuActive();
             switchGlobalPage('welcome');
             setTimeout(dismissSiteSplash, 2200);
         }
