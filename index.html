@@ -194,6 +194,27 @@
             .site-splash, .site-splash *, body.splash-revealed > * { animation: none !important; transition-duration: 0.01ms !important; }
             .splash-progress-bar { width: 100% !important; }
         }
+
+        /* PTP wizard */
+        .ptp-panel { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        .ptp-progress-dot { width: 8px; height: 8px; border-radius: 999px; background: #e5e7eb; transition: all 0.3s; flex-shrink: 0; }
+        .ptp-progress-dot.active { width: 24px; background: #FF7A00; }
+        .ptp-progress-dot.done { background: #fdba74; }
+        .ptp-choice-btn {
+            display: flex; align-items: center; gap: 0.75rem; width: 100%; text-align: left;
+            padding: 0.875rem 1rem; border-radius: 1rem; border: 2px solid #e5e7eb; background: white;
+            font-weight: 700; font-size: 0.875rem; color: #111827; transition: all 0.2s;
+            min-height: 3.25rem;
+        }
+        .ptp-choice-btn:hover { border-color: rgba(255,122,0,0.45); background: #fff8f3; }
+        .ptp-choice-btn i { width: 2rem; height: 2rem; border-radius: 0.65rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem; }
+        .ptp-choice-danger { border-color: #fecaca; }
+        .ptp-choice-danger:hover { border-color: #f87171; background: #fef2f2; }
+        .ptp-choice-safe { border-color: #bbf7d0; }
+        .ptp-choice-safe:hover { border-color: #4ade80; background: #f0fdf4; }
+        .ptp-detail-box { border-radius: 1rem; padding: 1rem; font-size: 0.8125rem; line-height: 1.5; }
+        .ptp-check-item { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6; }
+        .ptp-check-item:last-child { border-bottom: none; }
     </style>
 </head>
 <body class="bg-[#F3F4F6] text-gray-800 font-sans antialiased min-h-screen relative selection:bg-brand-orange selection:text-white splash-active">
@@ -711,36 +732,230 @@
                     </div>
                 </section>
 
-                <section id="sec-car-sos" class="car-tab-section bg-white rounded-[2rem] p-5 sm:p-8 border border-gray-200 space-y-6 hidden">
-                    <div class="space-y-2 border-b border-gray-100 pb-5">
+                <section id="sec-car-sos" class="car-tab-section bg-white rounded-[2rem] p-4 sm:p-8 border border-gray-200 space-y-5 sm:space-y-6 hidden">
+                    <div class="space-y-2 border-b border-gray-100 pb-4 sm:pb-5">
                         <h3 data-i18n="car_sos_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">3. Действия при ПТП или Авария</h3>
-                        <p data-i18n="car_sos_desc" class="text-brand-slate text-sm sm:text-base">Задължителни стъпки при инцидент на пътя или повреда на автомобила.</p>
+                        <p data-i18n="car_sos_desc" class="text-brand-slate text-sm sm:text-base">Следвай стъпките по ред — избираш отговора и те води напред.</p>
                     </div>
-                    <div class="bg-red-50 border border-red-200 rounded-[2rem] p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+                    <!-- Интерактивен път при ПТП -->
+                    <div id="ptp-wizard" class="bg-gradient-to-b from-red-50/80 to-white border border-red-100 rounded-2xl p-4 sm:p-6 space-y-4">
+                        <div class="flex items-center justify-between gap-2">
+                            <button type="button" id="ptp-back-btn" onclick="ptpGoBack()" class="hidden shrink-0 flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-brand-orange px-2 py-1.5 rounded-lg border border-gray-200 bg-white">
+                                <i class="fa-solid fa-arrow-left text-[10px]"></i> Назад
+                            </button>
+                            <div class="flex items-center gap-1.5 flex-1 min-w-0 justify-center" id="ptp-progress" aria-hidden="true">
+                                <span class="ptp-progress-dot active" data-ptp-dot="1"></span>
+                                <span class="ptp-progress-dot" data-ptp-dot="2"></span>
+                                <span class="ptp-progress-dot" data-ptp-dot="3"></span>
+                                <span class="ptp-progress-dot" data-ptp-dot="4"></span>
+                            </div>
+                            <button type="button" onclick="ptpReset()" class="shrink-0 text-xs font-bold text-gray-400 hover:text-brand-orange px-2 py-1 rounded-lg">↺ Начало</button>
+                        </div>
+                        <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest text-center" id="ptp-progress-label">Стъпка 1 · Оглед</p>
+
+                        <!-- Стъпка 1: Оглед -->
+                        <div class="ptp-panel space-y-3" data-ptp="1">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-red-500 text-white rounded-xl flex items-center justify-center font-black shrink-0">1</div>
+                                <div>
+                                    <h4 class="font-black text-brand-dark text-base sm:text-lg">Установяване на щети</h4>
+                                    <p class="text-xs text-gray-500">Огледай мястото и оцени ситуацията</p>
+                                </div>
+                            </div>
                             <div class="space-y-2">
-                                <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">1</div>
-                                 <h4 data-i18n="car_sos_step1_title" class="font-bold text-red-900 text-sm">Установяване на щетите</h4>
-                                 <p data-i18n="car_sos_step1_desc" class="text-xs text-red-800">Първо, огледайте внимателно щетите. При ПТП и спор за вина, веднага позвънете на <strong>112</strong>.</p>
-                             </div>
-                             <div class="space-y-2">
-                                 <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">2</div>
-                                 <h4 data-i18n="car_sos_step2_title" class="font-bold text-red-900 text-sm">Попълване на двустранен протокол</h4>
-                                 <p data-i18n="car_sos_step2_desc" class="text-xs text-red-800">Ако вината е установена от един от участниците и няма пострадали, попълнете двустранен констативен протокол по образеца по-долу.</p>
-                             </div>
-                             <div class="space-y-2">
-                                 <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">3</div>
-                                 <h4 data-i18n="car_sos_step3_title" class="font-bold text-red-900 text-sm">Уведомяване на Капитан</h4>
-                                 <p data-i18n="car_sos_step3_desc" class="text-xs text-red-800">Уведомете <a href="tel:+359889627470" class="text-blue-700 underline">Владимир Ненков</a> за инцидента. Той ще ви даде последващи действия и указания.</p>
-                             </div>
-                             <div class="space-y-2">
-                                 <div class="w-9 h-9 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">4</div>
-                                 <h4 data-i18n="car_sos_step4_title" class="font-bold text-red-900 text-sm">Репатрак (при нужда)</h4>
-                                 <p data-i18n="car_sos_step4_desc" class="text-xs text-red-800">Ако колата не е в движение и има нужда от репатрак, Капитанът ще ви инструктира.</p>
+                                <button type="button" onclick="showPtpStep('1b')" class="ptp-choice-btn ptp-choice-safe">
+                                    <i class="bg-green-100 text-green-600"><i class="fa-solid fa-check"></i></i>
+                                    <span>Няма пострадали — продължавам</span>
+                                </button>
+                                <button type="button" onclick="showPtpStep('112')" class="ptp-choice-btn ptp-choice-danger">
+                                    <i class="bg-red-100 text-red-600"><i class="fa-solid fa-phone"></i></i>
+                                    <span>Има пострадали — викам 112</span>
+                                </button>
                             </div>
                         </div>
+
+                        <!-- 1b: Тежест на щетата -->
+                        <div class="ptp-panel hidden space-y-3" data-ptp="1b">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-red-500 text-white rounded-xl flex items-center justify-center font-black shrink-0">1</div>
+                                <div>
+                                    <h4 class="font-black text-brand-dark text-base sm:text-lg">Състояние на колата</h4>
+                                    <p class="text-xs text-gray-500">Може ли да продължи на собствен ход?</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <button type="button" onclick="ptpSetParking(false); showPtpStep('2')" class="ptp-choice-btn ptp-choice-safe">
+                                    <i class="bg-green-100 text-green-600"><i class="fa-solid fa-car-side"></i></i>
+                                    <span>Лека щета — колата се движи</span>
+                                </button>
+                                <button type="button" onclick="ptpSetParking(true); showPtpStep('kat')" class="ptp-choice-btn ptp-choice-danger">
+                                    <i class="bg-red-100 text-red-600"><i class="fa-solid fa-triangle-exclamation"></i></i>
+                                    <span>Тежка щета — не може да се движи / блокира пътя</span>
+                                </button>
+                            </div>
+                            <details class="ptp-detail-box bg-white border border-gray-200 text-gray-600">
+                                <summary class="font-bold text-gray-700 cursor-pointer text-sm">Кога задължително се вика КАТ?</summary>
+                                <p class="mt-2">При неразбирателство за вината, или когато МПС-та <strong>не могат на собствен ход</strong>, запречват движението и затрудняват пътната обстановка.</p>
+                            </details>
+                        </div>
+
+                        <!-- 112 -->
+                        <div class="ptp-panel hidden space-y-3" data-ptp="112">
+                            <div class="ptp-detail-box bg-red-100 border border-red-300 text-red-900">
+                                <p class="font-black text-lg mb-2"><i class="fa-solid fa-phone-volume mr-2"></i>Обади се на 112</p>
+                                <p class="text-sm">При пострадали КАТ и спешна помощ са задължителни. След това уведоми Капитана.</p>
+                            </div>
+                            <a href="tel:112" class="flex items-center justify-center gap-2 w-full py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-sm"><i class="fa-solid fa-phone"></i> 112</a>
+                            <button type="button" onclick="showPtpStep('3')" class="ptp-choice-btn"><i class="bg-blue-100 text-blue-600"><i class="fa-solid fa-arrow-right"></i></i><span>След 112 → уведомяване на Капитан</span></button>
+                        </div>
+
+                        <!-- Стъпка 2: Съгласие -->
+                        <div class="ptp-panel hidden space-y-3" data-ptp="2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black shrink-0">2</div>
+                                <div>
+                                    <h4 class="font-black text-brand-dark text-base sm:text-lg">Протокол или КАТ?</h4>
+                                    <p class="text-xs text-gray-500">Двата автомобила в движение — съгласие за вината?</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <button type="button" onclick="showPtpStep('protocol')" class="ptp-choice-btn ptp-choice-safe">
+                                    <i class="bg-green-100 text-green-600"><i class="fa-solid fa-file-signature"></i></i>
+                                    <span>Да — съгласни сме, без КАТ → двустранен протокол</span>
+                                </button>
+                                <button type="button" onclick="showPtpStep('kat')" class="ptp-choice-btn ptp-choice-danger">
+                                    <i class="bg-red-100 text-red-600"><i class="fa-solid fa-building-shield"></i></i>
+                                    <span>Не — няма съгласие → вика се КАТ</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- KAT -->
+                        <div class="ptp-panel hidden space-y-3" data-ptp="kat">
+                            <div class="ptp-detail-box bg-amber-50 border border-amber-200 text-amber-950">
+                                <p class="font-black mb-1"><i class="fa-solid fa-building-shield mr-1"></i> Викате КАТ (112)</p>
+                                <p class="text-sm">При спор за вина или тежко ПТП — официален протокол от органите.</p>
+                            </div>
+                            <a href="tel:112" class="flex items-center justify-center gap-2 w-full py-3.5 bg-red-600 text-white font-bold rounded-xl text-sm"><i class="fa-solid fa-phone"></i> 112</a>
+                            <button type="button" onclick="showPtpStep('3')" class="ptp-choice-btn"><i class="bg-blue-100 text-blue-600"><i class="fa-solid fa-arrow-right"></i></i><span>Напред → уведомяване</span></button>
+                        </div>
+
+                        <!-- Протокол -->
+                        <div class="ptp-panel hidden space-y-3" data-ptp="protocol">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black shrink-0">2</div>
+                                <div>
+                                    <h4 class="font-black text-brand-dark text-base sm:text-lg">Двустранен протокол</h4>
+                                    <p class="text-xs text-gray-500">Подписват го и двамата водачи</p>
+                                </div>
+                            </div>
+                            <div class="ptp-detail-box bg-blue-50 border border-blue-100 text-brand-dark">
+                                <p class="text-sm">Попълва се <strong>без КАТ</strong>, ако сте съгласни за вината и няма пострадали.</p>
+                            </div>
+                            <button type="button" onclick="document.getElementById('ptp-protocol-guide').scrollIntoView({behavior:'smooth'}); toggleProtocolGuide(true)" class="ptp-choice-btn">
+                                <i class="bg-blue-100 text-blue-600"><i class="fa-solid fa-list-check"></i></i>
+                                <span>Инструкции за попълване (т. 6–15)</span>
+                            </button>
+                            <button type="button" onclick="toggleProtocolImage(); document.getElementById('ptp-protocol-guide').scrollIntoView({behavior:'smooth'})" class="ptp-choice-btn">
+                                <i class="bg-gray-100 text-gray-600"><i class="fa-solid fa-eye"></i></i>
+                                <span>Виж примерен протокол</span>
+                            </button>
+                            <button type="button" onclick="showPtpStep('3')" class="w-full py-3.5 bg-brand-orange hover:bg-brand-orangeLight text-white font-bold rounded-xl text-sm">Попълнен → Стъпка 3</button>
+                        </div>
+
+                        <!-- Стъпка 3: Капитан -->
+                        <div class="ptp-panel hidden space-y-3" data-ptp="3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-brand-orange text-white rounded-xl flex items-center justify-center font-black shrink-0">3</div>
+                                <div>
+                                    <h4 class="font-black text-brand-dark text-base sm:text-lg">Уведомяване на Капитан</h4>
+                                    <p class="text-xs text-gray-500">Делник — обаждане · уикенд — Viber</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <button type="button" onclick="showPtpStep('3weekday')" class="ptp-choice-btn">
+                                    <i class="bg-brand-orange/15 text-brand-orange"><i class="fa-solid fa-briefcase"></i></i>
+                                    <span>Делник — обаждане на Капитан</span>
+                                </button>
+                                <button type="button" onclick="showPtpStep('3off')" class="ptp-choice-btn">
+                                    <i class="bg-purple-100 text-purple-600"><i class="fa-solid fa-calendar-xmark"></i></i>
+                                    <span>Уикенд</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="ptp-panel hidden space-y-3" data-ptp="3weekday">
+                            <div class="ptp-detail-box bg-white border border-gray-200">
+                                <p class="font-bold text-brand-dark mb-3">Обади се веднага:</p>
+                                <a href="tel:+359889627470" class="flex items-center justify-center gap-2 w-full py-3.5 bg-brand-orange text-white font-bold rounded-xl text-sm mb-2"><i class="fa-solid fa-phone"></i> Владимир Ненков</a>
+                                <p class="text-xs text-gray-500 text-center">Пон–Пет · 10:00–18:00</p>
+                            </div>
+                            <button type="button" onclick="showPtpStep('4')" class="w-full py-3.5 bg-brand-dark text-white font-bold rounded-xl text-sm">Готово → Стъпка 4</button>
+                        </div>
+
+                        <div class="ptp-panel hidden space-y-3" data-ptp="3off">
+                            <div class="ptp-detail-box bg-purple-50 border border-purple-200 text-brand-dark space-y-1">
+                                <p class="font-black text-sm mb-2">Изпрати на <strong>Владимир Ненков</strong> по <strong>Viber</strong>:</p>
+                                <div class="ptp-check-item"><i class="fa-solid fa-video text-purple-600 mt-0.5"></i><span>Клип + снимки на <strong>нашата кола</strong></span></div>
+                                <div class="ptp-check-item"><i class="fa-solid fa-hashtag text-purple-600 mt-0.5"></i><span>Рег. № на <strong>колата, с която сте се ударили</strong></span></div>
+                                <div class="ptp-check-item"><i class="fa-solid fa-file-image text-purple-600 mt-0.5"></i><span>Снимка на <strong>цветния екземпляр</strong> от ДКП</span></div>
+                            </div>
+                            <a href="viber://chat?number=%2B359889627470" class="flex items-center justify-center gap-2 w-full py-3.5 bg-[#7360f2] hover:bg-[#5f4ed4] text-white font-bold rounded-xl text-sm shadow-sm transition"><i class="fa-brands fa-viber text-lg"></i> Владимир Ненков · Viber</a>
+                            <button type="button" onclick="showPtpStep('4')" class="w-full py-3.5 bg-brand-dark text-white font-bold rounded-xl text-sm">Изпратено → Стъпка 4</button>
+                        </div>
+
+                        <!-- Стъпка 4: Булстрад -->
+                        <div class="ptp-panel hidden space-y-3" data-ptp="4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-amber-600 text-white rounded-xl flex items-center justify-center font-black shrink-0">4</div>
+                                <div>
+                                    <h4 class="font-black text-brand-dark text-base sm:text-lg">Завеждане на щета</h4>
+                                    <p class="text-xs text-gray-500">В същия ден — само шофьорът</p>
+                                </div>
+                            </div>
+                            <div class="ptp-detail-box bg-amber-50 border border-amber-200 text-sm space-y-2">
+                                <p><strong>Важно:</strong> При щета по време на движение само <strong>шофьорът</strong> може да заведе щетата в Булстрад.</p>
+                                <p class="font-bold text-amber-900">Избери офис:</p>
+                                <p>• ул. „Хъшове“ 3, Красна поляна</p>
+                                <p>• ул. Георги Белов 4, Горубляне</p>
+                            </div>
+                            <button type="button" onclick="openCarTab('car-map'); showPtpStep('4map')" class="ptp-choice-btn">
+                                <i class="bg-amber-100 text-amber-700"><i class="fa-solid fa-map-location-dot"></i></i>
+                                <span>Виж адресите на картата</span>
+                            </button>
+                            <div id="ptp-parking-block" class="hidden space-y-2">
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Къде да оставиш колата?</p>
+                                <div class="ptp-detail-box bg-white border border-gray-200 text-sm">
+                                    <p class="mb-2"><strong>Вариант 1:</strong> Служебен гараж</p>
+                                    <p><strong>Вариант 2:</strong> Сервиз, който приема и работи с <strong>Булстрад АД</strong></p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="ptpReset()" class="w-full py-3 border-2 border-gray-200 text-gray-600 font-bold rounded-xl text-sm">✓ Приключих — начало</button>
+                        </div>
+
+                        <div class="ptp-panel hidden space-y-2" data-ptp="4map">
+                            <p class="text-sm text-center text-gray-500">Адресите са на таб „Карта & Старт“</p>
+                        </div>
                     </div>
-                    <div class="mt-6 bg-blue-50/50 border border-blue-100 rounded-[2rem] p-6 shadow-sm">
+
+                    <!-- Репатрак -->
+                    <details class="bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden group">
+                        <summary class="flex items-center justify-between gap-3 p-4 sm:p-5 cursor-pointer font-black text-brand-dark text-sm sm:text-base list-none">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-truck-pickup text-brand-orange"></i> Репатрак — кога се ползва?</span>
+                            <i class="fa-solid fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="px-4 sm:px-5 pb-4 sm:pb-5 space-y-2 text-sm text-gray-600 border-t border-gray-100 pt-3">
+                            <div class="ptp-check-item"><i class="fa-solid fa-car-burst text-red-500 mt-0.5"></i><span>При ПТП (след съгласуване с Капитан)</span></div>
+                            <div class="ptp-check-item"><i class="fa-solid fa-circle-dot text-gray-600 mt-0.5"></i><span>Спукана гума → 24/7 гумаджийница. <strong>Касова бележка</strong> за осребряване на услугата</span></div>
+                            <div class="ptp-check-item"><i class="fa-solid fa-gears text-gray-600 mt-0.5"></i><span>Блокирали скорости</span></div>
+                            <div class="ptp-check-item"><i class="fa-solid fa-ban text-gray-600 mt-0.5"></i><span>Друга невъзможност за движение на собствен ход</span></div>
+                            <a href="tel:+359887239391" class="mt-3 flex items-center justify-center gap-2 w-full py-3 bg-brand-orange text-white font-bold rounded-xl text-sm"><i class="fa-solid fa-phone"></i> Пътна помощ (след Капитан)</a>
+                        </div>
+                    </details>
+
+                    <!-- Протокол — ръководство -->
+                    <div id="ptp-protocol-guide" class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 sm:p-6 shadow-sm">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-lg font-black"><i class="fa-solid fa-file-signature"></i></div>
@@ -757,14 +972,13 @@
                         
                         <div id="protocol-image-container" class="hidden max-w-2xl mx-auto border border-gray-200 rounded-xl overflow-hidden bg-white p-2 shadow-inner mt-4 transition-all duration-300"></div>
 
-                        <div class="mt-6 bg-white border border-blue-200 rounded-2xl p-5 sm:p-6 space-y-4">
-                            <div class="flex items-center gap-3 border-b border-blue-100 pb-4">
-                                <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black">?</div>
-                                <div>
-                                    <h4 data-i18n="car_protocol_guide_title" class="text-lg font-black text-brand-dark">Как се попълва протоколът</h4>
-                                    <p data-i18n="car_protocol_guide_intro" class="text-xs text-gray-500 mt-0.5">Точки 1–5 са елементарни. По-долу са най-важните полета:</p>
-                                </div>
-                            </div>
+                        <details id="protocol-guide-details" class="mt-4 bg-white border border-blue-200 rounded-2xl overflow-hidden group">
+                            <summary class="flex items-center justify-between gap-3 p-4 sm:p-5 cursor-pointer font-black text-brand-dark text-sm list-none">
+                                <span class="flex items-center gap-2"><i class="fa-solid fa-list-check text-blue-600"></i> <span data-i18n="car_protocol_guide_title">Как се попълва протоколът</span> (т. 6–15)</span>
+                                <i class="fa-solid fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform shrink-0"></i>
+                            </summary>
+                            <div class="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-blue-100 pt-3 space-y-3">
+                                <p data-i18n="car_protocol_guide_intro" class="text-xs text-gray-500">Точки 1–5 са елементарни. По-долу са най-важните полета:</p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-1">
                                     <span class="text-xs font-black text-blue-600 uppercase">Т. 6 — ВАЖНО</span>
@@ -807,7 +1021,8 @@
                                     <p data-i18n="car_protocol_p15" class="text-brand-slate leading-snug">Подписи в бялото поле от двамата водачи.</p>
                                 </div>
                             </div>
-                        </div>
+                            </div>
+                        </details>
                     </div>
                 </section>
 
@@ -1267,6 +1482,73 @@
             activeBtn.classList.add('bg-brand-orange', 'text-white', 'shadow-sm');
             
             if (tabName === 'car-map' && carMap) setTimeout(() => carMap.invalidateSize(), 150);
+            if (tabName === 'car-sos') ptpReset();
+        }
+
+        let ptpNeedsParking = false;
+        let ptpHistory = [];
+        let ptpCurrentStep = '1';
+        const PTP_STEP_PROGRESS = {
+            '1': { label: 'Стъпка 1 · Оглед', progress: 1 },
+            '1b': { label: 'Стъпка 1 · Състояние на колата', progress: 1 },
+            '112': { label: 'Спешно · 112', progress: 1 },
+            '2': { label: 'Стъпка 2 · Протокол или КАТ', progress: 2 },
+            'kat': { label: 'Стъпка 2 · КАТ', progress: 2 },
+            'protocol': { label: 'Стъпка 2 · Двустранен протокол', progress: 2 },
+            '3': { label: 'Стъпка 3 · Уведомяване', progress: 3 },
+            '3weekday': { label: 'Стъпка 3 · Делник', progress: 3 },
+            '3off': { label: 'Стъпка 3 · Уикенд · Viber', progress: 3 },
+            '4': { label: 'Стъпка 4 · Булстрад', progress: 4 },
+            '4map': { label: 'Стъпка 4 · Адреси на карта', progress: 4 }
+        };
+
+        function ptpSetParking(needs) {
+            ptpNeedsParking = needs;
+        }
+
+        function renderPtpStep(stepId) {
+            ptpCurrentStep = stepId;
+            document.querySelectorAll('.ptp-panel').forEach((panel) => {
+                panel.classList.toggle('hidden', panel.getAttribute('data-ptp') !== stepId);
+            });
+            const meta = PTP_STEP_PROGRESS[stepId] || { label: 'ПТП', progress: 1 };
+            const labelEl = document.getElementById('ptp-progress-label');
+            if (labelEl) labelEl.textContent = meta.label;
+            document.querySelectorAll('[data-ptp-dot]').forEach((dot) => {
+                const n = parseInt(dot.getAttribute('data-ptp-dot'), 10);
+                dot.classList.remove('active', 'done');
+                if (n < meta.progress) dot.classList.add('done');
+                else if (n === meta.progress) dot.classList.add('active');
+            });
+            if (stepId === '4') {
+                document.getElementById('ptp-parking-block')?.classList.toggle('hidden', !ptpNeedsParking);
+            }
+            const backBtn = document.getElementById('ptp-back-btn');
+            if (backBtn) backBtn.classList.toggle('hidden', ptpHistory.length === 0);
+            document.getElementById('ptp-wizard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function showPtpStep(stepId) {
+            if (stepId !== ptpCurrentStep) {
+                ptpHistory.push(ptpCurrentStep);
+            }
+            renderPtpStep(stepId);
+        }
+
+        function ptpGoBack() {
+            if (!ptpHistory.length) return;
+            renderPtpStep(ptpHistory.pop());
+        }
+
+        function ptpReset() {
+            ptpHistory = [];
+            ptpSetParking(false);
+            renderPtpStep('1');
+        }
+
+        function toggleProtocolGuide(open) {
+            const details = document.getElementById('protocol-guide-details');
+            if (details && open) details.open = true;
         }
 
         let translations = {
@@ -1309,7 +1591,7 @@
                 car_maint_title: "2. Експлоатация и Поддръжка", car_maint_desc: "Основни правила за грижа към служебния автомобил.",
                 car_maint_fuel_title: "Зареждане с гориво", car_maint_fuel_desc: "Зареждаме само на бензиностанции <strong>Лукойл</strong>. Фирмената карта е в жабката на колата, а ПИН кодът е написан на самата нея.", car_maint_wash_title: "Служебна Автомивка", car_maint_wash_desc: "Колата трябва да се предава чиста. Партньорска автомивка: <strong>Автомивка Рико</strong> — кв. Модерно предградие, ул. „Адам Мицкевич“, 1360 София.", car_maint_clean_title: "Правила за автомобила", car_maint_clean_desc: "В колата <strong>не се пуши, не се яде</strong> и не се пият напитки без капачка. Забранено е возенето на други лица! Предавайте колата чиста и по възможност заредена.",
                 car_maint_claims_title: "Завеждане на щети", car_maint_service_title: "Официален сервиз", car_maint_service_desc: "<strong>SEAT Ауто техника ЕООД</strong> / Hertz — бул. Искърско шосе 13, София. Данните за сервиза се попълват в <strong>т. 6</strong> на двустранния протокол.",
-                car_sos_title: "3. Действия при ПТП или Авария", car_sos_desc: "Задължителни стъпки при инцидент на пътя или повреда на автомобила.", car_sos_step1_title: "Установяване на щетите", car_sos_step1_desc: "Първо, огледайте внимателно щетите. При ПТП и спор за вина, веднага позвънете на <strong>112</strong>.", car_sos_step2_title: "Попълване на двустранен протокол", car_sos_step2_desc: "Ако вината е установена от един от участниците и няма пострадали, попълнете двустранен констативен протокол по образеца по-долу.", car_sos_step3_title: "Уведомяване на Капитан", car_sos_step3_desc: "Уведомете <a href=\"tel:+359889627470\" class=\"text-blue-700 underline\">Владимир Ненков</a> за инцидента. Той ще ви даде последващи действия и указания.", car_sos_step4_title: "Репатрак (при нужда)", car_sos_step4_desc: "Ако колата не е в движение и има нужда от репатрак, Капитанът ще ви инструктира.",
+                car_sos_title: "3. Действия при ПТП или Авария", car_sos_desc: "Следвай стъпките по ред — избираш отговора и те води напред.",
                 car_protocol_title: "Двустранен констативен протокол", car_protocol_desc: "При леки материални щети, <strong>без пострадали хора</strong> и при пълно съгласие между двамата водачи за обстоятелствата, се попълва Двустранен протокол.",
                 car_protocol_guide_title: "Как се попълва протоколът", car_protocol_guide_intro: "Точки 1–5 са елементарни. По-долу са най-важните полета:",
                 car_protocol_p6: "Попълват се данните на <strong>Аутотехника</strong> (SEAT Ауто техника ЕООД).",
@@ -1364,7 +1646,7 @@
                 car_maint_title: "2. Maintenance & Operation", car_maint_desc: "Basic rules for taking care of the company car.",
                 car_maint_fuel_title: "Refueling", car_maint_fuel_desc: "Refuel only at <strong>Lukoil</strong> stations. The company card is in the glove box, and the PIN code is written on it.", car_maint_wash_title: "Company Car Wash", car_maint_wash_desc: "The car must be returned clean. Partner wash: <strong>Riko Car Wash</strong> — Moderno Predgradie, Adam Mickiewicz St., 1360 Sofia.", car_maint_clean_title: "Car Rules", car_maint_clean_desc: "<strong>No smoking, no eating</strong>, and no open drinks. Transporting other people is strictly forbidden! Return the car clean and preferably refueled.",
                 car_maint_claims_title: "Insurance Claims", car_maint_service_title: "Official Service", car_maint_service_desc: "<strong>SEAT Auto Technika EOOD</strong> / Hertz — 13 Iskarsko Shose Blvd., Sofia. Service details go in <strong>section 6</strong> of the bilateral protocol.",
-                car_sos_title: "3. Accidents & Emergencies", car_sos_desc: "Mandatory steps in case of a road accident or vehicle breakdown.", car_sos_step1_title: "Secure the area", car_sos_step1_desc: "Put on a reflective vest and place a triangle. If anyone is injured, call <strong>112</strong> immediately.", car_sos_step2_title: "Police Protocol", car_sos_step2_desc: "In case of an accident, you must call the police (112) for a protocol, even if the damage is minor.", car_sos_step3_title: "Inform Us", car_sos_step3_desc: "Message Dispatch immediately via Scoober to remove the order. Then call your <strong>Captain</strong>.", car_sos_step4_title: "Tow Truck", car_sos_step4_desc: "If the car is not drivable, the Captain will instruct you to call the partner tow truck.",
+                car_sos_title: "3. Accidents & Emergencies", car_sos_desc: "Follow the steps in order — choose your answer and the guide leads you forward.",
                 car_protocol_title: "Bilateral Accident Protocol", car_protocol_desc: "For minor material damages, with no injured people and full agreement between drivers, fill out a Bilateral Protocol.",
                 car_protocol_guide_title: "How to fill in the protocol", car_protocol_guide_intro: "Sections 1–5 are straightforward. Key fields below:",
                 car_protocol_p6: "Enter <strong>Auto Technika</strong> (SEAT Auto Technika EOOD) details.",
