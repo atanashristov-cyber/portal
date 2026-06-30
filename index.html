@@ -306,6 +306,23 @@
             #vehicle-tabs-wrap { display: grid; grid-template-columns: repeat(2, 1fr); width: 100%; }
             #tab-personal, #tab-company { padding: 0.75rem 0.5rem; font-size: 0.75rem; }
         }
+
+        /* Desktop cities strip */
+        .city-strip-group { display: inline-flex; align-items: center; gap: 0.125rem; }
+        .city-strip-chip {
+            padding: 0.3rem 0.7rem; border-radius: 999px;
+            font-size: 0.75rem; font-weight: 700; color: #374151;
+            background: #f9fafb; border: 1px solid #e5e7eb;
+            transition: all 0.2s; white-space: nowrap;
+        }
+        .city-strip-chip:hover { border-color: rgba(255,122,0,0.45); color: #FF7A00; background: #fff8f3; }
+        .city-strip-car {
+            width: 1.5rem; height: 1.5rem; border-radius: 999px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 0.6rem; color: #2563eb; background: #eff6ff; border: 1px solid #dbeafe;
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .city-strip-car:hover { background: #dbeafe; border-color: #93c5fd; }
     </style>
 </head>
 <body class="bg-[#F3F4F6] text-gray-800 font-sans antialiased min-h-screen relative selection:bg-brand-orange selection:text-white splash-active">
@@ -387,8 +404,8 @@
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
 
-        <div id="page-welcome" class="global-page space-y-10 sm:space-y-12 block">
-            <section class="bg-white border border-gray-200 rounded-[2rem] p-6 sm:p-10 shadow-sm relative overflow-hidden">
+        <div id="page-welcome" class="global-page space-y-6 sm:space-y-5 lg:space-y-4 block">
+            <section class="bg-white border border-gray-200 rounded-[2rem] sm:rounded-2xl p-6 sm:p-6 lg:p-5 shadow-sm relative overflow-hidden">
                 <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-orange opacity-10 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute right-8 top-8 hidden lg:block text-brand-orange opacity-10 pointer-events-none"><i class="fa-solid fa-motorcycle text-[160px]"></i></div>
                 <div class="relative z-10 max-w-3xl space-y-4">
@@ -398,24 +415,33 @@
                 </div>
             </section>
 
-            <section class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-6">
-                <div class="space-y-2 border-b border-gray-100 pb-6">
-                    <h2 data-i18n="welcome_cities_title" class="text-2xl sm:text-3xl font-extrabold text-brand-dark">Изберете град</h2>
-                    <p data-i18n="welcome_cities_desc" class="text-brand-slate text-base sm:text-lg">Кликнете върху града, в който работите, за да отворите пълния наръчник.</p>
+            <section id="welcome-cities" class="sm:px-0">
+                <div id="cities-strip-wrap" class="hidden sm:block bg-white/90 border border-gray-200/80 rounded-2xl px-4 py-3 shadow-sm">
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2.5">
+                        <span data-i18n="welcome_cities_label" class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest shrink-0">Град</span>
+                        <span data-i18n="welcome_cities_hint_desktop" class="text-[11px] text-gray-400 font-medium">Кликни за наръчник · иконата <i class="fa-solid fa-car-side text-blue-500 mx-0.5"></i> за служебни коли</span>
+                    </div>
+                    <div id="cities-strip" class="flex flex-wrap gap-1.5"></div>
                 </div>
-                <div id="cities-grid" class="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"></div>
+                <div id="cities-mobile-wrap" class="sm:hidden bg-white rounded-[2rem] p-6 shadow-sm border border-gray-200 space-y-6">
+                    <div class="space-y-2 border-b border-gray-100 pb-6">
+                        <h2 data-i18n="welcome_cities_title" class="text-2xl font-extrabold text-brand-dark">Изберете град</h2>
+                        <p data-i18n="welcome_cities_desc" class="text-brand-slate text-base">Кликнете върху града, в който работите, за да отворите пълния наръчник.</p>
+                    </div>
+                    <div id="cities-grid" class="grid grid-cols-1 min-[420px]:grid-cols-2 gap-3"></div>
+                </div>
             </section>
 
-            <section id="smart-contact-helper" class="bg-white rounded-[2rem] shadow-sm border border-gray-200 overflow-hidden relative">
-                <div class="p-6 sm:p-10 relative z-10">
-                    <div class="text-center mb-8">
-                        <div class="w-16 h-16 bg-brand-orange/10 text-brand-orange rounded-full flex items-center justify-center text-3xl mx-auto mb-4 border border-brand-orange/20 shadow-sm"><i class="fa-solid fa-magnifying-glass-location"></i></div>
-                        <h2 data-i18n="helper_title" class="text-2xl sm:text-3xl font-black text-brand-dark mb-2">Намери бързо това, което търсиш</h2>
-                        <p data-i18n="helper_desc" class="text-brand-slate text-sm sm:text-base max-w-2xl mx-auto">Не сте сигурни към кого да се обърнете? Напишете какво ви трябва по-долу и ние ще ви покажем точното място в приложението Scoober.</p>
+            <section id="smart-contact-helper" class="bg-white rounded-[2rem] sm:rounded-2xl shadow-sm border border-gray-200 overflow-hidden relative">
+                <div class="p-6 sm:p-5 lg:p-5 relative z-10">
+                    <div class="text-center mb-5 sm:mb-4">
+                        <div class="w-14 h-14 sm:w-12 sm:h-12 bg-brand-orange/10 text-brand-orange rounded-full flex items-center justify-center text-2xl sm:text-xl mx-auto mb-3 border border-brand-orange/20 shadow-sm"><i class="fa-solid fa-magnifying-glass-location"></i></div>
+                        <h2 data-i18n="helper_title" class="text-2xl sm:text-xl font-black text-brand-dark mb-1.5">Намери бързо това, което търсиш</h2>
+                        <p data-i18n="helper_desc" class="text-brand-slate text-sm max-w-2xl mx-auto">Напишете какво ви трябва — ще ви покажем точното място в портала или в приложението Scoober.</p>
                     </div>
-                    <div class="relative max-w-3xl mx-auto mb-8">
-                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none"><i class="fa-solid fa-magnifying-glass text-gray-400 text-xl"></i></div>
-                        <input type="text" id="searchInput" autocomplete="off" class="search-input block w-full pl-14 pr-12 py-4 sm:py-5 text-base sm:text-lg border-2 border-gray-200 rounded-2xl text-brand-dark bg-gray-50 focus:bg-white transition-all duration-300 shadow-sm">
+                    <div class="relative max-w-3xl mx-auto mb-5 sm:mb-4">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none"><i class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i></div>
+                        <input type="text" id="searchInput" autocomplete="off" class="search-input block w-full pl-12 pr-12 py-3.5 sm:py-3 text-base border-2 border-gray-200 rounded-2xl text-brand-dark bg-gray-50 focus:bg-white transition-all duration-300 shadow-sm">
                         <button id="clearBtn" class="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-400 hover:text-brand-orange hidden transition-colors"><i class="fa-solid fa-circle-xmark text-2xl"></i></button>
                     </div>
                     <div id="resultsArea" class="max-w-3xl mx-auto hidden space-y-4"></div>
@@ -1612,9 +1638,20 @@
 
         function renderCitiesGrid() {
             const grid = document.getElementById('cities-grid');
-            if (!grid) return;
+            const strip = document.getElementById('cities-strip');
             const guideLabel = currentLangCode === 'en' ? 'Courier guide' : 'Куриерски наръчник';
             const carsLabel = currentLangCode === 'en' ? 'Company cars' : 'Служебни коли';
+
+            if (strip) {
+                strip.innerHTML = CITIES_LIST.map((city) => {
+                    const carBtn = CITIES_WITH_CARS.includes(city.name)
+                        ? `<button type="button" onclick="openCompanyCars('${city.name}', '${city.short}')" class="city-strip-car" title="${carsLabel}"><i class="fa-solid fa-car-side"></i></button>`
+                        : '';
+                    return `<div class="city-strip-group"><button type="button" onclick="openCityGuide('${city.name}', '${city.short}')" class="city-strip-chip">${city.name}</button>${carBtn}</div>`;
+                }).join('');
+            }
+
+            if (!grid) return;
             grid.innerHTML = CITIES_LIST.map((city) => {
                 const carsBtn = CITIES_WITH_CARS.includes(city.name) ? `
                         <button type="button" onclick="openCompanyCars('${city.name}', '${city.short}')" class="flex items-center gap-2.5 w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-brand-dark bg-blue-50 border border-blue-100 hover:border-blue-300 hover:bg-blue-100/80 transition-all">
@@ -1759,7 +1796,7 @@
             bg: {
                 lang_name: "БГ | Български", nav_home: "Начало",
                 city_topics_label: "Раздели за този град", city_link_guide: "Куриерски наръчник", city_link_guide_desc: "Стартови точки, плащания, графици", city_link_cars: "Служебни коли", city_link_cars_desc: "Паркинг, поддръжка, аварии", cars_back_guide: "Обратно към наръчника",
-                welcome_title: "Добре дошли!", welcome_desc: "Тук ще намерите основната информация за куриерите — стартови точки, плащания, графици, доходи и контакти. Изберете вашия град, за да видите актуалния наръчник.", welcome_cities_title: "Изберете град", welcome_cities_desc: "Кликнете върху града, в който работите, за да отворите пълния наръчник.",
+                welcome_title: "Добре дошли!", welcome_desc: "Тук ще намерите основната информация за куриерите — стартови точки, плащания, графици, доходи и контакти. Изберете вашия град, за да видите актуалния наръчник.", welcome_cities_title: "Изберете град", welcome_cities_desc: "Кликнете върху града, в който работите, за да отворите пълния наръчник.", welcome_cities_label: "Град", welcome_cities_hint_desktop: "Кликни за наръчник · иконата <i class=\"fa-solid fa-car-side text-blue-500 mx-0.5\"></i> за служебни коли",
                 nav_sec_intro: "Въведение", nav_sec_map: "Стартови точки", nav_sec_pay: "Плащания", nav_sec_schedule: "Графици", nav_sec_income: "Доходи", nav_sec_contacts: "Контакти",
                 hero_badge: "АКТУАЛЕН НАРЪЧНИК 2026", hero_title: "Всичко за твоя успешен старт в Takeaway", hero_desc: "Добре дошли в нашия портал! Тук сме събрали актуалната информация за стартовите точки, методологията на плащане и директни контакти към ключовите отдели.",
                 map_title: "1. Стартови точки (София)", map_desc: "Интерактивна GPS карта с разпределение на официалните четири стартови зони в столицата.",
@@ -1778,7 +1815,7 @@
                 schedule_title: "3. Планиране на смените", schedule_subtitle: "ГРАФИЦИ И КОРЕКЦИИ", schedule_important_title: "Краен срок за подаване", schedule_important_desc: "Всеки куриер трябва да подаде своите часове за следващата седмица <strong>най-късно до Вторник 23:59 ч.</strong>", schedule_edit_title: "Корекции след Вторник", schedule_edit_desc: "Корекции могат да се правят <strong>до Петък най-късно</strong>, и то <strong>само след изрично разрешение</strong> и връзка с отдел PAS. След публикуване на графика в петък, промени не са възможни.", schedule_how: "Как се подава график в приложението:", schedule_step1: "Отворете <strong>менюто вляво</strong> в приложението Scoober.", schedule_step2: "Изберете секция <strong>Планиране на график (Schedule)</strong>.", schedule_step3: "Маркирайте часовете, в които сте на разположение за новата седмица.",
                 matrix_title: "4. Доходи и Бонусна схема", matrix_info_desc: "Бонусът се трупа на месечна база. Посочените суми са брутни.", tab_personal: "С лична кола", tab_company: "Със служебна", contract_8h: "8-Hour (8ч)", contract_6h: "6-Hour (6ч)", contract_4h: "4-Hour (4ч)", contract_2h: "2-Hour (2ч)", avg_net_title: "Средно Нето Месечно* (заплата плюс бонус)", avg_net_title_2: "Средно Нето Месечно* (заплата плюс бонус)", avg_net_title_3: "Средно Нето Месечно* (заплата плюс бонус)", avg_net_title_4: "Средно Нето Месечно* (заплата плюс бонус)",
                 sim_title: "Симулатор", sim_desc: "Симулирай заплатата си спрямо очакваното представяне.", sim_net: "Очаквано Нето", sim_gross: "Бруто", sim_orders: "Поръчки", sim_hours: "Часове", calc_contract_lbl: "Договор", calc_vehicle_lbl: "Превозно", calc_days_lbl: "Раб. дни", calc_eff_lbl: "Ефект. (ч)", calc_eff_tooltip: "Среден брой поръчки за 1 час.",
-                helper_title: "Намери бързо това, което търсиш", helper_desc: "Не сте сигурни към кого да се обърнете? Напишете какво ви трябва по-долу и ние ще ви покажем точното място в приложението Scoober.", helper_quick: "Бързи търсения (Кликни)", helper_ph: "Напр. 'ресторант', 'болничен', 'заплата', 'график'...", helper_notfound: "Не открихме точна категория за", helper_try: "Опитайте с друга дума.", helper_path: "Как да стигна до там:",
+                helper_title: "Намери бързо това, което търсиш", helper_desc: "Напишете какво ви трябва — ще ви покажем точното място в портала или в приложението Scoober.", helper_quick: "Бързи търсения (Кликни)", helper_ph: "Напр. 'птп', 'болничен', 'заплата', 'график'...", helper_notfound: "Не открихме точна категория за", helper_try: "Опитайте с друга дума.", helper_path: "Как да стигна до там:", helper_portal_path: "Къде в портала:", helper_open_btn: "Отвори →",
                 contact_disp_title: "5. Връзка с Диспечери", contact_disp_subtitle: "ПО ВРЕМЕ НА АКТИВНА СМЯНА", contact_how_title: "Как да се свържете:", contact_step1: "Отворете приложението <strong>Scoober</strong>.", contact_step2: "Кликнете на <strong>иконата за чат</strong> в горния десен ъгъл.", contact_step3: "Опишете ясно казуса си в чата.",
                 contact_admin_title: "6. Директна Администрация", contact_admin_subtitle: "ИЗВЪН АКТИВНА СМЯНА", contact_admin_important: "<i class='fa-solid fa-envelope text-blue-500 mr-2'></i>Отговор до следващия работен ден.", contact_admin_how: "Къде е контактната форма:", admin_step1: "Отворете <strong>менюто вляво</strong> в Scoober.", admin_step2: "Изберете секция <strong>Профил (Profile)</strong>.", admin_step3: "Изберете <strong>Contact Form</strong>.",
                 footer_rights: "© 2026 Всички права запазени.", footer_info: "Вътрешна информационна платформа", select_contract: "Договор...", select_vehicle: "Избери...", hours: "ч",
@@ -1814,7 +1851,7 @@
             en: {
                 lang_name: "EN | English", nav_home: "Home",
                 city_topics_label: "Sections for this city", city_link_guide: "Courier guide", city_link_guide_desc: "Starting points, payments, schedules", city_link_cars: "Company cars", city_link_cars_desc: "Parking, maintenance, accidents", cars_back_guide: "Back to city guide",
-                welcome_title: "Welcome!", welcome_desc: "Here you will find essential information for couriers — starting points, payments, schedules, income and contacts. Select your city to open the full guide.", welcome_cities_title: "Choose your city", welcome_cities_desc: "Click on the city where you work to open the full guide.",
+                welcome_title: "Welcome!", welcome_desc: "Here you will find essential information for couriers — starting points, payments, schedules, income and contacts. Select your city to open the full guide.", welcome_cities_title: "Choose your city", welcome_cities_desc: "Click on the city where you work to open the full guide.", welcome_cities_label: "City", welcome_cities_hint_desktop: "Click for guide · <i class=\"fa-solid fa-car-side text-blue-500 mx-0.5\"></i> icon for company cars",
                 nav_sec_intro: "Introduction", nav_sec_map: "Starting points", nav_sec_pay: "Payments", nav_sec_schedule: "Schedules", nav_sec_income: "Income", nav_sec_contacts: "Contacts",
                 hero_badge: "LATEST GUIDE 2026", hero_title: "Everything for your successful start at Takeaway", hero_desc: "Welcome to our portal! Here we have gathered the latest information about the starting points, payment methodology, and direct contacts to key departments.",
                 map_title: "1. Starting Points (Sofia)", map_desc: "Interactive GPS map with the distribution of the official four starting zones in the capital.",
@@ -1833,7 +1870,7 @@
                 schedule_title: "3. Shift Planning", schedule_subtitle: "SCHEDULES & CORRECTIONS", schedule_important_title: "Submission Deadline", schedule_important_desc: "Every courier must submit their hours for the next week <strong>by Tuesday 23:59 at the latest</strong>.", schedule_edit_title: "Corrections after Tuesday", schedule_edit_desc: "Corrections can be made <strong>until Friday at the latest</strong>, and <strong>only after explicit permission</strong> and contact with the PAS department. Once the schedule is published on Friday, no changes are possible.", schedule_how: "How to submit a schedule:", schedule_step1: "Open the <strong>left menu</strong> in the Scoober app.", schedule_step2: "Select the <strong>Schedule Planning</strong> section.", schedule_step3: "Mark the hours you are available for the new week.",
                 matrix_title: "4. Income and Bonus Scheme", matrix_info_desc: "The bonus is accumulated on a monthly basis. The amounts are gross.", tab_personal: "Personal Car", tab_company: "Company Car", contract_8h: "8-Hour", contract_6h: "6-Hour", contract_4h: "4-Hour", contract_2h: "2-Hour", avg_net_title: "Avg. Net Monthly* (salary plus bonus)", avg_net_title_2: "Avg. Net Monthly* (salary plus bonus)", avg_net_title_3: "Avg. Net Monthly* (salary plus bonus)", avg_net_title_4: "Avg. Net Monthly* (salary plus bonus)",
                 sim_title: "Simulator", sim_desc: "Simulate your salary based on expected performance.", sim_net: "Expected Net", sim_gross: "Gross", sim_orders: "Orders", sim_hours: "Hours", calc_contract_lbl: "Contract", calc_vehicle_lbl: "Vehicle", calc_days_lbl: "Work days", calc_eff_lbl: "Efficiency (h)", calc_eff_tooltip: "Average number of orders you deliver per 1 hour.",
-                helper_title: "Find what you need quickly", helper_desc: "Not sure who to contact? Type what you need below and we will show you exactly where to go in the Scoober app.", helper_quick: "Quick searches (Click)", helper_ph: "E.g. 'restaurant', 'sick', 'salary', 'schedule'...", helper_notfound: "We couldn't find an exact match for", helper_try: "Try another word.", helper_path: "Where to click in the app:",
+                helper_title: "Find what you need quickly", helper_desc: "Type what you need — we will show you the right place in the portal or the Scoober app.", helper_quick: "Quick searches (Click)", helper_ph: "E.g. 'accident', 'sick', 'salary', 'schedule'...", helper_notfound: "We couldn't find an exact match for", helper_try: "Try another word.", helper_path: "Where to click in the app:", helper_portal_path: "Where in the portal:", helper_open_btn: "Open →",
                 contact_disp_title: "5. Contact Dispatchers", contact_disp_subtitle: "DURING AN ACTIVE SHIFT", contact_how_title: "How to connect:", contact_step1: "Open the <strong>Scoober</strong> app.", contact_step2: "Click on the <strong>chat icon</strong> in the top right corner.", contact_step3: "Clearly describe your issue in the chat.",
                 contact_admin_title: "6. Direct Administration", contact_admin_subtitle: "OUTSIDE ACTIVE SHIFT", contact_admin_important: "<i class='fa-solid fa-envelope text-blue-500 mr-2'></i>Answer within the next working day.", contact_admin_how: "Where is the contact form:", admin_step1: "Open the <strong>left menu</strong> in Scoober.", admin_step2: "Select the <strong>Profile</strong> section.", admin_step3: "Select <strong>Contact Form</strong>.",
                 footer_rights: "© 2026 All rights reserved.", footer_info: "Internal Information Platform", select_contract: "Select...", select_vehicle: "Select...", hours: "h",
@@ -1870,6 +1907,7 @@
 
         let helperContactData = {
             bg: [
+                { id: "car_ptp", title: "ПТП със служебен автомобил", keywords: ["птп", "катастрофа", "удар", "авария", "сблъсък", "протокол", "дкп", "щета", "булстрад", "служебна", "служебен", "автомобил", "кола", "капитан", "владимир", "112", "репатрак", "кат"], portalAction: "car-ptp", path: ["Служебни коли", "Аварии & ПТП", "Интерактивен наръчник"], icon: "fa-car-burst", color: "text-red-600", bg: "bg-red-50", border: "border-red-200", instructions: "Стъпка по стъпка: оглед на щети, протокол или КАТ, уведомяване на капитан, завеждане в Булстрад. <strong>Натисни бутона</strong> за да отвориш наръчника.", actionLabel: "Отвори ПТП наръчник" },
                 { id: "field_issue", title: "Проблем на терен / С поръчка", keywords: ["поръчка", "клиент", "ресторант", "адрес", "грешен", "отказана", "бави", "чакам", "доставка", "терен", "смяната", "адреси", "клиенти", "ресторанти"], path: ["Scoober Приложение", "Икона Чат (Горе вдясно)", "Поддръжка"], icon: "fa-motorcycle", color: "text-red-500", bg: "bg-red-50", border: "border-red-200", instructions: "За проблеми на терен, грешни адреси или отказани поръчки се свържете <strong>веднага с Диспечер през чата</strong> (иконата горе вдясно)." },
                 { id: "sick_leave", title: "Качване на Болничен лист", keywords: ["болничен", "болен", "лекар", "доктор", "отсъствие", "sick", "leave"], path: ["Меню", "Профил", "Формуляр за контакт", "Болничен"], icon: "fa-notes-medical", color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200", instructions: "<strong>❗️ Важно:</strong> При прикачване на снимка на болничния лист трябва да се виждат <strong>всичките 4 ъгъла на листа</strong>!" },
                 { id: "leave", title: "Отпуска (Молба, Остатък)", keywords: ["отпуска", "почивка", "дни", "платена", "неплатена", "молба"], path: ["Меню", "Профил", "Формуляр за контакт", "Отпуска"], icon: "fa-plane-departure", color: "text-teal-500", bg: "bg-teal-50", border: "border-teal-200", instructions: "Качване на молби или проверка на оставащи дни. Снимката трябва да обхваща и 4-те ъгъла на листа." },
@@ -1878,14 +1916,15 @@
                 { id: "salary", title: "Заплата и Бонуси", keywords: ["заплата", "пари", "бонус", "плащане", "фиш", "липсва"], path: ["Меню", "Профил", "Формуляр за контакт", "Заплата"], icon: "fa-money-bill-wave", color: "text-green-600", bg: "bg-green-50", border: "border-green-200", instructions: "Всички въпроси, свързани с фишове, удръжки или бонусна система." }
             ],
             en: [
+                { id: "car_ptp", title: "Accident with company car", keywords: ["accident", "crash", "collision", "ptp", "protocol", "insurance", "claim", "bulstrad", "company car", "captain", "tow"], portalAction: "car-ptp", path: ["Company cars", "Accidents & SOS", "Interactive guide"], icon: "fa-car-burst", color: "text-red-600", bg: "bg-red-50", border: "border-red-200", instructions: "Step by step: damage assessment, protocol or police, notify captain, Bulstrad claim. <strong>Tap the button</strong> to open the guide.", actionLabel: "Open accident guide" },
                 { id: "field_issue", title: "Field / Order Issue", keywords: ["order", "customer", "restaurant", "address", "wrong", "cancelled", "delay", "waiting"], path: ["Scoober App", "Chat Icon (Top Right)", "Support"], icon: "fa-motorcycle", color: "text-red-500", bg: "bg-red-50", border: "border-red-200", instructions: "Contact <strong>Dispatchers immediately via chat</strong> (icon in top right corner) for active deliveries." },
                 { id: "sick_leave", title: "Submit Sick Leave", keywords: ["sick", "leave", "doctor", "absence", "hospital"], path: ["Menu", "Profile", "Contact form", "Sick Leave"], icon: "fa-notes-medical", color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200", instructions: "<strong>❗️ Important:</strong> Ensure all <strong>4 corners of the document</strong> are completely visible in the image!" }
             ]
         };
 
         let helperQuickLinks = {
-            bg: [{ t: 'болничен', l: '💊 Болничен' }, { t: 'отпуска', l: '✈️ Отпуска' }, { t: 'график', l: '📅 График' }, { t: 'клиент', l: '🍔 Проблем на терен' }, { t: 'заплата', l: '💰 Заплата' }],
-            en: [{ t: 'sick', l: '💊 Sick Leave' }, { t: 'leave', l: '✈️ Leave' }, { t: 'schedule', l: '📅 Schedule' }, { t: 'order', l: '🍔 Field Issue' }]
+            bg: [{ t: 'птп', l: '🚗 ПТП служебна кола' }, { t: 'болничен', l: '💊 Болничен' }, { t: 'отпуска', l: '✈️ Отпуска' }, { t: 'график', l: '📅 График' }, { t: 'клиент', l: '🍔 Проблем на терен' }, { t: 'заплата', l: '💰 Заплата' }],
+            en: [{ t: 'accident', l: '🚗 Company car accident' }, { t: 'sick', l: '💊 Sick Leave' }, { t: 'leave', l: '✈️ Leave' }, { t: 'schedule', l: '📅 Schedule' }, { t: 'order', l: '🍔 Field Issue' }]
         };
 
         var currentLangCode = 'bg';
@@ -2128,6 +2167,20 @@
             else { document.getElementById('clearBtn').classList.add('hidden'); document.getElementById('quickCategories').classList.remove('hidden'); document.getElementById('resultsArea').classList.add('hidden'); }
         });
         document.getElementById('clearBtn').addEventListener('click', function() { document.getElementById('searchInput').value = ''; this.classList.add('hidden'); document.getElementById('quickCategories').classList.remove('hidden'); document.getElementById('resultsArea').classList.add('hidden'); });
+
+        function navigateHelperPortal(action) {
+            if (action === 'car-ptp') {
+                const targetCity = CITIES_WITH_CARS.includes(currentCityName) ? currentCityName : 'София';
+                const cityMeta = CITIES_LIST.find((c) => c.name === targetCity);
+                if (cityMeta) setCity(targetCity, cityMeta.short);
+                switchGlobalPage('cars');
+                openCarTab('car-sos');
+                setTimeout(() => {
+                    document.getElementById('ptp-wizard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 200);
+            }
+        }
+
         function performHelperSearch(query) {
             const resultsArea = document.getElementById('resultsArea'); const t = translations[currentLangCode]; const queryWords = query.split(/[\s,!?]+/).filter(w => w.length >= 3);
             const results = helperContactData[currentLangCode].filter(item => {
@@ -2141,8 +2194,12 @@
             resultsArea.innerHTML = ''; resultsArea.classList.remove('hidden');
             if (results.length === 0) { resultsArea.innerHTML = `<div class="text-center py-8 bg-gray-50 rounded-2xl border border-gray-200 shadow-inner"><i class="fa-solid fa-face-frown-open text-3xl text-gray-400 mb-3"></i><p class="text-brand-slate font-medium">${t.helper_notfound} "${query}".</p></div>`; return; }
             results.forEach(item => {
+                const pathLabel = item.portalAction ? (t.helper_portal_path || 'Къде в портала:') : t.helper_path;
                 const pathHtml = item.path.map((step, i) => `<span class="${i === item.path.length-1 ? 'bg-brand-orange text-white':'bg-white text-brand-dark'} px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold shadow-sm border border-gray-200">${step}</span>`).join('<i class="fa-solid fa-chevron-right text-[10px] text-gray-400 mx-2"></i>');
-                resultsArea.innerHTML += `<div class="result-card ${item.bg} border ${item.border} rounded-2xl p-5 shadow-sm"><div class="flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 border text-xl ${item.color} shadow-sm"><i class="fa-solid ${item.icon}"></i></div><div class="space-y-3 w-full"><h3 class="text-base font-extrabold text-brand-dark">${item.title}</h3><div class="bg-white/60 p-3 rounded-xl border"><div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">${t.helper_path}</div><div class="flex flex-wrap items-center gap-y-2">${pathHtml}</div></div><div class="text-xs text-brand-slate flex gap-2 items-start"><i class="fa-solid fa-circle-info mt-0.5 text-brand-orange"></i><span>${item.instructions}</span></div></div></div></div>`;
+                const actionBtn = item.portalAction
+                    ? `<button type="button" onclick="navigateHelperPortal('${item.portalAction}')" class="w-full mt-3 py-3.5 bg-brand-orange hover:bg-brand-orangeLight text-white font-bold rounded-xl text-sm shadow-sm transition-all flex items-center justify-center gap-2"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${item.actionLabel || t.helper_open_btn}</button>`
+                    : '';
+                resultsArea.innerHTML += `<div class="result-card ${item.bg} border ${item.border} rounded-2xl p-5 shadow-sm"><div class="flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shrink-0 border text-xl ${item.color} shadow-sm"><i class="fa-solid ${item.icon}"></i></div><div class="space-y-3 w-full"><h3 class="text-base font-extrabold text-brand-dark">${item.title}</h3><div class="bg-white/60 p-3 rounded-xl border"><div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">${pathLabel}</div><div class="flex flex-wrap items-center gap-y-2">${pathHtml}</div></div><div class="text-xs text-brand-slate flex gap-2 items-start"><i class="fa-solid fa-circle-info mt-0.5 text-brand-orange"></i><span>${item.instructions}</span></div>${actionBtn}</div></div></div>`;
             });
         }
 
