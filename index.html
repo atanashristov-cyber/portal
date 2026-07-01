@@ -216,6 +216,43 @@
         .ptp-check-item { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6; }
         .ptp-check-item:last-child { border-bottom: none; }
 
+        .sos-alert-banner {
+            background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 100%);
+            border: 2px solid #fecaca; border-radius: 1.25rem;
+            padding: 1rem 1.25rem; display: flex; gap: 1rem; align-items: flex-start;
+            box-shadow: 0 4px 20px -6px rgba(220, 38, 38, 0.2);
+        }
+        .sos-subnav {
+            display: grid; grid-template-columns: 1fr; gap: 0.5rem;
+        }
+        @media (min-width: 640px) { .sos-subnav { grid-template-columns: repeat(3, 1fr); } }
+        .sos-subnav-btn {
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 0.85rem 1rem; border-radius: 1rem; font-size: 0.8125rem; font-weight: 800;
+            border: 2px solid #e5e7eb; background: white; color: #6b7280;
+            transition: all 0.2s; text-align: center; min-height: 3.25rem;
+        }
+        .sos-subnav-btn i { font-size: 1rem; }
+        .sos-subnav-btn.active {
+            border-color: #FF7A00; background: #FF7A00; color: white;
+            box-shadow: 0 4px 14px -4px rgba(255, 122, 0, 0.5);
+        }
+        .sos-subnav-btn.active i { color: white !important; }
+        .sos-subnav-btn:not(.active):hover { border-color: #fdba74; color: #ea580c; background: #fff8f3; }
+        #ptp-wizard.ptp-wizard-hero {
+            border: 2px solid #fca5a5; box-shadow: 0 8px 30px -8px rgba(239, 68, 68, 0.25);
+        }
+        .ptp-wizard-head {
+            text-align: center; padding-bottom: 0.25rem;
+            border-bottom: 1px dashed #fecaca; margin-bottom: 0.25rem;
+        }
+        .ptp-info-hint {
+            font-size: 0.75rem; color: #6b7280; background: #f9fafb;
+            border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 0.75rem;
+            line-height: 1.45;
+        }
+        .sos-panel { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+
         /* Mobile-first navigation */
         .scroll-mt-sticky { scroll-margin-top: 5.5rem; }
         @media (min-width: 640px) { .scroll-mt-sticky { scroll-margin-top: 9.5rem; } }
@@ -305,6 +342,61 @@
 
             #vehicle-tabs-wrap { display: grid; grid-template-columns: repeat(2, 1fr); width: 100%; }
             #tab-personal, #tab-company { padding: 0.75rem 0.5rem; font-size: 0.75rem; }
+
+            /* Служебни коли — по-компактно на телефон */
+            #page-cars.global-page { gap: 0.625rem; }
+
+            #page-cars .car-tab-section { padding: 0.75rem 0.875rem !important; }
+
+            #page-cars .car-tab-section > h3,
+            #page-cars .car-tab-section .car-section-head h3 {
+                font-size: 1rem !important;
+                line-height: 1.25;
+            }
+
+            #car-page-hero { padding: 0.875rem 1rem !important; }
+            #car-page-hero h2 { font-size: 1.375rem !important; line-height: 1.2; }
+            #car-page-hero p { font-size: 0.8125rem !important; line-height: 1.4; }
+            #car-page-hero .relative.z-10 { gap: 0.5rem; }
+
+            #sec-car-map .car-section-head { padding-bottom: 0.5rem !important; }
+            #sec-car-map .car-section-head p { font-size: 0.75rem; }
+            #sec-car-map .car-map-layout { gap: 0.625rem !important; }
+            #sec-car-map .car-map-frame { min-height: 200px !important; padding: 0.5rem !important; border-radius: 1rem !important; }
+            #car-map-locations-list { max-height: 168px; gap: 0.375rem; }
+            .car-loc-card { padding: 0.5rem 0.625rem !important; border-radius: 0.75rem !important; }
+            .car-loc-card .car-loc-pin { width: 1.5rem !important; height: 1.5rem !important; font-size: 0.625rem !important; }
+            .car-loc-card h5 { font-size: 0.75rem !important; }
+            .car-loc-card p { font-size: 0.6875rem !important; margin-left: 2rem !important; }
+            .car-loc-nav-btn { margin-left: 2rem; margin-top: 0.25rem; padding: 0.2rem 0.45rem; font-size: 0.625rem; }
+
+            #sec-car-maint .car-maint-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 0.375rem !important; }
+            .car-maint-card { padding: 0.5rem 0.375rem !important; border-radius: 0.75rem !important; gap: 0.375rem !important; }
+            .car-maint-card .car-maint-icon { width: 2rem !important; height: 2rem !important; font-size: 0.875rem !important; }
+            .car-maint-card h4 { font-size: 0.6875rem !important; line-height: 1.2; }
+            .car-maint-card .car-maint-desc { display: none; }
+            .car-maint-card .car-action-nav-btn { margin-top: 0.25rem; padding: 0.3rem 0.25rem; font-size: 0.5625rem; }
+
+            #sec-car-contacts { gap: 0.625rem !important; }
+            #sec-car-contacts .car-contact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 0.5rem !important; }
+            .car-contact-card { padding: 0.625rem !important; border-radius: 0.875rem !important; }
+            .car-contact-card .car-contact-icon { width: 1.75rem !important; height: 1.75rem !important; font-size: 0.75rem !important; margin-bottom: 0.375rem !important; }
+            .car-contact-card h4 { font-size: 0.8125rem !important; line-height: 1.2; }
+            .car-contact-card .car-contact-desc { display: none; }
+            .car-contact-card .car-contact-hours { font-size: 0.5625rem !important; padding: 0.15rem 0.35rem !important; margin-bottom: 0.25rem; }
+            .car-contact-card .car-contact-body { margin-bottom: 0.375rem !important; }
+            .car-contact-card .car-contact-call { padding-top: 0.35rem !important; padding-bottom: 0.35rem !important; font-size: 0.6875rem !important; border-radius: 0.5rem !important; }
+
+            #sec-car-sos { gap: 0.5rem !important; }
+            .sos-alert-banner { padding: 0.625rem 0.75rem !important; gap: 0.5rem !important; }
+            .sos-alert-banner .sos-alert-icon { width: 2.25rem !important; height: 2.25rem !important; font-size: 0.875rem !important; }
+            .sos-alert-banner h3 { font-size: 0.875rem !important; }
+            .sos-alert-banner p { font-size: 0.6875rem !important; }
+            .sos-subnav-btn { padding: 0.45rem 0.35rem !important; font-size: 0.625rem !important; }
+            .sos-subnav-btn i { font-size: 0.75rem !important; }
+            #ptp-wizard { padding: 0.625rem !important; gap: 0.625rem !important; }
+            #ptp-wizard .ptp-step-badge { width: 2rem !important; height: 2rem !important; font-size: 0.875rem !important; }
+            #ptp-wizard h4 { font-size: 0.875rem !important; }
         }
 
         /* Desktop cities strip */
@@ -323,6 +415,24 @@
             transition: all 0.2s; flex-shrink: 0;
         }
         .city-strip-car:hover { background: #dbeafe; border-color: #93c5fd; }
+
+        .car-loc-nav-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;
+            margin-top: 0.5rem; margin-left: 2.75rem;
+            padding: 0.35rem 0.75rem; border-radius: 0.65rem;
+            font-size: 0.7rem; font-weight: 800; color: #FF7A00;
+            background: white; border: 1px solid rgba(255,122,0,0.35);
+            transition: all 0.2s;
+        }
+        .car-loc-nav-btn:hover { background: #fff8f3; border-color: #FF7A00; }
+        .car-action-nav-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+            width: 100%; margin-top: 0.75rem; padding: 0.55rem 1rem;
+            border-radius: 0.75rem; font-size: 0.75rem; font-weight: 800;
+            color: #FF7A00; background: white; border: 1px solid rgba(255,122,0,0.35);
+            transition: all 0.2s;
+        }
+        .car-action-nav-btn:hover { background: #fff8f3; }
     </style>
 </head>
 <body class="bg-[#F3F4F6] text-gray-800 font-sans antialiased min-h-screen relative selection:bg-brand-orange selection:text-white splash-active">
@@ -486,12 +596,21 @@
                                     </div>
                                 </div>
                             </button>
-                            <button type="button" onclick="openCompanyCars()" class="interactive-card text-left bg-blue-50 border border-blue-200 rounded-2xl p-4 sm:p-5 hover:border-blue-400 transition-all">
+                            <button type="button" id="city-link-cars" onclick="openCompanyCars()" class="interactive-card text-left bg-blue-50 border border-blue-200 rounded-2xl p-4 sm:p-5 hover:border-blue-400 transition-all hidden">
                                 <div class="flex items-center gap-3">
                                     <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-car-side"></i></div>
                                     <div class="min-w-0">
                                         <div class="font-black text-brand-dark" data-i18n="city_link_cars">Служебни коли</div>
                                         <div class="text-xs text-gray-500 font-medium" data-i18n="city_link_cars_desc">Паркинг, поддръжка, аварии</div>
+                                    </div>
+                                </div>
+                            </button>
+                            <button type="button" id="city-link-captain" onclick="scrollToGuideSection('section-contacts')" class="interactive-card text-left bg-teal-50 border border-teal-200 rounded-2xl p-4 sm:p-5 hover:border-teal-400 transition-all hidden">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-xl bg-teal-600 text-white flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-user-shield"></i></div>
+                                    <div class="min-w-0">
+                                        <div class="font-black text-brand-dark" data-i18n="city_link_captain">Капитан</div>
+                                        <div class="text-xs text-gray-500 font-medium" data-i18n="city_link_captain_desc">Обаждане и Viber</div>
                                     </div>
                                 </div>
                             </button>
@@ -687,6 +806,16 @@
             </section>
 
             <section id="section-contacts" class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 scroll-mt-sticky">
+                <div id="city-captain-section" class="hidden md:col-span-2">
+                    <div class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-teal-200 hover:border-teal-300 transition-colors">
+                        <div class="space-y-2 border-b border-gray-100 pb-5 mb-5">
+                            <div class="w-14 h-14 bg-teal-100 text-teal-700 rounded-2xl flex items-center justify-center text-2xl border border-teal-200"><i class="fa-solid fa-user-shield"></i></div>
+                            <h4 data-i18n="city_captain_title" class="text-xl sm:text-2xl font-black text-brand-dark pt-2">Капитан</h4>
+                            <p data-i18n="city_captain_desc" class="text-sm text-brand-slate">Директен контакт с капитана на града.</p>
+                        </div>
+                        <div id="city-captain-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+                </div>
                 <div class="bg-white rounded-[2rem] p-6 sm:p-10 shadow-sm border border-gray-200 space-y-6 flex flex-col justify-between hover:border-brand-orange/50 transition-colors">
                     <div class="space-y-4 border-b border-gray-100 pb-5">
                         <div class="w-14 h-14 bg-brand-orange/10 text-brand-orange rounded-2xl flex items-center justify-center text-2xl border border-brand-orange/20"><i class="fa-solid fa-headset"></i></div>
@@ -725,14 +854,14 @@
             </section>
         </div>
 
-        <div id="page-cars" class="global-page space-y-5 sm:space-y-10 hidden">
+        <div id="page-cars" class="global-page space-y-3 sm:space-y-10 hidden">
             <div class="flex items-center gap-2 sm:gap-3">
                 <button type="button" onclick="switchGlobalPage('home')" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl text-sm font-bold text-brand-dark bg-white border border-gray-200 shadow-sm hover:border-brand-orange hover:text-brand-orange transition-all w-full sm:w-auto justify-center sm:justify-start">
                     <i class="fa-solid fa-arrow-left"></i>
                     <span data-i18n="cars_back_guide">Обратно към наръчника</span>
                 </button>
             </div>
-            <section class="bg-white border border-gray-200 rounded-[2rem] p-6 sm:p-10 shadow-sm relative overflow-hidden">
+            <section id="car-page-hero" class="bg-white border border-gray-200 rounded-[2rem] p-6 sm:p-10 shadow-sm relative overflow-hidden">
                 <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-orange opacity-10 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute right-8 top-8 hidden lg:block text-brand-orange opacity-10 pointer-events-none"><i class="fa-solid fa-car-side text-[160px]"></i></div>
                 <div class="relative z-10 max-w-2xl space-y-4">
@@ -752,67 +881,24 @@
             </nav>
 
             <div class="relative">
-                <section id="sec-car-map" class="car-tab-section bg-white rounded-[2rem] p-5 sm:p-8 border border-gray-200 space-y-6 block">
-                    <div class="space-y-2 border-b border-gray-100 pb-5">
+                <section id="sec-car-map" class="car-tab-section bg-white rounded-[2rem] p-4 sm:p-8 border border-gray-200 space-y-4 sm:space-y-6 block">
+                    <div class="car-section-head space-y-1 sm:space-y-2 border-b border-gray-100 pb-3 sm:pb-5">
                         <h3 data-i18n="car_map_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">1. Карта на ключови локации</h3>
                         <p data-i18n="car_map_desc" class="text-brand-slate text-sm sm:text-base">Паркинг, стартова зона, автомивка, сервиз и пунктове за завеждане на щети.</p>
                     </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    <div class="car-map-layout grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch">
                         <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
                             <div class="space-y-4">
                                 <h4 class="text-base sm:text-lg font-bold text-brand-dark flex items-center gap-2"><i class="fa-solid fa-route text-brand-orange"></i> <span data-i18n="car_map_subtitle">Ключови локации</span></h4>
                                 <p data-i18n="car_map_text" class="text-sm text-brand-slate leading-relaxed">За куриерите със служебни автомобили процесът започва от фирмения паркинг, но смяната стартира официално едва когато достигнете определената зона.</p>
-                                <div class="space-y-3 mt-4 max-h-[420px] overflow-y-auto custom-scrollbar pr-1">
-                                    <div class="bg-brand-lightBg p-4 rounded-2xl border border-gray-200">
-                                        <div class="flex items-center gap-3 mb-1">
-                                            <div class="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center shrink-0 text-xs font-black">P</div>
-                                            <h5 data-i18n="car_loc_parking_title" class="font-bold text-brand-dark text-sm">Паркинг Западен Парк</h5>
-                                        </div>
-                                        <p data-i18n="car_loc_parking_desc" class="text-xs text-brand-slate ml-11">От тук взимате и тук връщате служебния автомобил. (бул. Сливница / Суходолска река)</p>
-                                    </div>
-                                    <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
-                                        <div class="flex items-center gap-3 mb-1">
-                                            <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 text-xs font-black">1</div>
-                                            <h5 data-i18n="car_loc_zone_title" class="font-bold text-brand-dark text-sm">Стартова Зона (Център)</h5>
-                                        </div>
-                                        <p data-i18n="car_loc_zone_desc" class="text-xs text-brand-slate ml-11">Единствената стартова точка за служебни автомобили. Тук се очаква най-голям брой поръчки.</p>
-                                    </div>
-                                    <div class="bg-cyan-50 p-4 rounded-2xl border border-cyan-100">
-                                        <div class="flex items-center gap-3 mb-1">
-                                            <div class="w-8 h-8 rounded-full bg-cyan-600 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-shower text-sm"></i></div>
-                                            <h5 data-i18n="car_loc_wash_title" class="font-bold text-brand-dark text-sm">Автомивка Рико</h5>
-                                        </div>
-                                        <p data-i18n="car_loc_wash_desc" class="text-xs text-brand-slate ml-11">кв. Модерно предградие, ул. „Адам Мицкевич“, 1360 София</p>
-                                    </div>
-                                    <div class="bg-purple-50 p-4 rounded-2xl border border-purple-100">
-                                        <div class="flex items-center gap-3 mb-1">
-                                            <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-screwdriver-wrench text-sm"></i></div>
-                                            <h5 data-i18n="car_loc_service_title" class="font-bold text-brand-dark text-sm">SEAT Ауто техника / Hertz</h5>
-                                        </div>
-                                        <p data-i18n="car_loc_service_desc" class="text-xs text-brand-slate ml-11">Сервиз — бул. Искърско шосе 13, София</p>
-                                    </div>
-                                    <div class="bg-amber-50 p-4 rounded-2xl border border-amber-100">
-                                        <div class="flex items-center gap-3 mb-1">
-                                            <div class="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-file-circle-exclamation text-sm"></i></div>
-                                            <h5 data-i18n="car_loc_claim1_title" class="font-bold text-brand-dark text-sm">Завеждане на щети — Булстрад</h5>
-                                        </div>
-                                        <p data-i18n="car_loc_claim1_desc" class="text-xs text-brand-slate ml-11">Горубляне, ул. Георги Белов 4</p>
-                                    </div>
-                                    <div class="bg-amber-50/70 p-4 rounded-2xl border border-amber-100">
-                                        <div class="flex items-center gap-3 mb-1">
-                                            <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-file-circle-exclamation text-sm"></i></div>
-                                            <h5 data-i18n="car_loc_claim2_title" class="font-bold text-brand-dark text-sm">Завеждане на щети — Булстрад</h5>
-                                        </div>
-                                        <p data-i18n="car_loc_claim2_desc" class="text-xs text-brand-slate ml-11">г.к. Разсадника – Коньовица, ул. „Хъшове“ 3, 1330 София</p>
-                                    </div>
-                                </div>
+                                <div id="car-map-locations-list" class="space-y-3 mt-4 max-h-[420px] overflow-y-auto custom-scrollbar pr-1"></div>
                             </div>
                             <div class="p-4 bg-brand-orange/5 border border-brand-orange/20 rounded-xl flex items-start gap-3">
                                 <i class="fa-solid fa-triangle-exclamation text-brand-orange mt-0.5"></i>
                                 <p data-i18n="car_map_start_info" class="text-xs text-brand-dark font-medium leading-snug"><strong>Внимание:</strong> Активирайте смяната си в приложението <strong>САМО</strong> след като физически навлезете в границите на Зона Център.</p>
                             </div>
                         </div>
-                        <div class="lg:col-span-7 bg-brand-lightBg border border-gray-200 rounded-[2rem] p-3 shadow-inner relative flex flex-col min-h-[420px] sm:min-h-[480px]">
+                        <div class="car-map-frame lg:col-span-7 bg-brand-lightBg border border-gray-200 rounded-[2rem] p-3 shadow-inner relative flex flex-col min-h-[280px] sm:min-h-[480px]">
                             <div class="flex-1 rounded-2xl overflow-hidden relative shadow-sm border border-gray-300">
                                 <div id="company-map" class="w-full h-full absolute inset-0 z-10"></div>
                             </div>
@@ -820,49 +906,53 @@
                     </div>
                 </section>
 
-                <section id="sec-car-maint" class="car-tab-section bg-white rounded-[2rem] p-5 sm:p-8 border border-gray-200 space-y-6 hidden">
-                    <div class="space-y-2 border-b border-gray-100 pb-5">
-                        <h3 data-i18n="car_maint_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">2. Експлоатация и Поддръжка</h3>
-                        <p data-i18n="car_maint_desc" class="text-brand-slate text-sm sm:text-base">Основни правила за грижа към служебния автомобил.</p>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 flex flex-col items-center text-center space-y-3 hover:border-brand-orange transition-colors">
-                            <div class="w-14 h-14 bg-brand-orange/10 text-brand-orange rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-gas-pump"></i></div>
+                <section id="sec-car-maint" class="car-tab-section bg-white rounded-[2rem] p-4 sm:p-8 border border-gray-200 space-y-4 sm:space-y-6 hidden">
+                    <h3 data-i18n="car_maint_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">2. Експлоатация и Поддръжка</h3>
+                    <div class="car-maint-grid grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                        <div class="car-maint-card bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-6 flex flex-col items-center text-center space-y-3 hover:border-brand-orange transition-colors">
+                            <div class="car-maint-icon w-14 h-14 bg-brand-orange/10 text-brand-orange rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-gas-pump"></i></div>
                             <h4 data-i18n="car_maint_fuel_title" class="font-bold text-brand-dark">Зареждане с гориво</h4>
-                            <p data-i18n="car_maint_fuel_desc" class="text-xs text-gray-500">Зареждаме само на бензиностанции <strong>Лукойл</strong>. Фирмената карта е в жабката на колата, а ПИН кодът е написан на самата нея.</p>
+                            <p data-i18n="car_maint_fuel_desc" class="car-maint-desc text-xs text-gray-500">Зареждаме само на бензиностанции <strong>Лукойл</strong>. Фирмената карта е в жабката на колата, а ПИН кодът е написан на самата нея.</p>
                         </div>
-                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 flex flex-col items-center text-center space-y-3 hover:border-blue-500 transition-colors">
-                            <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-shower"></i></div>
+                        <div class="car-maint-card bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-6 flex flex-col items-center text-center space-y-3 hover:border-cyan-500 transition-colors">
+                            <div class="car-maint-icon w-14 h-14 bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-shower"></i></div>
                             <h4 data-i18n="car_maint_wash_title" class="font-bold text-brand-dark">Служебна Автомивка</h4>
-                            <p data-i18n="car_maint_wash_desc" class="text-xs text-gray-500">Колата трябва да се предава чиста. Партньорска автомивка: <strong>Автомивка Рико</strong> — кв. Модерно предградие, ул. „Адам Мицкевич“, 1360 София.</p>
+                            <p data-i18n="car_maint_wash_desc" class="car-maint-desc text-xs text-gray-500">Колата трябва да се предава чиста. Партньорска автомивка: <strong>Автомивка Рико</strong>.</p>
+                            <button type="button" onclick="openCarNavById('wash')" class="car-action-nav-btn"><i class="fa-solid fa-diamond-turn-right"></i> <span data-i18n="nav_btn">Навигация</span></button>
                         </div>
-                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 flex flex-col items-center text-center space-y-3 hover:border-green-500 transition-colors">
-                            <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-check"></i></div>
+                        <div class="car-maint-card bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-6 flex flex-col items-center text-center space-y-3 hover:border-green-500 transition-colors">
+                            <div class="car-maint-icon w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-check"></i></div>
                             <h4 data-i18n="car_maint_clean_title" class="font-bold text-brand-dark">Правила за автомобила</h4>
-                            <p data-i18n="car_maint_clean_desc" class="text-xs text-gray-500">В колата <strong>не се пуши, не се яде</strong> и не се пият напитки без капачка. Забранено е возенето на други лица! Предавайте колата чиста и по възможност заредена.</p>
+                            <p data-i18n="car_maint_clean_desc" class="car-maint-desc text-xs text-gray-500">В колата <strong>не се пуши, не се яде</strong> и не се пият напитки без капачка. Забранено е возенето на други лица! Предавайте колата чиста и по възможност заредена.</p>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 space-y-2">
-                            <div class="flex items-center gap-2 text-amber-700 font-bold text-sm"><i class="fa-solid fa-file-circle-exclamation"></i> <span data-i18n="car_maint_claims_title">Завеждане на щети</span></div>
-                            <p class="text-xs text-gray-600"><strong>Булстрад — Горубляне</strong><br><span data-i18n="car_loc_claim1_desc">ул. Георги Белов 4</span></p>
-                            <p class="text-xs text-gray-600"><strong>Булстрад — Красна поляна</strong><br><span data-i18n="car_loc_claim2_desc">ул. Хъшове 3</span></p>
-                        </div>
-                        <div class="bg-purple-50 border border-purple-200 rounded-2xl p-5 space-y-2 md:col-span-2">
-                            <div class="flex items-center gap-2 text-purple-700 font-bold text-sm"><i class="fa-solid fa-screwdriver-wrench"></i> <span data-i18n="car_maint_service_title">Официален сервиз</span></div>
-                            <p data-i18n="car_maint_service_desc" class="text-xs text-gray-600"><strong>SEAT Ауто техника ЕООД</strong> / Hertz — бул. Искърско шосе 13, София. Данните за сервиза се попълват в <strong>т. 6</strong> на двустранния протокол.</p>
-                        </div>
+                    <div class="bg-brand-lightBg border border-gray-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <p data-i18n="car_maint_map_hint" class="text-xs text-gray-600"><i class="fa-solid fa-map-location-dot text-brand-orange mr-1"></i> Сервиз, Булстрад и останалите адреси — на таб <strong>Карта & Старт</strong>.</p>
+                        <button type="button" onclick="openCarTab('car-map')" class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold text-brand-orange bg-white border border-brand-orange/30 hover:bg-brand-orange/5 transition-all"><span data-i18n="car_maint_map_btn">Карта →</span></button>
                     </div>
                 </section>
 
-                <section id="sec-car-sos" class="car-tab-section bg-white rounded-[2rem] p-4 sm:p-8 border border-gray-200 space-y-5 sm:space-y-6 hidden">
-                    <div class="space-y-2 border-b border-gray-100 pb-4 sm:pb-5">
-                        <h3 data-i18n="car_sos_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">3. Действия при ПТП или Авария</h3>
-                        <p data-i18n="car_sos_desc" class="text-brand-slate text-sm sm:text-base">Следвай стъпките по ред — избираш отговора и те води напред.</p>
+                <section id="sec-car-sos" class="car-tab-section bg-white rounded-[2rem] p-4 sm:p-8 border border-gray-200 space-y-4 sm:space-y-5 hidden">
+                    <div class="sos-alert-banner">
+                        <div class="sos-alert-icon w-12 h-12 shrink-0 bg-red-600 text-white rounded-xl flex items-center justify-center text-xl shadow-md"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="min-w-0">
+                            <h3 data-i18n="car_sos_title" class="text-lg sm:text-xl font-black text-red-900 leading-tight mb-1">3. Действия при ПТП или Авария</h3>
+                            <p data-i18n="car_sos_start_hint" class="text-sm text-red-800/90 font-medium leading-snug">При ПТП започни от <strong>„ПТП — стъпка по стъпка“</strong> и натискай само оранжевите/зелените бутони в наръчника.</p>
+                        </div>
                     </div>
 
-                    <!-- Интерактивен път при ПТП -->
-                    <div id="ptp-wizard" class="bg-gradient-to-b from-red-50/80 to-white border border-red-100 rounded-2xl p-4 sm:p-6 space-y-4">
+                    <nav id="sos-subnav" class="sos-subnav" aria-label="ПТП раздели">
+                        <button type="button" id="sos-btn-wizard" onclick="switchSosPanel('wizard')" class="sos-subnav-btn active"><i class="fa-solid fa-route text-red-500"></i> <span data-i18n="sos_tab_wizard">ПТП — стъпка по стъпка</span></button>
+                        <button type="button" id="sos-btn-tow" onclick="switchSosPanel('tow')" class="sos-subnav-btn"><i class="fa-solid fa-truck-pickup text-brand-orange"></i> <span data-i18n="sos_tab_tow">Репатрак</span></button>
+                        <button type="button" id="sos-btn-protocol" onclick="switchSosPanel('protocol')" class="sos-subnav-btn"><i class="fa-solid fa-file-signature text-blue-600"></i> <span data-i18n="sos_tab_protocol">Протокол</span></button>
+                    </nav>
+
+                    <div id="sos-panel-wizard" class="sos-panel">
+                    <div id="ptp-wizard" class="ptp-wizard-hero bg-gradient-to-b from-red-50/90 to-white rounded-2xl p-4 sm:p-6 space-y-4">
+                        <div class="ptp-wizard-head space-y-1">
+                            <span class="inline-block text-[10px] font-black uppercase tracking-widest text-red-600 bg-red-100 px-2.5 py-1 rounded-md border border-red-200">Главен наръчник</span>
+                            <p class="text-sm font-bold text-brand-dark">Следвай стъпките — избираш отговор и продължаваш напред</p>
+                        </div>
                         <div class="flex items-center justify-between gap-2">
                             <button type="button" id="ptp-back-btn" onclick="ptpGoBack()" class="hidden shrink-0 flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-brand-orange px-2 py-1.5 rounded-lg border border-gray-200 bg-white">
                                 <i class="fa-solid fa-arrow-left text-[10px]"></i> Назад
@@ -880,7 +970,7 @@
                         <!-- Стъпка 1: Оглед -->
                         <div class="ptp-panel space-y-3" data-ptp="1">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-red-500 text-white rounded-xl flex items-center justify-center font-black shrink-0">1</div>
+                                <div class="w-10 h-10 ptp-step-badge bg-red-500 text-white rounded-xl flex items-center justify-center font-black shrink-0">1</div>
                                 <div>
                                     <h4 class="font-black text-brand-dark text-base sm:text-lg">Установяване на щети</h4>
                                     <p class="text-xs text-gray-500">Огледай мястото и оцени ситуацията</p>
@@ -901,7 +991,7 @@
                         <!-- 1b: Тежест на щетата -->
                         <div class="ptp-panel hidden space-y-3" data-ptp="1b">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-red-500 text-white rounded-xl flex items-center justify-center font-black shrink-0">1</div>
+                                <div class="w-10 h-10 ptp-step-badge bg-red-500 text-white rounded-xl flex items-center justify-center font-black shrink-0">1</div>
                                 <div>
                                     <h4 class="font-black text-brand-dark text-base sm:text-lg">Състояние на колата</h4>
                                     <p class="text-xs text-gray-500">Може ли да продължи на собствен ход?</p>
@@ -917,10 +1007,7 @@
                                     <span>Тежка щета — не може да се движи / блокира пътя</span>
                                 </button>
                             </div>
-                            <details class="ptp-detail-box bg-white border border-gray-200 text-gray-600">
-                                <summary class="font-bold text-gray-700 cursor-pointer text-sm">Кога задължително се вика КАТ?</summary>
-                                <p class="mt-2">При неразбирателство за вината, или когато МПС-та <strong>не могат на собствен ход</strong>, запречват движението и затрудняват пътната обстановка.</p>
-                            </details>
+                            <div class="ptp-info-hint"><i class="fa-solid fa-circle-info text-gray-400 mr-1"></i> <strong>КАТ е задължителен</strong> при спор за вина или ако колите не могат да се движат и пречат на движението.</div>
                         </div>
 
                         <!-- 112 -->
@@ -936,7 +1023,7 @@
                         <!-- Стъпка 2: Съгласие -->
                         <div class="ptp-panel hidden space-y-3" data-ptp="2">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black shrink-0">2</div>
+                                <div class="w-10 h-10 ptp-step-badge bg-blue-600 text-white rounded-xl flex items-center justify-center font-black shrink-0">2</div>
                                 <div>
                                     <h4 class="font-black text-brand-dark text-base sm:text-lg">Протокол или КАТ?</h4>
                                     <p class="text-xs text-gray-500">Двата автомобила в движение — съгласие за вината?</p>
@@ -967,7 +1054,7 @@
                         <!-- Протокол -->
                         <div class="ptp-panel hidden space-y-3" data-ptp="protocol">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black shrink-0">2</div>
+                                <div class="w-10 h-10 ptp-step-badge bg-blue-600 text-white rounded-xl flex items-center justify-center font-black shrink-0">2</div>
                                 <div>
                                     <h4 class="font-black text-brand-dark text-base sm:text-lg">Двустранен протокол</h4>
                                     <p class="text-xs text-gray-500">Подписват го и двамата водачи</p>
@@ -976,11 +1063,11 @@
                             <div class="ptp-detail-box bg-blue-50 border border-blue-100 text-brand-dark">
                                 <p class="text-sm">Попълва се <strong>без КАТ</strong>, ако сте съгласни за вината и няма пострадали.</p>
                             </div>
-                            <button type="button" onclick="document.getElementById('ptp-protocol-guide').scrollIntoView({behavior:'smooth'}); toggleProtocolGuide(true)" class="ptp-choice-btn">
+                            <button type="button" onclick="switchSosPanel('protocol')" class="ptp-choice-btn">
                                 <i class="bg-blue-100 text-blue-600"><i class="fa-solid fa-list-check"></i></i>
                                 <span>Инструкции за попълване (т. 6–15)</span>
                             </button>
-                            <button type="button" onclick="toggleProtocolImage(); document.getElementById('ptp-protocol-guide').scrollIntoView({behavior:'smooth'})" class="ptp-choice-btn">
+                            <button type="button" onclick="switchSosPanel('protocol'); setTimeout(toggleProtocolImage, 150)" class="ptp-choice-btn">
                                 <i class="bg-gray-100 text-gray-600"><i class="fa-solid fa-eye"></i></i>
                                 <span>Виж примерен протокол</span>
                             </button>
@@ -990,7 +1077,7 @@
                         <!-- Стъпка 3: Капитан -->
                         <div class="ptp-panel hidden space-y-3" data-ptp="3">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-brand-orange text-white rounded-xl flex items-center justify-center font-black shrink-0">3</div>
+                                <div class="w-10 h-10 ptp-step-badge bg-brand-orange text-white rounded-xl flex items-center justify-center font-black shrink-0">3</div>
                                 <div>
                                     <h4 class="font-black text-brand-dark text-base sm:text-lg">Уведомяване на Капитан</h4>
                                     <p class="text-xs text-gray-500">Делник — обаждане · уикенд — Viber</p>
@@ -1031,17 +1118,17 @@
                         <!-- Стъпка 4: Булстрад -->
                         <div class="ptp-panel hidden space-y-3" data-ptp="4">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-amber-600 text-white rounded-xl flex items-center justify-center font-black shrink-0">4</div>
+                                <div class="w-10 h-10 ptp-step-badge bg-amber-600 text-white rounded-xl flex items-center justify-center font-black shrink-0">4</div>
                                 <div>
                                     <h4 class="font-black text-brand-dark text-base sm:text-lg">Завеждане на щета</h4>
                                     <p class="text-xs text-gray-500">В същия ден — само шофьорът</p>
                                 </div>
                             </div>
-                            <div class="ptp-detail-box bg-amber-50 border border-amber-200 text-sm space-y-2">
+                            <div class="ptp-detail-box bg-amber-50 border border-amber-200 text-sm space-y-3">
                                 <p><strong>Важно:</strong> При щета по време на движение само <strong>шофьорът</strong> може да заведе щетата в Булстрад.</p>
                                 <p class="font-bold text-amber-900">Избери офис:</p>
-                                <p>• ул. „Хъшове“ 3, Красна поляна</p>
-                                <p>• ул. Георги Белов 4, Горубляне</p>
+                                <button type="button" onclick="openCarNavById('claim2')" class="car-action-nav-btn !ml-0"><i class="fa-solid fa-diamond-turn-right"></i> Булстрад — Красна поляна</button>
+                                <button type="button" onclick="openCarNavById('claim1')" class="car-action-nav-btn !ml-0"><i class="fa-solid fa-diamond-turn-right"></i> Булстрад — Горубляне</button>
                             </div>
                             <button type="button" onclick="openCarTab('car-map'); showPtpStep('4map')" class="ptp-choice-btn">
                                 <i class="bg-amber-100 text-amber-700"><i class="fa-solid fa-map-location-dot"></i></i>
@@ -1061,47 +1148,46 @@
                             <p class="text-sm text-center text-gray-500">Адресите са на таб „Карта & Старт“</p>
                         </div>
                     </div>
+                    </div>
 
-                    <!-- Репатрак -->
-                    <details class="bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden group">
-                        <summary class="flex items-center justify-between gap-3 p-4 sm:p-5 cursor-pointer font-black text-brand-dark text-sm sm:text-base list-none">
-                            <span class="flex items-center gap-2"><i class="fa-solid fa-truck-pickup text-brand-orange"></i> Репатрак — кога се ползва?</span>
-                            <i class="fa-solid fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform"></i>
-                        </summary>
-                        <div class="px-4 sm:px-5 pb-4 sm:pb-5 space-y-2 text-sm text-gray-600 border-t border-gray-100 pt-3">
-                            <div class="ptp-check-item"><i class="fa-solid fa-car-burst text-red-500 mt-0.5"></i><span>При ПТП (след съгласуване с Капитан)</span></div>
-                            <div class="ptp-check-item"><i class="fa-solid fa-circle-dot text-gray-600 mt-0.5"></i><span>Спукана гума → 24/7 гумаджийница. <strong>Касова бележка</strong> за осребряване на услугата</span></div>
-                            <div class="ptp-check-item"><i class="fa-solid fa-gears text-gray-600 mt-0.5"></i><span>Блокирали скорости</span></div>
-                            <div class="ptp-check-item"><i class="fa-solid fa-ban text-gray-600 mt-0.5"></i><span>Друга невъзможност за движение на собствен ход</span></div>
-                            <a href="tel:+359887239391" class="mt-3 flex items-center justify-center gap-2 w-full py-3 bg-brand-orange text-white font-bold rounded-xl text-sm"><i class="fa-solid fa-phone"></i> Пътна помощ (след Капитан)</a>
-                        </div>
-                    </details>
-
-                    <!-- Протокол — ръководство -->
-                    <div id="ptp-protocol-guide" class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 sm:p-6 shadow-sm">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-lg font-black"><i class="fa-solid fa-file-signature"></i></div>
+                    <div id="sos-panel-tow" class="sos-panel hidden">
+                        <div class="bg-gray-50 border-2 border-gray-200 rounded-2xl p-5 sm:p-6 space-y-4">
+                            <div class="flex items-center gap-3 pb-3 border-b border-gray-200">
+                                <div class="w-11 h-11 bg-brand-orange text-white rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-truck-pickup"></i></div>
                                 <div>
-                                    <h4 data-i18n="car_protocol_title" class="text-lg sm:text-xl font-bold text-brand-dark">Двустранен констативен протокол</h4>
-                                    <p data-i18n="car_protocol_desc" class="text-brand-slate text-xs sm:text-sm mt-0.5">При леки материални щети, <strong>без пострадали хора</strong> и при пълно съгласие между двамата водачи за обстоятелствата, се попълва Двустранен протокол.</p>
+                                    <h4 class="font-black text-brand-dark text-base sm:text-lg">Репатрак — кога се ползва?</h4>
+                                    <p data-i18n="sos_tow_hint" class="text-xs text-gray-500">Само след съгласуване с Капитан</p>
                                 </div>
                             </div>
-                            
-                            <button onclick="toggleProtocolImage()" id="btn-toggle-protocol" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer whitespace-nowrap self-start sm:self-auto">
+                            <div class="space-y-1 text-sm text-gray-700">
+                                <div class="ptp-check-item"><i class="fa-solid fa-car-burst text-red-500 mt-0.5"></i><span>При ПТП (след съгласуване с Капитан)</span></div>
+                                <div class="ptp-check-item"><i class="fa-solid fa-circle-dot text-gray-600 mt-0.5"></i><span>Спукана гума → 24/7 гумаджийница. <strong>Касова бележка</strong> за осребряване</span></div>
+                                <div class="ptp-check-item"><i class="fa-solid fa-gears text-gray-600 mt-0.5"></i><span>Блокирали скорости</span></div>
+                                <div class="ptp-check-item"><i class="fa-solid fa-ban text-gray-600 mt-0.5"></i><span>Друга невъзможност за движение на собствен ход</span></div>
+                            </div>
+                            <a href="tel:+359887239391" class="flex items-center justify-center gap-2 w-full py-3.5 bg-brand-orange hover:bg-brand-orangeLight text-white font-bold rounded-xl text-sm shadow-sm"><i class="fa-solid fa-phone"></i> Пътна помощ · 0887 239 391</a>
+                            <button type="button" onclick="switchSosPanel('wizard')" class="w-full py-2.5 text-sm font-bold text-gray-500 hover:text-brand-orange transition-colors">← Обратно към ПТП наръчника</button>
+                        </div>
+                    </div>
+
+                    <div id="sos-panel-protocol" class="sos-panel hidden">
+                    <div id="ptp-protocol-guide" class="bg-blue-50/80 border-2 border-blue-200 rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 bg-blue-600 text-white rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-file-signature"></i></div>
+                                <div>
+                                    <h4 data-i18n="car_protocol_title" class="text-lg sm:text-xl font-black text-brand-dark">Двустранен констативен протокол</h4>
+                                    <p data-i18n="car_protocol_desc" class="text-brand-slate text-xs sm:text-sm mt-0.5">При леки щети, <strong>без пострадали</strong> и пълно съгласие между водачите.</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="toggleProtocolImage()" id="btn-toggle-protocol" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-2 w-full sm:w-auto">
                                 <i class="fa-solid fa-eye"></i> <span data-i18n="btn_show_sample">Виж примерния протокол</span>
                             </button>
                         </div>
-                        
-                        <div id="protocol-image-container" class="hidden max-w-2xl mx-auto border border-gray-200 rounded-xl overflow-hidden bg-white p-2 shadow-inner mt-4 transition-all duration-300"></div>
-
-                        <details id="protocol-guide-details" class="mt-4 bg-white border border-blue-200 rounded-2xl overflow-hidden group">
-                            <summary class="flex items-center justify-between gap-3 p-4 sm:p-5 cursor-pointer font-black text-brand-dark text-sm list-none">
-                                <span class="flex items-center gap-2"><i class="fa-solid fa-list-check text-blue-600"></i> <span data-i18n="car_protocol_guide_title">Как се попълва протоколът</span> (т. 6–15)</span>
-                                <i class="fa-solid fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform shrink-0"></i>
-                            </summary>
-                            <div class="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-blue-100 pt-3 space-y-3">
-                                <p data-i18n="car_protocol_guide_intro" class="text-xs text-gray-500">Точки 1–5 са елементарни. По-долу са най-важните полета:</p>
+                        <div id="protocol-image-container" class="hidden max-w-2xl mx-auto border border-gray-200 rounded-xl overflow-hidden bg-white p-2 shadow-inner"></div>
+                        <div class="bg-white border border-blue-200 rounded-2xl p-4 sm:p-5 space-y-3">
+                            <p class="font-black text-brand-dark text-sm flex items-center gap-2"><i class="fa-solid fa-list-check text-blue-600"></i> <span data-i18n="car_protocol_guide_title">Как се попълва протоколът</span> (т. 6–15)</p>
+                            <p data-i18n="car_protocol_guide_intro" class="text-xs text-gray-500">Точки 1–5 са елементарни. По-долу са най-важните полета:</p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-1">
                                     <span class="text-xs font-black text-blue-600 uppercase">Т. 6 — ВАЖНО</span>
@@ -1144,45 +1230,52 @@
                                     <p data-i18n="car_protocol_p15" class="text-brand-slate leading-snug">Подписи в бялото поле от двамата водачи.</p>
                                 </div>
                             </div>
-                            </div>
-                        </details>
+                        </div>
+                        <button type="button" onclick="switchSosPanel('wizard')" class="w-full py-2.5 text-sm font-bold text-blue-700 hover:text-blue-900 transition-colors">← Обратно към ПТП наръчника</button>
+                    </div>
                     </div>
                 </section>
 
-                <section id="sec-car-contacts" class="car-tab-section bg-white rounded-[2rem] p-5 sm:p-8 border border-gray-200 space-y-6 hidden">
-                    <div class="space-y-2 border-b border-gray-100 pb-5">
-                        <h3 data-i18n="car_contact_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">4.  Телефонен указател</h3>
-                        <p data-i18n="car_contact_desc" class="text-brand-slate text-sm sm:text-base">Списък с отговорниците за автопарка. Използвайте бутоните за директно набиране.</p>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-5 flex flex-col justify-between hover:shadow-sm transition">
-                            <div class="mb-4">
-                                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-base mb-3"><i class="fa-solid fa-user-tie"></i></div>
+                <section id="sec-car-contacts" class="car-tab-section bg-white rounded-[2rem] p-4 sm:p-8 border border-gray-200 space-y-4 sm:space-y-6 hidden">
+                    <h3 data-i18n="car_contact_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">4.  Телефонен указател</h3>
+                    <div class="car-contact-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-6">
+                        <div class="car-contact-card bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-sm transition">
+                            <div class="car-contact-body mb-4">
+                                <div class="car-contact-icon w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-base mb-3"><i class="fa-solid fa-user-tie"></i></div>
                                 <h4 class="font-black text-lg text-brand-dark">Християн Борисов</h4>
                                 <div data-i18n="car_c1_role" class="text-[10px] font-bold text-brand-orange uppercase tracking-wider mt-0.5 mb-2">Капитан</div>
-                                <p data-i18n="car_c1_desc" class="text-xs text-gray-500 mb-3">За въпроси, свързани с промяна в графика и разпределението на колите.</p>
-                                <div class="text-[11px] text-gray-600 bg-gray-200/60 px-2.5 py-1.5 rounded-lg inline-block font-bold"><i class="fa-regular fa-clock mr-1"></i> <span data-i18n="car_cap_hours">Пон-Пет | 10:00 - 18:00</span></div>
+                                <p data-i18n="car_c1_desc" class="car-contact-desc text-xs text-gray-500 mb-3">За въпроси, свързани с промяна в графика и разпределението на колите.</p>
+                                <div class="car-contact-hours text-[11px] text-gray-600 bg-gray-200/60 px-2.5 py-1.5 rounded-lg inline-block font-bold"><i class="fa-regular fa-clock mr-1"></i> <span data-i18n="car_cap_hours">Пон-Пет | 10:00 - 18:00</span></div>
                             </div>
-                            <a href="tel:+359877021585" class="w-full bg-white border border-gray-200 hover:border-brand-orange hover:text-brand-orange text-brand-dark font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
+                            <a href="tel:+359877021585" class="car-contact-call w-full bg-white border border-gray-200 hover:border-brand-orange hover:text-brand-orange text-brand-dark font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
                         </div>
-                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-5 flex flex-col justify-between hover:shadow-sm transition">
-                            <div class="mb-4">
-                                <div class="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-base mb-3"><i class="fa-solid fa-user-shield"></i></div>
+                        <div class="car-contact-card bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-sm transition">
+                            <div class="car-contact-body mb-4">
+                                <div class="car-contact-icon w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-base mb-3"><i class="fa-solid fa-user-shield"></i></div>
                                 <h4 class="font-black text-lg text-brand-dark">Владимир Ненков</h4>
                                 <div data-i18n="car_c2_role" class="text-[10px] font-bold text-brand-orange uppercase tracking-wider mt-0.5 mb-2">Капитан</div>
-                                <p data-i18n="car_c2_desc" class="text-xs text-gray-500 mb-3">За спешни въпроси, свързани с повреда по автомобила или при възникнало ПТП.</p>
-                                <div class="text-[11px] text-gray-600 bg-gray-200/60 px-2.5 py-1.5 rounded-lg inline-block font-bold"><i class="fa-regular fa-clock mr-1"></i> <span data-i18n="car_cap_hours">Пон-Пет | 10:00 - 18:00</span></div>
+                                <p data-i18n="car_c2_desc" class="car-contact-desc text-xs text-gray-500 mb-3">За спешни въпроси, свързани с повреда по автомобила или при възникнало ПТП.</p>
+                                <div class="car-contact-hours text-[11px] text-gray-600 bg-gray-200/60 px-2.5 py-1.5 rounded-lg inline-block font-bold"><i class="fa-regular fa-clock mr-1"></i> <span data-i18n="car_cap_hours">Пон-Пет | 10:00 - 18:00</span></div>
                             </div>
-                            <a href="tel:+359889627470" class="w-full bg-white border border-gray-200 hover:border-brand-orange hover:text-brand-orange text-brand-dark font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
+                            <a href="tel:+359889627470" class="car-contact-call w-full bg-white border border-gray-200 hover:border-brand-orange hover:text-brand-orange text-brand-dark font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
                         </div>
-                        <div class="bg-brand-orange/5 border border-brand-orange/20 rounded-2xl p-5 flex flex-col justify-between hover:shadow-sm transition">
-                            <div class="mb-4">
-                                <div class="w-10 h-10 bg-brand-orange text-white rounded-full flex items-center justify-center text-base mb-3"><i class="fa-solid fa-truck-pickup"></i></div>
+                        <div class="car-contact-card bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-sm transition">
+                            <div class="car-contact-body mb-4">
+                                <div class="car-contact-icon w-10 h-10 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center text-base mb-3"><i class="fa-solid fa-user-tie"></i></div>
+                                <h4 class="font-black text-lg text-brand-dark">Тодор Николов</h4>
+                                <div data-i18n="car_c1_role" class="text-[10px] font-bold text-brand-orange uppercase tracking-wider mt-0.5 mb-2">Капитан</div>
+                                <div class="car-contact-hours text-[11px] text-gray-600 bg-gray-200/60 px-2.5 py-1.5 rounded-lg inline-block font-bold"><i class="fa-regular fa-clock mr-1"></i> <span data-i18n="car_cap_hours">Пон-Пет | 10:00 - 18:00</span></div>
+                            </div>
+                            <a href="tel:+359887199930" class="car-contact-call w-full bg-white border border-gray-200 hover:border-brand-orange hover:text-brand-orange text-brand-dark font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
+                        </div>
+                        <div class="car-contact-card bg-brand-orange/5 border border-brand-orange/20 rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-sm transition">
+                            <div class="car-contact-body mb-4">
+                                <div class="car-contact-icon w-10 h-10 bg-brand-orange text-white rounded-full flex items-center justify-center text-base mb-3"><i class="fa-solid fa-truck-pickup"></i></div>
                                 <h4 data-i18n="car_c3_title" class="font-black text-lg text-brand-dark">Пътна помощ</h4>
                                 <div data-i18n="car_c3_role" class="text-[10px] font-bold text-brand-orange uppercase tracking-wider mt-0.5 mb-2">Денонощен репатрак</div>
-                                <p data-i18n="car_c3_desc" class="text-xs text-gray-500">Звънете на този номер само след предварително съгласуване с Капитан.</p>
+                                <p data-i18n="car_c3_desc" class="car-contact-desc text-xs text-gray-500">Звънете на този номер само след предварително съгласуване с Капитан.</p>
                             </div>
-                            <a href="tel:+359887239391" class="w-full bg-brand-orange hover:bg-brand-orangeLight text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
+                            <a href="tel:+359887239391" class="car-contact-call w-full bg-brand-orange hover:bg-brand-orangeLight text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
                         </div>
                     </div>
                 </section>
@@ -1512,8 +1605,12 @@
         function updateCityTopicLinks() {
             const box = document.getElementById('city-topic-links');
             if (!box) return;
-            const show = currentPage === 'home' && CITIES_WITH_CARS.includes(currentCityName);
+            const hasCars = CITIES_WITH_CARS.includes(currentCityName);
+            const hasCaptain = (CITY_CAPTAIN_CONFIG[currentCityName] || []).length > 0;
+            const show = currentPage === 'home' && (hasCars || hasCaptain);
             box.classList.toggle('hidden', !show);
+            document.getElementById('city-link-cars')?.classList.toggle('hidden', !hasCars);
+            document.getElementById('city-link-captain')?.classList.toggle('hidden', !hasCaptain);
         }
 
         function openCompanyCars(city, shortCity) {
@@ -1696,9 +1793,9 @@
                 showCityOnMap(currentCityName);
                 if (map) setTimeout(() => map.invalidateSize(), 150);
                 setGuideNavActive('section-hero');
+                renderCityCaptain();
             } else if (pageId === 'cars') {
-                if (carMap) setTimeout(() => carMap.invalidateSize(), 150);
-                setCarNavActive('car-map');
+                openCarTab('car-map');
             }
             updateMobileNavVisibility();
             updateCityMenuActive();
@@ -1721,9 +1818,13 @@
             document.getElementById('sec-' + tabName).classList.remove('hidden');
             document.getElementById('sec-' + tabName).classList.add('block');
             setCarNavActive(tabName);
+            document.getElementById('car-page-hero')?.classList.toggle('hidden', tabName !== 'car-map');
             if (tabName === 'car-map' && carMap) setTimeout(() => carMap.invalidateSize(), 150);
             if (isMobileView()) window.scrollTo({ top: 0, behavior: 'smooth' });
-            if (tabName === 'car-sos') ptpReset();
+            if (tabName === 'car-sos') {
+                ptpReset();
+                switchSosPanel('wizard');
+            }
         }
 
         let ptpNeedsParking = false;
@@ -1787,16 +1888,26 @@
             renderPtpStep('1');
         }
 
-        function toggleProtocolGuide(open) {
-            const details = document.getElementById('protocol-guide-details');
-            if (details && open) details.open = true;
+        function switchSosPanel(panelId) {
+            ['wizard', 'tow', 'protocol'].forEach((id) => {
+                document.getElementById('sos-panel-' + id)?.classList.toggle('hidden', id !== panelId);
+                document.getElementById('sos-btn-' + id)?.classList.toggle('active', id === panelId);
+            });
+            if (panelId === 'wizard') {
+                setTimeout(() => document.getElementById('ptp-wizard')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+            }
+        }
+
+        function toggleProtocolGuide() {
+            /* протоколът вече е отделен таб — без падащо меню */
         }
 
         let translations = {
             bg: {
                 lang_name: "БГ | Български", nav_home: "Начало",
-                city_topics_label: "Раздели за този град", city_link_guide: "Куриерски наръчник", city_link_guide_desc: "Стартови точки, плащания, графици", city_link_cars: "Служебни коли", city_link_cars_desc: "Паркинг, поддръжка, аварии", cars_back_guide: "Обратно към наръчника",
-                welcome_title: "Добре дошли!", welcome_desc: "Тук ще намерите основната информация за куриерите — стартови точки, плащания, графици, доходи и контакти. Изберете вашия град, за да видите актуалния наръчник.", welcome_cities_title: "Изберете град", welcome_cities_desc: "Кликнете върху града, в който работите, за да отворите пълния наръчник.", welcome_cities_label: "Град", welcome_cities_hint_desktop: "Кликни за наръчник · иконата <i class=\"fa-solid fa-car-side text-blue-500 mx-0.5\"></i> за служебни коли",
+                city_topics_label: "Раздели за този град", city_link_guide: "Куриерски наръчник", city_link_guide_desc: "Стартови точки, плащания, графици", city_link_cars: "Служебни коли", city_link_cars_desc: "Паркинг, поддръжка, аварии", city_link_captain: "Капитан", city_link_captain_desc: "Обаждане и Viber", cars_back_guide: "Обратно към наръчника",
+                welcome_title: "Добре дошли!", welcome_desc: "Тук ще намерите основната информация за куриерите — стартови точки, плащания, графици, доходи и контакти. Изберете вашия град, за да видите актуалния наръчник.", welcome_cities_title: "Изберете град", welcome_cities_desc: "Кликнете върху града, в който работите, за да отворите пълния наръчник.", welcome_cities_label: "Град", welcome_cities_hint_desktop: "Кликни за наръчник · <span class=\"text-blue-600\">София:</span> <i class=\"fa-solid fa-car-side text-blue-500 mx-0.5\"></i> служебни коли",
+                city_captain_title: "Капитан", city_captain_desc: "Директен контакт с капитана на града.", city_captain_role: "Капитан",
                 nav_sec_intro: "Въведение", nav_sec_map: "Стартови точки", nav_sec_pay: "Плащания", nav_sec_schedule: "Графици", nav_sec_income: "Доходи", nav_sec_contacts: "Контакти",
                 hero_badge: "АКТУАЛЕН НАРЪЧНИК 2026", hero_title: "Всичко за твоя успешен старт в Takeaway", hero_desc: "Добре дошли в нашия портал! Тук сме събрали актуалната информация за стартовите точки, методологията на плащане и директни контакти към ключовите отдели.",
                 map_title: "1. Стартови точки (София)", map_desc: "Интерактивна GPS карта с разпределение на официалните четири стартови зони в столицата.",
@@ -1830,9 +1941,9 @@
                 car_loc_claim2_title: "Завеждане на щети — Булстрад", car_loc_claim2_desc: "г.к. Разсадника – Коньовица, ул. „Хъшове“ 3, 1330 София",
                 car_map_start_info: "<strong>Внимание:</strong> Активирайте смяната си в приложението <strong>САМО</strong> след като физически навлезете в границите на Зона Център.",
                 car_maint_title: "2. Експлоатация и Поддръжка", car_maint_desc: "Основни правила за грижа към служебния автомобил.",
-                car_maint_fuel_title: "Зареждане с гориво", car_maint_fuel_desc: "Зареждаме само на бензиностанции <strong>Лукойл</strong>. Фирмената карта е в жабката на колата, а ПИН кодът е написан на самата нея.", car_maint_wash_title: "Служебна Автомивка", car_maint_wash_desc: "Колата трябва да се предава чиста. Партньорска автомивка: <strong>Автомивка Рико</strong> — кв. Модерно предградие, ул. „Адам Мицкевич“, 1360 София.", car_maint_clean_title: "Правила за автомобила", car_maint_clean_desc: "В колата <strong>не се пуши, не се яде</strong> и не се пият напитки без капачка. Забранено е возенето на други лица! Предавайте колата чиста и по възможност заредена.",
-                car_maint_claims_title: "Завеждане на щети", car_maint_service_title: "Официален сервиз", car_maint_service_desc: "<strong>SEAT Ауто техника ЕООД</strong> / Hertz — бул. Искърско шосе 13, София. Данните за сервиза се попълват в <strong>т. 6</strong> на двустранния протокол.",
-                car_sos_title: "3. Действия при ПТП или Авария", car_sos_desc: "Следвай стъпките по ред — избираш отговора и те води напред.",
+                car_maint_fuel_title: "Зареждане с гориво", car_maint_fuel_desc: "Зареждаме само на бензиностанции <strong>Лукойл</strong>. Фирмената карта е в жабката на колата, а ПИН кодът е написан на самата нея.", car_maint_wash_title: "Служебна Автомивка", car_maint_wash_desc: "Колата трябва да се предава чиста. Партньорска автомивка: <strong>Автомивка Рико</strong>.", car_maint_clean_title: "Правила за автомобила", car_maint_clean_desc: "В колата <strong>не се пуши, не се яде</strong> и не се пият напитки без капачка. Забранено е возенето на други лица! Предавайте колата чиста и по възможност заредена.",
+                car_maint_map_hint: "Сервиз, Булстрад и останалите адреси — на таб <strong>Карта & Старт</strong>.", nav_btn: "Навигация", car_maint_map_btn: "Карта →",
+                car_sos_title: "3. Действия при ПТП или Авария", car_sos_desc: "Следвай стъпките по ред — избираш отговора и те води напред.", car_sos_start_hint: "При ПТП започни от <strong>„ПТП — стъпка по стъпка“</strong> и натискай само бутоните в наръчника.", sos_tab_wizard: "ПТП — стъпка по стъпка", sos_tab_tow: "Репатрак", sos_tab_protocol: "Протокол", sos_tow_hint: "Само след съгласуване с Капитан",
                 car_protocol_title: "Двустранен констативен протокол", car_protocol_desc: "При леки материални щети, <strong>без пострадали хора</strong> и при пълно съгласие между двамата водачи за обстоятелствата, се попълва Двустранен протокол.",
                 car_protocol_guide_title: "Как се попълва протоколът", car_protocol_guide_intro: "Точки 1–5 са елементарни. По-долу са най-важните полета:",
                 car_protocol_p6: "Попълват се данните на <strong>Аутотехника</strong> (SEAT Ауто техника ЕООД).",
@@ -1850,8 +1961,9 @@
             },
             en: {
                 lang_name: "EN | English", nav_home: "Home",
-                city_topics_label: "Sections for this city", city_link_guide: "Courier guide", city_link_guide_desc: "Starting points, payments, schedules", city_link_cars: "Company cars", city_link_cars_desc: "Parking, maintenance, accidents", cars_back_guide: "Back to city guide",
-                welcome_title: "Welcome!", welcome_desc: "Here you will find essential information for couriers — starting points, payments, schedules, income and contacts. Select your city to open the full guide.", welcome_cities_title: "Choose your city", welcome_cities_desc: "Click on the city where you work to open the full guide.", welcome_cities_label: "City", welcome_cities_hint_desktop: "Click for guide · <i class=\"fa-solid fa-car-side text-blue-500 mx-0.5\"></i> icon for company cars",
+                city_topics_label: "Sections for this city", city_link_guide: "Courier guide", city_link_guide_desc: "Starting points, payments, schedules", city_link_cars: "Company cars", city_link_cars_desc: "Parking, maintenance, accidents", city_link_captain: "Captain", city_link_captain_desc: "Call and Viber", cars_back_guide: "Back to city guide",
+                welcome_title: "Welcome!", welcome_desc: "Here you will find essential information for couriers — starting points, payments, schedules, income and contacts. Select your city to open the full guide.", welcome_cities_title: "Choose your city", welcome_cities_desc: "Click on the city where you work to open the full guide.", welcome_cities_label: "City", welcome_cities_hint_desktop: "Click for guide · <span class=\"text-blue-600\">Sofia:</span> <i class=\"fa-solid fa-car-side text-blue-500 mx-0.5\"></i> company cars",
+                city_captain_title: "Captain", city_captain_desc: "Direct contact with the city captain.", city_captain_role: "Captain",
                 nav_sec_intro: "Introduction", nav_sec_map: "Starting points", nav_sec_pay: "Payments", nav_sec_schedule: "Schedules", nav_sec_income: "Income", nav_sec_contacts: "Contacts",
                 hero_badge: "LATEST GUIDE 2026", hero_title: "Everything for your successful start at Takeaway", hero_desc: "Welcome to our portal! Here we have gathered the latest information about the starting points, payment methodology, and direct contacts to key departments.",
                 map_title: "1. Starting Points (Sofia)", map_desc: "Interactive GPS map with the distribution of the official four starting zones in the capital.",
@@ -1885,9 +1997,9 @@
                 car_loc_claim2_title: "Insurance Claims — Bulstrad", car_loc_claim2_desc: "Razsadnika – Konyovitsa, 3 Hashove St., 1330 Sofia",
                 car_map_start_info: "<strong>Attention:</strong> Activate your shift in the app <strong>ONLY</strong> after physically entering the boundaries of Zone Center.",
                 car_maint_title: "2. Maintenance & Operation", car_maint_desc: "Basic rules for taking care of the company car.",
-                car_maint_fuel_title: "Refueling", car_maint_fuel_desc: "Refuel only at <strong>Lukoil</strong> stations. The company card is in the glove box, and the PIN code is written on it.", car_maint_wash_title: "Company Car Wash", car_maint_wash_desc: "The car must be returned clean. Partner wash: <strong>Riko Car Wash</strong> — Moderno Predgradie, Adam Mickiewicz St., 1360 Sofia.", car_maint_clean_title: "Car Rules", car_maint_clean_desc: "<strong>No smoking, no eating</strong>, and no open drinks. Transporting other people is strictly forbidden! Return the car clean and preferably refueled.",
-                car_maint_claims_title: "Insurance Claims", car_maint_service_title: "Official Service", car_maint_service_desc: "<strong>SEAT Auto Technika EOOD</strong> / Hertz — 13 Iskarsko Shose Blvd., Sofia. Service details go in <strong>section 6</strong> of the bilateral protocol.",
-                car_sos_title: "3. Accidents & Emergencies", car_sos_desc: "Follow the steps in order — choose your answer and the guide leads you forward.",
+                car_maint_fuel_title: "Refueling", car_maint_fuel_desc: "Refuel only at <strong>Lukoil</strong> stations. The company card is in the glove box, and the PIN code is written on it.", car_maint_wash_title: "Company Car Wash", car_maint_wash_desc: "The car must be returned clean. Partner wash: <strong>Riko Car Wash</strong>.", car_maint_clean_title: "Car Rules", car_maint_clean_desc: "<strong>No smoking, no eating</strong>, and no open drinks. Transporting other people is strictly forbidden! Return the car clean and preferably refueled.",
+                car_maint_map_hint: "Service, Bulstrad and other addresses — on the <strong>Map & Start</strong> tab.", nav_btn: "Directions", car_maint_map_btn: "Map →",
+                car_sos_title: "3. Accidents & Emergencies", car_sos_desc: "Follow the steps in order — choose your answer and the guide leads you forward.", car_sos_start_hint: "In an accident, start with <strong>„Step-by-step guide“</strong> and tap only the buttons in the wizard.", sos_tab_wizard: "Step-by-step guide", sos_tab_tow: "Tow truck", sos_tab_protocol: "Protocol", sos_tow_hint: "Only after consulting Captain",
                 car_protocol_title: "Bilateral Accident Protocol", car_protocol_desc: "For minor material damages, with no injured people and full agreement between drivers, fill out a Bilateral Protocol.",
                 car_protocol_guide_title: "How to fill in the protocol", car_protocol_guide_intro: "Sections 1–5 are straightforward. Key fields below:",
                 car_protocol_p6: "Enter <strong>Auto Technika</strong> (SEAT Auto Technika EOOD) details.",
@@ -1947,7 +2059,85 @@
             if (willOpen) menu.classList.remove('hidden');
         }
 
-        const CITIES_WITH_CARS = ['София', 'Перник', 'Благоевград'];
+        const CITIES_WITH_CARS = ['София'];
+
+        const CITY_CAPTAIN_CONFIG = {
+            'Пловдив': [
+                { name: 'Димитър Димов Тойчев', phone: '+359877509551', role: 'Капитан · Гагарин', hours: 'Пон–Пет до 18:00' },
+                { name: 'Христо Железчев Христов', phone: '+359893228572', role: 'Капитан · Кършяка' },
+                { name: 'Кристина Василева Дошева', phone: '+359894365774', roleKey: 'city_captain_role' }
+            ],
+            'Бургас': [
+                { name: 'Пламен Стефанов Иванов', phone: '+359899626601', roleKey: 'city_captain_role' }
+            ],
+            'Стара Загора': [
+                { name: 'Георги Спасов Демиров', phone: '+359889221330', roleKey: 'city_captain_role' }
+            ],
+            'Перник': [
+                { name: 'Антония Любомирова', phone: '+359897504770', roleKey: 'city_captain_role' }
+            ],
+            'Благоевград': [
+                { name: 'Николай Петров', phone: '+359877155151', roleKey: 'city_captain_role' }
+            ],
+            'Варна': [
+                { name: 'Желязко Атанасов', phone: '+359884565884', roleKey: 'city_captain_role' },
+                { name: 'Добромир Валентинов Костадинов', phone: '+359879894530', roleKey: 'city_captain_role' },
+                { name: 'Георги Цонков Йорданов', phone: '+359899195508', roleKey: 'city_captain_role' },
+                { name: 'Петко Георгиев Георгиев', phone: '+359896457007', roleKey: 'city_captain_role' }
+            ],
+            'Велико Търново': [
+                { name: 'Даниел Живков Костадинов', phone: '+359876302044', roleKey: 'city_captain_role' }
+            ],
+            'Русе': [
+                { name: 'Надежда Стефанова Върбанова', phone: '+359898827250', roleKey: 'city_captain_role' }
+            ],
+            'Казанлък': [
+                { name: 'Христо Русев Тодоров', phone: '+359898481748', roleKey: 'city_captain_role' }
+            ],
+            'Габрово': [
+                { name: 'Мартина Илиянова Бурова', phone: '+359895656282', roleKey: 'city_captain_role' }
+            ],
+            'Плевен': [
+                { name: 'Благовеста Стефанова Николова', phone: '+359899256790', roleKey: 'city_captain_role' }
+            ]
+        };
+
+        function viberLink(phone) {
+            const normalized = phone.startsWith('+') ? phone : '+' + phone.replace(/\D/g, '');
+            return `viber://chat?number=${encodeURIComponent(normalized)}`;
+        }
+
+        function renderCityCaptain() {
+            const section = document.getElementById('city-captain-section');
+            const list = document.getElementById('city-captain-list');
+            if (!section || !list) return;
+            const captains = CITY_CAPTAIN_CONFIG[currentCityName];
+            if (!captains || !captains.length || CITIES_WITH_CARS.includes(currentCityName)) {
+                section.classList.add('hidden');
+                list.innerHTML = '';
+                return;
+            }
+            const t = translations[currentLangCode];
+            section.classList.remove('hidden');
+            list.innerHTML = captains.map((cap) => {
+                const role = cap.role || (cap.roleKey && t[cap.roleKey]) || t.city_captain_role || 'Капитан';
+                const tel = cap.phone.replace(/\s/g, '');
+                const hoursHtml = cap.hours ? `<div class="text-[11px] text-gray-600 bg-gray-200/60 px-2.5 py-1.5 rounded-lg inline-block font-bold mt-2"><i class="fa-regular fa-clock mr-1"></i> ${cap.hours}</div>` : '';
+                return `<div class="bg-gray-50 border border-gray-200 rounded-2xl p-5 flex flex-col justify-between hover:shadow-sm transition">
+                    <div class="mb-4">
+                        <div class="w-10 h-10 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center text-base mb-3"><i class="fa-solid fa-user-tie"></i></div>
+                        <h5 class="font-black text-lg text-brand-dark leading-snug">${cap.name}</h5>
+                        <div class="text-[10px] font-bold text-brand-orange uppercase tracking-wider mt-1">${role}</div>
+                        ${hoursHtml}
+                        <p class="text-xs text-gray-500 mt-2 font-mono">${cap.phone}</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <a href="tel:${tel}" class="flex items-center justify-center gap-2 py-2.5 bg-white border border-gray-200 hover:border-brand-orange hover:text-brand-orange text-brand-dark font-bold rounded-xl text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> ${t.car_btn_call || 'Позвъни'}</a>
+                        <a href="${viberLink(cap.phone)}" class="flex items-center justify-center gap-2 py-2.5 bg-[#7360f2] hover:bg-[#5f4ed4] text-white font-bold rounded-xl text-sm shadow-sm transition"><i class="fa-brands fa-viber"></i> Viber</a>
+                    </div>
+                </div>`;
+            }).join('');
+        }
 
         function updateCityMenuActive() {
             document.querySelectorAll('#city-menu button').forEach((btn) => {
@@ -1980,6 +2170,7 @@
             }
             incomeMatrix = buildIncomeMatrixForCity(city);
             updateCityTopicLinks();
+            renderCityCaptain();
             updateMapSectionForCity(city);
             showCityOnMap(city);
             if (currentPage === 'home') {
@@ -2044,6 +2235,8 @@
             updateMapSectionForCity(currentCityName);
             showCityOnMap(currentCityName);
             if (carMap) showCompanyLocationsOnMap();
+            renderCarMapSidebar();
+            renderCityCaptain();
             document.getElementById('searchInput').placeholder = translations[lang].helper_ph;
             renderHelperQuickLinks();
             renderCitiesGrid();
@@ -2258,14 +2451,49 @@
             center: [42.685, 23.33],
             zoom: 11.2,
             places: [
-                { id: 'parking', coords: [42.715471, 23.279151], color: '#FF7A00', icon: 'fa-car', label: 'P', pulse: true, titleKey: 'car_loc_parking_title', descKey: 'car_loc_parking_desc' },
-                { id: 'zone', coords: [42.6975, 23.3320], color: '#2563eb', icon: '1', circle: true, radius: 2100, titleKey: 'car_loc_zone_title', descKey: 'car_loc_zone_desc' },
-                { id: 'wash', coords: [42.719681, 23.279531], color: '#0891b2', icon: 'fa-shower', label: 'M', titleKey: 'car_loc_wash_title', descKey: 'car_loc_wash_desc' },
-                { id: 'service', coords: [42.671523, 23.399063], color: '#7c3aed', icon: 'fa-wrench', label: 'S', titleKey: 'car_loc_service_title', descKey: 'car_loc_service_desc' },
-                { id: 'claim1', coords: [42.636752, 23.402626], color: '#d97706', icon: 'fa-file', label: 'B1', titleKey: 'car_loc_claim1_title', descKey: 'car_loc_claim1_desc' },
-                { id: 'claim2', coords: [42.695249, 23.292427], color: '#f59e0b', icon: 'fa-file', label: 'B2', titleKey: 'car_loc_claim2_title', descKey: 'car_loc_claim2_desc' }
+                { id: 'parking', coords: [42.715471, 23.279151], color: '#FF7A00', icon: 'fa-car', label: 'P', pulse: true, titleKey: 'car_loc_parking_title', descKey: 'car_loc_parking_desc', sidebar: { bg: 'bg-brand-lightBg', border: 'border-gray-200', pin: 'P', pinBg: 'bg-brand-orange' } },
+                { id: 'zone', coords: [42.6975, 23.3320], color: '#2563eb', icon: '1', circle: true, radius: 2100, titleKey: 'car_loc_zone_title', descKey: 'car_loc_zone_desc', sidebar: { bg: 'bg-blue-50', border: 'border-blue-100', pin: '1', pinBg: 'bg-blue-600' } },
+                { id: 'wash', coords: [42.719681, 23.279531], color: '#0891b2', icon: 'fa-shower', label: 'M', titleKey: 'car_loc_wash_title', descKey: 'car_loc_wash_desc', sidebar: { bg: 'bg-cyan-50', border: 'border-cyan-100', pinIcon: 'fa-shower', pinBg: 'bg-cyan-600' } },
+                { id: 'service', coords: [42.671523, 23.399063], color: '#7c3aed', icon: 'fa-wrench', label: 'S', titleKey: 'car_loc_service_title', descKey: 'car_loc_service_desc', sidebar: { bg: 'bg-purple-50', border: 'border-purple-100', pinIcon: 'fa-screwdriver-wrench', pinBg: 'bg-purple-600' } },
+                { id: 'claim1', coords: [42.636752, 23.402626], color: '#d97706', icon: 'fa-file', label: 'B1', titleKey: 'car_loc_claim1_title', descKey: 'car_loc_claim1_desc', sidebar: { bg: 'bg-amber-50', border: 'border-amber-100', pinIcon: 'fa-file-circle-exclamation', pinBg: 'bg-amber-600' } },
+                { id: 'claim2', coords: [42.695249, 23.292427], color: '#f59e0b', icon: 'fa-file', label: 'B2', titleKey: 'car_loc_claim2_title', descKey: 'car_loc_claim2_desc', sidebar: { bg: 'bg-amber-50/70', border: 'border-amber-100', pinIcon: 'fa-file-circle-exclamation', pinBg: 'bg-amber-500' } }
             ]
         };
+
+        function openCarNavigation(lat, lng) {
+            window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank', 'noopener');
+        }
+
+        function openCarNavById(placeId) {
+            const place = CAR_MAP_LOCATIONS.places.find((p) => p.id === placeId);
+            if (place?.coords) openCarNavigation(place.coords[0], place.coords[1]);
+        }
+
+        function renderCarMapSidebar() {
+            const list = document.getElementById('car-map-locations-list');
+            if (!list) return;
+            const t = translations[currentLangCode];
+            const navLabel = t.nav_btn || 'Навигация';
+            list.innerHTML = CAR_MAP_LOCATIONS.places.map((place) => {
+                const sb = place.sidebar || {};
+                const title = t[place.titleKey] || '';
+                const desc = t[place.descKey] || '';
+                const pinContent = sb.pinIcon
+                    ? `<i class="fa-solid ${sb.pinIcon} text-sm"></i>`
+                    : (sb.pin || place.label || '');
+                const navBtn = place.coords
+                    ? `<button type="button" onclick="openCarNavById('${place.id}')" class="car-loc-nav-btn"><i class="fa-solid fa-diamond-turn-right"></i> ${navLabel}</button>`
+                    : '';
+                return `<div class="car-loc-card ${sb.bg || 'bg-gray-50'} p-4 rounded-2xl border ${sb.border || 'border-gray-200'}">
+                    <div class="flex items-center gap-3 mb-1">
+                        <div class="car-loc-pin w-8 h-8 rounded-full ${sb.pinBg || 'bg-brand-orange'} text-white flex items-center justify-center shrink-0 text-xs font-black">${pinContent}</div>
+                        <h5 class="font-bold text-brand-dark text-sm">${title}</h5>
+                    </div>
+                    <p class="text-xs text-brand-slate ml-11">${desc}</p>
+                    ${navBtn}
+                </div>`;
+            }).join('');
+        }
 
         function initMaps() {
             if (typeof L === 'undefined') return;
@@ -2369,6 +2597,8 @@
             showCityOnMap(currentCityName);
             updateMapSectionForCity(currentCityName);
             showCompanyLocationsOnMap();
+            renderCarMapSidebar();
+            renderCityCaptain();
             updateCityMenuActive();
             switchGlobalPage('welcome');
             setTimeout(dismissSiteSplash, 2200);
