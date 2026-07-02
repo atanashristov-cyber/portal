@@ -2,7 +2,7 @@
 <html lang="bg">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Takeaway - Единен Информационен Портал</title>
     <meta name="description" content="Официален информационен портал за куриери на Takeaway — стартови точки, плащания, графици, доходи и служебни коли.">
     <meta property="og:type" content="website">
@@ -255,6 +255,7 @@
 
         /* Mobile-first navigation */
         .scroll-mt-sticky { scroll-margin-top: 5.5rem; }
+        @media (max-width: 639px) { .scroll-mt-sticky { scroll-margin-top: 7.25rem; } }
         @media (min-width: 640px) { .scroll-mt-sticky { scroll-margin-top: 9.5rem; } }
 
         .mobile-tab-bar {
@@ -303,57 +304,116 @@
         #mobile-location-bar { display: none; }
 
         @media (max-width: 639px) {
+            html { -webkit-text-size-adjust: 100%; }
+            body { overflow-x: hidden; }
+
             #mobile-location-bar.is-visible {
                 display: block;
                 position: sticky;
                 z-index: 90;
                 top: calc(3.1rem + env(safe-area-inset-top, 0px));
             }
-            #lang-fixed { top: max(0.5rem, env(safe-area-inset-top)); right: 0.5rem; }
-            #lang-btn { padding: 0.5rem 0.65rem; font-size: 0.75rem; }
+            #lang-fixed { top: max(0.5rem, env(safe-area-inset-top)); right: max(0.5rem, env(safe-area-inset-right)); z-index: 110; }
+            #lang-btn { padding: 0.5rem 0.65rem; font-size: 0.75rem; min-height: 2.5rem; }
+            #lang-menu { max-width: calc(100vw - 1rem); }
 
             #main-header {
                 top: 0; left: 0; right: 0; max-width: none;
                 padding-top: max(0.25rem, env(safe-area-inset-top));
                 padding-left: 0.5rem; padding-right: 3.75rem;
             }
-            #main-header > div { border-radius: 0 0 1rem 1rem; border-top: none; }
+            #main-header > div { border-radius: 0 0 1rem 1rem; border-top: none; min-height: 2.75rem; }
+            #header-page-title { font-size: 0.8125rem; }
 
-            main { padding-top: 0.75rem; padding-left: 0.75rem; padding-right: 0.75rem; }
+            main { padding-top: 0.5rem; padding-left: 0.625rem; padding-right: 0.625rem; }
+            body:not(.has-mobile-nav) main { padding-bottom: 1rem; }
+            body:not(.has-mobile-nav) footer { margin-bottom: 0; }
 
+            .global-page { gap: 0.625rem !important; }
             .global-page > section,
-            .car-tab-section { border-radius: 1.25rem !important; }
+            .car-tab-section { border-radius: 1.125rem !important; }
 
-            #city-menu {
-                position: fixed; left: 0; right: 0; bottom: 0; top: auto !important;
-                margin: 0; max-height: min(70vh, 520px);
-                border-radius: 1.25rem 1.25rem 0 0;
-                z-index: 120; box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.15);
+            /* Начало */
+            #page-welcome > section:first-child { padding: 1rem 3.25rem 1rem 1rem !important; }
+            #page-welcome h1 { font-size: 1.625rem !important; line-height: 1.15; }
+            #page-welcome .hub-card { padding: 1rem !important; border-radius: 1.125rem !important; }
+            #page-welcome .hub-card h3 { font-size: 1rem !important; }
+            #page-welcome .hub-card p { font-size: 0.8125rem !important; line-height: 1.4; }
+            #smart-contact-helper { padding: 0 !important; }
+            #smart-contact-helper > div { padding: 1rem !important; }
+            #smart-contact-helper h2 { font-size: 1.125rem !important; }
+            #smart-contact-helper p { font-size: 0.8125rem !important; }
+            #searchInput { font-size: 16px; min-height: 3rem; }
+            #quickLinksContainer button { font-size: 0.75rem; padding: 0.45rem 0.7rem; }
+            .result-card { padding: 0.875rem !important; }
+            .result-card h3 { font-size: 0.9375rem !important; }
+            .result-card .fa-chevron-right { margin-left: 0.25rem !important; margin-right: 0.25rem !important; }
+
+            /* Splash */
+            .splash-content { padding: 1.25rem; }
+            .splash-icon-wrap { width: 88px; height: 88px; margin-bottom: 1rem; }
+            .splash-icon-box i { font-size: 2.25rem; }
+            .splash-title { font-size: 1.5rem; }
+            .splash-sub { font-size: 0.875rem; max-width: 18rem; margin-left: auto; margin-right: auto; }
+            .splash-orb-1 { width: 260px; height: 260px; }
+            .splash-orb-2 { width: 200px; height: 200px; }
+
+            /* Обща информация */
+            #page-home > section { padding: 1rem !important; }
+            #page-home h2, #page-home h3, #page-home h4 { line-height: 1.25; word-break: break-word; }
+            #page-home h2 { font-size: 1.375rem !important; }
+            #page-home h3, #page-home h4 { font-size: 1.125rem !important; }
+            #page-home p, #page-home li { font-size: 0.875rem; }
+            #section-contacts { grid-template-columns: 1fr !important; gap: 0.75rem !important; }
+            #city-captain-list { grid-template-columns: 1fr !important; }
+            #city-captain-section .rounded-\[2rem\] { border-radius: 1.125rem !important; }
+            #common-city-select, select, .calc-field select, .calc-field input[type="number"] { font-size: 16px; min-height: 2.75rem; }
+            #contracts-grid { gap: 0.625rem !important; }
+            #contracts-grid > div { padding: 1rem !important; }
+            #city-captain-list > div { padding: 0.875rem !important; }
+            #city-captain-list .grid.grid-cols-2 a { min-height: 2.5rem; font-size: 0.75rem; }
+
+            /* Карта зони */
+            #page-zones section { padding: 1rem !important; }
+            #page-zones h3 { font-size: 1.25rem !important; }
+            #main-map, #page-zones .h-\[350px\] { height: min(52vh, 280px) !important; min-height: 220px; }
+            #map-layout-grid { gap: 0.75rem !important; }
+            #map-zones-panel { padding: 0.875rem !important; }
+
+            /* Калкулатор */
+            .calc-shell { padding: 0 0 0.5rem; }
+            .calc-header-container { padding: 1.25rem 1rem; border-radius: 1.125rem 1.125rem 0 0; }
+            .calc-animated-logo { width: 3.5rem; height: 3.5rem; margin-bottom: 0.5rem; }
+            .calc-header-title { font-size: 1.125rem; }
+            .calc-main-card { margin-top: -0.625rem; border-radius: 1.125rem; }
+            .calc-inputs-wrapper { padding: 0.875rem; gap: 0.625rem; }
+            .calc-inputs-row-top, .calc-inputs-row-mid, .calc-inputs-row-bottom { grid-template-columns: 1fr; gap: 0.625rem; }
+            .calc-content-split { padding: 0 0.875rem 0.875rem; gap: 0.75rem; grid-template-columns: 1fr; }
+            .calc-result-box { padding: 0.875rem; }
+            .calc-breakdown-row { font-size: 0.8125rem; flex-wrap: wrap; }
+            .calc-breakdown-row > span:last-child { text-align: right; max-width: 100%; }
+            .calc-breakdown-final-net { font-size: 1.625rem; }
+            .calc-breakdown-val-net { display: block; margin-left: 0; font-size: 0.6875rem; }
+            #curLevelText { font-size: 0.625rem; padding: 0.15rem 0.5rem; }
+            #tiersDetail { padding: 0 0.875rem 0.875rem !important; }
+            .calc-tier-row { font-size: 0.8125rem; flex-wrap: wrap; gap: 0.25rem; }
+
+            /* Tooltips — tap на телефон */
+            .tooltip-container .tooltip-content {
+                display: none; opacity: 0; position: static; width: 100%; max-width: none;
+                margin: 0.5rem 0 0; pointer-events: auto; transform: none;
             }
-            #city-menu::before {
-                content: ''; display: block; width: 2.5rem; height: 0.25rem;
-                background: #d1d5db; border-radius: 999px; margin: 0.5rem auto 0.25rem;
+            .tooltip-container:focus-within .tooltip-content,
+            .tooltip-container.tooltip-open .tooltip-content {
+                display: block; opacity: 1;
             }
+            .tooltip-container .fa-circle-info { padding: 0.25rem; cursor: pointer; }
 
-            .ptp-choice-btn { font-size: 0.8125rem; padding: 0.75rem 0.875rem; }
-            #ptp-wizard { border-radius: 1.25rem; }
-
-            .interactive-card:hover { transform: none; }
-
-            #vehicle-tabs-wrap { display: grid; grid-template-columns: repeat(2, 1fr); width: 100%; }
-            #tab-personal, #tab-company { padding: 0.75rem 0.5rem; font-size: 0.75rem; }
-
-            /* Служебни коли — по-компактно на телефон */
-            #page-cars.global-page { gap: 0.625rem; }
-
-            #page-cars .car-tab-section { padding: 0.75rem 0.875rem !important; }
-
+            /* Служебни коли */
+            #page-cars.global-page { gap: 0.5rem; }
+            #page-cars .car-tab-section { padding: 0.75rem !important; }
             #page-cars .car-tab-section > h3,
-            #page-cars .car-tab-section .car-section-head h3 {
-                font-size: 1rem !important;
-                line-height: 1.25;
-            }
-
+            #page-cars .car-tab-section .car-section-head h3 { font-size: 1rem !important; line-height: 1.25; }
             #car-page-hero { padding: 0.875rem 1rem !important; }
             #car-page-hero h2 { font-size: 1.375rem !important; line-height: 1.2; }
             #car-page-hero p { font-size: 0.8125rem !important; line-height: 1.4; }
@@ -362,13 +422,13 @@
             #sec-car-map .car-section-head { padding-bottom: 0.5rem !important; }
             #sec-car-map .car-section-head p { font-size: 0.75rem; }
             #sec-car-map .car-map-layout { gap: 0.625rem !important; }
-            #sec-car-map .car-map-frame { min-height: 200px !important; padding: 0.5rem !important; border-radius: 1rem !important; }
             #car-map-locations-list { max-height: 168px; gap: 0.375rem; }
+
             .car-loc-card { padding: 0.5rem 0.625rem !important; border-radius: 0.75rem !important; }
             .car-loc-card .car-loc-pin { width: 1.5rem !important; height: 1.5rem !important; font-size: 0.625rem !important; }
             .car-loc-card h5 { font-size: 0.75rem !important; }
             .car-loc-card p { font-size: 0.6875rem !important; margin-left: 2rem !important; }
-            .car-loc-nav-btn { margin-left: 2rem; margin-top: 0.25rem; padding: 0.2rem 0.45rem; font-size: 0.625rem; }
+            .car-loc-nav-btn { margin-left: 2rem; margin-top: 0.25rem; padding: 0.35rem 0.5rem; font-size: 0.625rem; min-height: 2rem; }
 
             #sec-car-maint .car-maint-grid { grid-template-columns: 1fr !important; gap: 0.5rem !important; }
             .car-maint-card {
@@ -390,51 +450,72 @@
                 margin-top: 0.125rem !important;
             }
             .car-maint-card:not(:has(.car-action-nav-btn)) .car-maint-icon { grid-row: 1 / span 2; }
-            .car-maint-card h4 {
-                grid-column: 2;
-                font-size: 0.8125rem !important;
-                line-height: 1.25;
-            }
-            .car-maint-card .car-maint-desc {
-                grid-column: 2;
-                display: block !important;
-                font-size: 0.6875rem !important;
-                line-height: 1.4;
-            }
+            .car-maint-card h4 { grid-column: 2; font-size: 0.8125rem !important; line-height: 1.25; }
+            .car-maint-card .car-maint-desc { grid-column: 2; display: block !important; font-size: 0.6875rem !important; line-height: 1.4; }
             .car-maint-card .car-action-nav-btn {
-                grid-column: 2;
-                margin-top: 0.25rem;
-                margin-left: 0;
-                width: 100%;
-                padding: 0.4rem 0.5rem;
-                font-size: 0.625rem;
+                grid-column: 2; margin-top: 0.25rem; margin-left: 0; width: 100%;
+                padding: 0.45rem 0.5rem; font-size: 0.625rem; min-height: 2.25rem;
             }
 
+            #sec-car-map .car-map-frame { min-height: min(48vh, 260px) !important; padding: 0.5rem !important; border-radius: 1rem !important; }
+            #company-map { min-height: 200px; }
+
             #sec-car-contacts { gap: 0.625rem !important; }
-            #sec-car-contacts .car-contact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 0.5rem !important; }
-            .car-contact-card { padding: 0.625rem !important; border-radius: 0.875rem !important; }
+            .car-notify-block { padding: 0.75rem !important; border-radius: 1rem !important; }
+            .car-notify-block h4 { font-size: 0.9375rem !important; }
+            .car-notify-platform { font-size: 0.75rem !important; padding: 0.625rem 0.75rem !important; }
+            .car-notify-step p { font-size: 0.75rem !important; }
+            #sec-car-contacts .car-contact-grid { grid-template-columns: 1fr !important; gap: 0.5rem !important; }
+            .car-contact-card { padding: 0.75rem !important; border-radius: 0.875rem !important; }
             .car-contact-card .car-contact-icon { width: 1.75rem !important; height: 1.75rem !important; font-size: 0.75rem !important; margin-bottom: 0.375rem !important; }
-            .car-contact-card h4 { font-size: 0.8125rem !important; line-height: 1.2; }
-            .car-contact-card .car-contact-desc {
-                display: block !important;
-                font-size: 0.625rem !important;
-                line-height: 1.35;
-                margin-bottom: 0.25rem !important;
-            }
-            .car-contact-card .car-contact-hours { font-size: 0.5625rem !important; padding: 0.15rem 0.35rem !important; margin-bottom: 0.25rem; }
+            .car-contact-card h4 { font-size: 0.875rem !important; line-height: 1.2; }
+            .car-contact-card .car-contact-desc { display: block !important; font-size: 0.6875rem !important; line-height: 1.35; margin-bottom: 0.25rem !important; }
+            .car-contact-card .car-contact-hours { font-size: 0.625rem !important; padding: 0.2rem 0.4rem !important; margin-bottom: 0.25rem; }
             .car-contact-card .car-contact-body { margin-bottom: 0.375rem !important; }
-            .car-contact-card .car-contact-call { padding-top: 0.35rem !important; padding-bottom: 0.35rem !important; font-size: 0.6875rem !important; border-radius: 0.5rem !important; }
+            .car-contact-card .car-contact-call { padding: 0.5rem !important; font-size: 0.75rem !important; min-height: 2.5rem; border-radius: 0.625rem !important; }
 
             #sec-car-sos { gap: 0.5rem !important; }
             .sos-alert-banner { padding: 0.625rem 0.75rem !important; gap: 0.5rem !important; }
             .sos-alert-banner .sos-alert-icon { width: 2.25rem !important; height: 2.25rem !important; font-size: 0.875rem !important; }
             .sos-alert-banner h3 { font-size: 0.875rem !important; }
             .sos-alert-banner p { font-size: 0.6875rem !important; }
-            .sos-subnav-btn { padding: 0.45rem 0.35rem !important; font-size: 0.625rem !important; }
+            .sos-subnav-btn { padding: 0.5rem 0.35rem !important; font-size: 0.625rem !important; min-height: 2.75rem; }
             .sos-subnav-btn i { font-size: 0.75rem !important; }
-            #ptp-wizard { padding: 0.625rem !important; gap: 0.625rem !important; }
+            #ptp-wizard { padding: 0.625rem !important; gap: 0.625rem !important; border-radius: 1rem !important; }
             #ptp-wizard .ptp-step-badge { width: 2rem !important; height: 2rem !important; font-size: 0.875rem !important; }
             #ptp-wizard h4 { font-size: 0.875rem !important; }
+            .ptp-choice-btn { font-size: 0.8125rem; padding: 0.75rem 0.875rem; min-height: 3rem; }
+            .ptp-detail-box { font-size: 0.75rem; padding: 0.75rem; }
+
+            .interactive-card:hover { transform: none; }
+
+            /* Долна навигация */
+            .mobile-tab-bar { padding-left: 0.25rem; padding-right: 0.25rem; }
+            .mobile-tab-btn { font-size: 0.5625rem; min-height: 3.35rem; padding: 0.35rem 0.1rem; }
+            .mobile-tab-btn i { font-size: 1rem; }
+            .mobile-tab-btn span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+            /* Footer */
+            footer { margin-top: 1.5rem; padding-top: 1.25rem; padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px)); }
+            footer .max-w-7xl { flex-direction: column; text-align: center; gap: 0.625rem; padding-left: 0.75rem; padding-right: 0.75rem; }
+            footer .max-w-7xl > div { flex-direction: column; align-items: center; gap: 0.5rem; }
+
+            /* Touch targets */
+            a.car-contact-call, button, .car-action-nav-btn, .ptp-choice-btn, .hub-card { -webkit-tap-highlight-color: transparent; }
+
+            #vehicle-tabs-wrap { display: grid; grid-template-columns: repeat(2, 1fr); width: 100%; }
+            #tab-personal, #tab-company { padding: 0.65rem 0.35rem; font-size: 0.6875rem; line-height: 1.2; min-height: 2.75rem; }
+
+            #city-menu {
+                position: fixed; left: 0; right: 0; bottom: 0; top: auto !important;
+                margin: 0; max-height: min(70vh, 520px);
+                border-radius: 1.25rem 1.25rem 0 0;
+                z-index: 120; box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.15);
+            }
+            #city-menu::before {
+                content: ''; display: block; width: 2.5rem; height: 0.25rem;
+                background: #d1d5db; border-radius: 999px; margin: 0.5rem auto 0.25rem;
+            }
         }
 
         /* Desktop cities strip */
@@ -1513,19 +1594,19 @@
 
     <nav id="guide-mobile-nav" class="mobile-tab-bar sm:hidden hidden" aria-label="Навигация по раздели">
         <div class="flex items-stretch gap-0.5 max-w-lg mx-auto">
-            <button type="button" onclick="scrollToGuideSection('section-pay')" class="mobile-tab-btn guide-nav-btn active" data-section="section-pay"><i class="fa-solid fa-sack-dollar"></i><span>Плащ.</span></button>
-            <button type="button" onclick="scrollToGuideSection('section-schedule')" class="mobile-tab-btn guide-nav-btn" data-section="section-schedule"><i class="fa-solid fa-calendar-days"></i><span>График</span></button>
-            <button type="button" onclick="scrollToGuideSection('methodology')" class="mobile-tab-btn guide-nav-btn" data-section="methodology"><i class="fa-solid fa-chart-line"></i><span>Доход</span></button>
-            <button type="button" onclick="scrollToGuideSection('section-contacts')" class="mobile-tab-btn guide-nav-btn" data-section="section-contacts"><i class="fa-solid fa-headset"></i><span>Контакт</span></button>
+            <button type="button" onclick="scrollToGuideSection('section-pay')" class="mobile-tab-btn guide-nav-btn active" data-section="section-pay"><i class="fa-solid fa-sack-dollar"></i><span data-i18n="nav_mob_pay">Плащ.</span></button>
+            <button type="button" onclick="scrollToGuideSection('section-schedule')" class="mobile-tab-btn guide-nav-btn" data-section="section-schedule"><i class="fa-solid fa-calendar-days"></i><span data-i18n="nav_mob_schedule">График</span></button>
+            <button type="button" onclick="scrollToGuideSection('methodology')" class="mobile-tab-btn guide-nav-btn" data-section="methodology"><i class="fa-solid fa-chart-line"></i><span data-i18n="nav_mob_income">Доход</span></button>
+            <button type="button" onclick="scrollToGuideSection('section-contacts')" class="mobile-tab-btn guide-nav-btn" data-section="section-contacts"><i class="fa-solid fa-headset"></i><span data-i18n="nav_mob_contacts">Контакт</span></button>
         </div>
     </nav>
 
     <nav id="car-mobile-nav" class="mobile-tab-bar sm:hidden hidden" aria-label="Навигация служебни коли">
         <div class="flex items-stretch gap-0.5 max-w-md mx-auto">
-            <button type="button" data-car-tab="car-map" onclick="openCarTab('car-map')" class="mobile-tab-btn car-nav-btn active"><i class="fa-solid fa-map-location-dot"></i><span>Карта</span></button>
-            <button type="button" data-car-tab="car-maint" onclick="openCarTab('car-maint')" class="mobile-tab-btn car-nav-btn"><i class="fa-solid fa-wrench"></i><span>Поддр.</span></button>
-            <button type="button" data-car-tab="car-sos" onclick="openCarTab('car-sos')" class="mobile-tab-btn car-nav-btn"><i class="fa-solid fa-triangle-exclamation"></i><span>ПТП</span></button>
-            <button type="button" data-car-tab="car-contacts" onclick="openCarTab('car-contacts')" class="mobile-tab-btn car-nav-btn"><i class="fa-solid fa-bell"></i><span>Увед.</span></button>
+            <button type="button" data-car-tab="car-map" onclick="openCarTab('car-map')" class="mobile-tab-btn car-nav-btn active"><i class="fa-solid fa-map-location-dot"></i><span data-i18n="nav_mob_car_map">Карта</span></button>
+            <button type="button" data-car-tab="car-maint" onclick="openCarTab('car-maint')" class="mobile-tab-btn car-nav-btn"><i class="fa-solid fa-wrench"></i><span data-i18n="nav_mob_car_maint">Поддр.</span></button>
+            <button type="button" data-car-tab="car-sos" onclick="openCarTab('car-sos')" class="mobile-tab-btn car-nav-btn"><i class="fa-solid fa-triangle-exclamation"></i><span data-i18n="nav_mob_car_sos">ПТП</span></button>
+            <button type="button" data-car-tab="car-contacts" onclick="openCarTab('car-contacts')" class="mobile-tab-btn car-nav-btn"><i class="fa-solid fa-bell"></i><span data-i18n="nav_mob_car_notify">Увед.</span></button>
         </div>
     </nav>
 
@@ -1943,8 +2024,9 @@
         }
 
         function setGuideNavActive(sectionId) {
+            const navSection = sectionId === 'section-common-intro' ? 'section-pay' : sectionId;
             document.querySelectorAll('.guide-nav-btn').forEach((btn) => {
-                btn.classList.toggle('active', btn.getAttribute('data-section') === sectionId);
+                btn.classList.toggle('active', btn.getAttribute('data-section') === navSection);
             });
             updateMobileLocationBar(sectionId);
         }
@@ -2241,8 +2323,8 @@
                 city_topics_label: "Раздели за този град", city_link_guide: "Куриерски наръчник", city_link_guide_desc: "Стартови точки, плащания, графици", city_link_cars: "Служебни коли", city_link_cars_desc: "Паркинг, поддръжка, аварии", city_link_captain: "Капитан", city_link_captain_desc: "Обаждане и Viber", cars_back_guide: "Обратно към наръчника",
                 welcome_title: "Добре дошли!", welcome_desc: "Изберете раздел — обща информация, калкулатор, стартови зони София или служебни коли.", hub_common_title: "Обща информация", hub_common_desc: "Плащания, графици, доходи, диспечери и администрация — за всички градове.", hub_calc_title: "Калкулатор", hub_calc_desc: "Симулатор на заплата — изберете град и въведете данни.", hub_zones_title: "Стартови зони — София", hub_zones_desc: "Карта с 4-те официални зони за пускане на смяна.", hub_cars_title: "Служебни коли — София", hub_cars_desc: "Паркинг, поддръжка, ПТП и уведомяване на капитан.", common_badge: "За всички градове", common_title: "Обща информация", common_desc: "Плащания, графици, доходи и контакти — еднакви правила за всички куриери. Изберете град за доходи и капитан.", common_city_lbl: "Град", common_city_hint: "Доходи, бонуси и капитан", open_calc_btn: "Отвори калкулатор на заплата →", calc_page_title: "Калкулатор на заплата", calc_page_desc: "Изберете град и въведете данни, за да видите очакван бруто и нето.", calc_city_lbl: "Град", zones_page_title: "Стартови зони (София)", zones_badge: "София", cars_back_home: "Обратно към началото",
                 city_sofia: "София", city_plovdiv: "Пловдив", city_varna: "Варна", city_burgas: "Бургас", city_ruse: "Русе", city_stara_zagora: "Стара Загора", city_pleven: "Плевен", city_pernik: "Перник", city_blagoevgrad: "Благоевград", city_veliko_tarnovo: "Велико Търново", city_kazanlak: "Казанлък", city_gabrovo: "Габрово",
-                city_captain_title: "Капитан", city_captain_desc: "Директен контакт с капитана на града.", city_captain_role: "Капитан",
-                nav_sec_intro: "Въведение", nav_sec_map: "Стартови точки", nav_sec_pay: "Плащания", nav_sec_schedule: "Графици", nav_sec_income: "Доходи", nav_sec_contacts: "Контакти",
+                city_captain_title: "Капитан", city_captain_desc: "Директен контакт с капитана на града.", city_captain_role: "Капитан", city_captain_reimburse_role: "Капитан · Осребряване",
+                nav_sec_intro: "Въведение", nav_sec_map: "Стартови точки", nav_sec_pay: "Плащания", nav_sec_schedule: "Графици", nav_sec_income: "Доходи", nav_sec_contacts: "Контакти", nav_mob_pay: "Плащ.", nav_mob_schedule: "График", nav_mob_income: "Доход", nav_mob_contacts: "Контакт", nav_mob_car_map: "Карта", nav_mob_car_maint: "Поддр.", nav_mob_car_sos: "ПТП", nav_mob_car_notify: "Увед.",
                 hero_badge: "АКТУАЛЕН НАРЪЧНИК 2026", hero_title: "Всичко за твоя успешен старт в Takeaway", hero_desc: "Добре дошли в нашия портал! Тук сме събрали актуалната информация за стартовите точки, методологията на плащане и директни контакти към ключовите отдели.",
                 map_title: "1. Стартови точки (София)", map_desc: "Интерактивна GPS карта с разпределение на официалните четири стартови зони в столицата.",
                 map_subtitle: "Ключови райони", map_text: "Официалните стартови точки са съобразени с гъстотата на поръчките и гарантират бърз старт на работния ви ден.",
@@ -2323,8 +2405,8 @@
                 city_topics_label: "Sections for this city", city_link_guide: "Courier guide", city_link_guide_desc: "Starting points, payments, schedules", city_link_cars: "Company cars", city_link_cars_desc: "Parking, maintenance, accidents", city_link_captain: "Captain", city_link_captain_desc: "Call and Viber", cars_back_guide: "Back to city guide",
                 welcome_title: "Welcome!", welcome_desc: "Choose a section — common information, calculator, Sofia starting zones, or company cars.", hub_common_title: "Common information", hub_common_desc: "Payments, schedules, income, dispatchers and administration — for all cities.", hub_calc_title: "Calculator", hub_calc_desc: "Salary simulator — select city and enter your data.", hub_zones_title: "Starting zones — Sofia", hub_zones_desc: "Map with the 4 official shift-start zones.", hub_cars_title: "Company cars — Sofia", hub_cars_desc: "Parking, maintenance, accidents and captain notification.", common_badge: "All cities", common_title: "Common information", common_desc: "Payments, schedules, income and contacts — same rules for all couriers. Select city for income and captain.", common_city_lbl: "City", common_city_hint: "Income, bonuses and captain", open_calc_btn: "Open salary calculator →", calc_page_title: "Salary calculator", calc_page_desc: "Select city and enter data to see expected gross and net.", calc_city_lbl: "City", zones_page_title: "Starting zones (Sofia)", zones_badge: "Sofia", cars_back_home: "Back to home",
                 city_sofia: "Sofia", city_plovdiv: "Plovdiv", city_varna: "Varna", city_burgas: "Burgas", city_ruse: "Ruse", city_stara_zagora: "Stara Zagora", city_pleven: "Pleven", city_pernik: "Pernik", city_blagoevgrad: "Blagoevgrad", city_veliko_tarnovo: "Veliko Tarnovo", city_kazanlak: "Kazanlak", city_gabrovo: "Gabrovo",
-                city_captain_title: "Captain", city_captain_desc: "Direct contact with the city captain.", city_captain_role: "Captain",
-                nav_sec_intro: "Introduction", nav_sec_map: "Starting points", nav_sec_pay: "Payments", nav_sec_schedule: "Schedules", nav_sec_income: "Income", nav_sec_contacts: "Contacts",
+                city_captain_title: "Captain", city_captain_desc: "Direct contact with the city captain.", city_captain_role: "Captain", city_captain_reimburse_role: "Captain · Reimbursement",
+                nav_sec_intro: "Introduction", nav_sec_map: "Starting points", nav_sec_pay: "Payments", nav_sec_schedule: "Schedules", nav_sec_income: "Income", nav_sec_contacts: "Contacts", nav_mob_pay: "Pay", nav_mob_schedule: "Sched.", nav_mob_income: "Income", nav_mob_contacts: "Contact", nav_mob_car_map: "Map", nav_mob_car_maint: "Maint.", nav_mob_car_sos: "SOS", nav_mob_car_notify: "Notify",
                 hero_badge: "LATEST GUIDE 2026", hero_title: "Everything for your successful start at Takeaway", hero_desc: "Welcome to our portal! Here we have gathered the latest information about the starting points, payment methodology, and direct contacts to key departments.",
                 map_title: "1. Starting Points (Sofia)", map_desc: "Interactive GPS map with the distribution of the official four starting zones in the capital.",
                 map_subtitle: "Key Areas", map_text: "The official starting points are tailored to order density and guarantee a quick start to your working day.",
@@ -2447,6 +2529,9 @@
         const CITIES_WITH_CARS = ['София'];
 
         const CITY_CAPTAIN_CONFIG = {
+            'София': [
+                { name: 'Християн Борисов', phone: '+359877021585', roleKey: 'city_captain_reimburse_role', hoursKey: 'car_c1_hours' }
+            ],
             'Перник': [
                 { name: 'Антония Любомирова', phone: '+359897504770', roleKey: 'city_captain_role' }
             ],
@@ -2468,7 +2553,7 @@
             const list = document.getElementById('city-captain-list');
             if (!section || !list) return;
             const captains = CITY_CAPTAIN_CONFIG[currentCityName];
-            if (!captains || !captains.length || CITIES_WITH_CARS.includes(currentCityName)) {
+            if (!captains || !captains.length) {
                 section.classList.add('hidden');
                 list.innerHTML = '';
                 return;
@@ -2478,7 +2563,8 @@
             list.innerHTML = captains.map((cap) => {
                 const role = cap.role || (cap.roleKey && t[cap.roleKey]) || t.city_captain_role || 'Капитан';
                 const tel = cap.phone.replace(/\s/g, '');
-                const hoursHtml = cap.hours ? `<div class="text-[11px] text-gray-600 bg-gray-200/60 px-2.5 py-1.5 rounded-lg inline-block font-bold mt-2"><i class="fa-regular fa-clock mr-1"></i> ${cap.hours}</div>` : '';
+                const hoursLabel = cap.hours || (cap.hoursKey && t[cap.hoursKey]) || '';
+                const hoursHtml = hoursLabel ? `<div class="text-[11px] text-gray-600 bg-gray-200/60 px-2.5 py-1.5 rounded-lg inline-block font-bold mt-2"><i class="fa-regular fa-clock mr-1"></i> ${hoursLabel}</div>` : '';
                 return `<div class="bg-gray-50 border border-gray-200 rounded-2xl p-5 flex flex-col justify-between hover:shadow-sm transition">
                     <div class="mb-4">
                         <div class="w-10 h-10 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center text-base mb-3"><i class="fa-solid fa-user-tie"></i></div>
@@ -3148,6 +3234,43 @@
             }
         }
 
+        function initMobileUX() {
+            document.querySelectorAll('.tooltip-container .fa-circle-info').forEach((icon) => {
+                icon.setAttribute('tabindex', '0');
+                icon.setAttribute('role', 'button');
+                const toggle = (e) => {
+                    if (!isMobileView()) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const container = icon.closest('.tooltip-container');
+                    if (!container) return;
+                    document.querySelectorAll('.tooltip-container.tooltip-open').forEach((el) => {
+                        if (el !== container) el.classList.remove('tooltip-open');
+                    });
+                    container.classList.toggle('tooltip-open');
+                };
+                icon.addEventListener('click', toggle);
+                icon.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') toggle(e);
+                });
+            });
+            document.addEventListener('click', (e) => {
+                if (!isMobileView()) return;
+                if (!e.target.closest('.tooltip-container')) {
+                    document.querySelectorAll('.tooltip-container.tooltip-open').forEach((el) => el.classList.remove('tooltip-open'));
+                }
+            });
+            const invalidateMaps = () => {
+                if (map) map.invalidateSize();
+                if (carMap) carMap.invalidateSize();
+            };
+            window.addEventListener('orientationchange', () => setTimeout(invalidateMaps, 300));
+            window.addEventListener('resize', () => {
+                updateMobileNavVisibility();
+                if (isMobileView()) setTimeout(invalidateMaps, 150);
+            });
+        }
+
         function dismissSiteSplash() {
             const splash = document.getElementById('site-splash');
             if (!splash || splash.classList.contains('splash-exit')) return;
@@ -3160,6 +3283,7 @@
 
         window.onload = function() {
             initMaps();
+            initMobileUX();
             setLang('bg');
             renderHelperQuickLinks();
             renderCityPickers();
