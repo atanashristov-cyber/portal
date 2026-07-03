@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#FF8000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="manifest" href="manifest.json">
     <title>Takeaway - Единен Информационен Портал</title>
     <meta name="description" content="Официален информационен портал за куриери на Takeaway — стартови точки, плащания, графици, доходи и служебни коли.">
     <meta property="og:type" content="website">
@@ -33,12 +37,12 @@
                 extend: {
                     colors: {
                         brand: {
-                            orange: '#FF7A00',
-                            orangeLight: '#FFA142',
-                            dark: '#111827',
-                            grayDark: '#1F2937',
-                            slate: '#4B5563',
-                            lightBg: '#F9FAFB'
+                            orange: '#FF8000',
+                            orangeLight: '#FF9A33',
+                            dark: '#222222',
+                            grayDark: '#333333',
+                            slate: '#6B7280',
+                            lightBg: '#F7F7F9'
                         }
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
@@ -47,6 +51,468 @@
         }
     </script>
     <style>
+        :root {
+            --brand-orange: #FF8000;
+            --brand-orange-light: #FF9A33;
+            --brand-orange-soft: #FFF4E8;
+            --surface-bg: #F7F7F9;
+            --surface-card: #FFFFFF;
+            --text-primary: #222222;
+            --text-secondary: #6B7280;
+            --text-muted: #9CA3AF;
+            --call-green: #28A745;
+            --call-green-hover: #218838;
+            --viber-purple: #7360F2;
+            --viber-purple-hover: #5E4FD9;
+            --danger-red: #DC3545;
+            --portal-radius: 12px;
+            --portal-radius-lg: 16px;
+            --portal-shadow-card: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --portal-shadow-nav: 0 -4px 20px rgba(0, 0, 0, 0.08);
+            --touch-min: 48px;
+            --portal-ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --portal-transition: 0.3s var(--portal-ease);
+            --portal-orange: var(--brand-orange);
+            --portal-orange-light: var(--brand-orange-light);
+            --portal-dark: var(--text-primary);
+            --portal-slate: var(--text-secondary);
+            --portal-radius-xl: var(--portal-radius-lg);
+            --portal-shadow: var(--portal-shadow-card);
+            --portal-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        html { -webkit-tap-highlight-color: transparent; }
+        body.portal-body {
+            background-color: var(--surface-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        body.portal-body h1, body.portal-body h2, body.portal-body h3, body.portal-body h4 {
+            color: var(--text-primary);
+        }
+        .portal-bg-mesh { display: none; }
+
+        /* PWA app shell — долна навигация */
+        .app-shell-nav {
+            position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+            background: var(--surface-card);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            padding: 0.35rem 0.5rem calc(0.35rem + env(safe-area-inset-bottom, 0px));
+            box-shadow: var(--portal-shadow-nav);
+        }
+        .app-shell-nav-inner {
+            display: flex; align-items: stretch; gap: 0.25rem; max-width: 32rem; margin: 0 auto;
+        }
+        .app-nav-btn {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.2rem; min-height: var(--touch-min); padding: 0.35rem 0.15rem;
+            border: none; border-radius: 12px; background: transparent;
+            font-size: 0.625rem; font-weight: 800; line-height: 1.1;
+            color: var(--text-secondary); cursor: pointer;
+            transition: all var(--portal-transition);
+        }
+        .app-nav-btn i { font-size: 1.2rem; color: var(--text-muted); transition: color var(--portal-transition); }
+        .app-nav-btn.active {
+            color: var(--brand-orange);
+            background: var(--brand-orange-soft);
+        }
+        .app-nav-btn.active i { color: var(--brand-orange); }
+        .app-nav-btn:active:not(.active) { background: #f0f0f2; transform: scale(0.96); }
+
+        body.has-app-nav main { padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)); }
+        body.has-app-nav.has-fab main { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
+        body.has-app-nav footer { margin-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px)); }
+
+        /* FAB — спешен ПТП */
+        #ptp-fab {
+            position: fixed; z-index: 105;
+            right: max(1rem, env(safe-area-inset-right));
+            bottom: calc(4.85rem + env(safe-area-inset-bottom, 0px));
+            width: 3.5rem; height: 3.5rem; border-radius: 999px;
+            display: none; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #DC3545 0%, #FF8000 100%);
+            color: #fff; font-size: 1.35rem; border: none;
+            box-shadow: 0 6px 24px rgba(220, 53, 69, 0.45);
+            cursor: pointer; transition: all 0.3s ease;
+            animation: fabPulse 2.2s ease-in-out infinite;
+        }
+        #ptp-fab:hover, #ptp-fab:focus-visible { transform: scale(1.06); box-shadow: 0 8px 28px rgba(255, 128, 0, 0.5); }
+        #ptp-fab:active { transform: scale(0.95); }
+        body.has-fab #ptp-fab { display: flex; }
+        @media (min-width: 640px) {
+            #ptp-fab { bottom: max(1.25rem, env(safe-area-inset-bottom, 0px)); }
+        }
+        @keyframes fabPulse {
+            0%, 100% { box-shadow: 0 6px 24px rgba(220, 53, 69, 0.45), 0 0 0 0 rgba(255, 128, 0, 0.5); }
+            50% { box-shadow: 0 8px 28px rgba(220, 53, 69, 0.55), 0 0 0 10px rgba(255, 128, 0, 0); }
+        }
+
+        /* Тъмен режим */
+        html.theme-dark {
+            color-scheme: dark;
+            --surface-bg: #121212;
+            --surface-card: #1E1E1E;
+            --text-primary: #F5F5F5;
+            --text-secondary: #B0B0B0;
+            --text-muted: #888888;
+            --portal-shadow-card: 0 4px 12px rgba(0, 0, 0, 0.35);
+            --brand-orange-soft: rgba(255, 128, 0, 0.15);
+        }
+        html.theme-dark body.portal-body { background-color: var(--surface-bg); color: var(--text-primary); }
+        html.theme-dark .portal-section,
+        html.theme-dark .portal-header-inner,
+        html.theme-dark .app-shell-nav,
+        html.theme-dark .portal-subnav,
+        html.theme-dark footer,
+        html.theme-dark #mobile-location-bar,
+        html.theme-dark .hub-card,
+        html.theme-dark .car-tab-section,
+        html.theme-dark .calc-main-card { background: var(--surface-card); border-color: rgba(255,255,255,0.08); color: var(--text-primary); }
+        html.theme-dark .text-brand-dark, html.theme-dark h1, html.theme-dark h2, html.theme-dark h3, html.theme-dark h4 { color: var(--text-primary) !important; }
+        html.theme-dark .text-brand-slate, html.theme-dark .text-gray-500, html.theme-dark .text-gray-600, html.theme-dark .text-gray-700 { color: var(--text-secondary) !important; }
+        html.theme-dark .bg-white, html.theme-dark .bg-gray-50, html.theme-dark .bg-brand-lightBg { background-color: #252525 !important; }
+        html.theme-dark .border-gray-200, html.theme-dark .border-gray-100 { border-color: rgba(255,255,255,0.1) !important; }
+        html.theme-dark .calc-result-box, html.theme-dark .calc-stat-mini { background: #252525 !important; border-color: rgba(255,255,255,0.08) !important; }
+        html.theme-dark .calc-field select, html.theme-dark .calc-field input, html.theme-dark #searchInput { background: #2a2a2a; color: #f5f5f5; border-color: rgba(255,255,255,0.12); }
+        html.theme-dark #lang-btn, html.theme-dark #theme-toggle { background: rgba(30,30,30,0.95); border-color: rgba(255,255,255,0.12); color: var(--text-primary); }
+        html.theme-dark .quick-pill { background: #2a2a2a; border-color: rgba(255,255,255,0.12); color: var(--text-secondary); }
+
+        #top-controls { display: flex; align-items: center; gap: 0.5rem; }
+        #theme-toggle {
+            width: 2.75rem; height: 2.75rem; min-height: 2.75rem;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 999px; border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            color: var(--brand-orange); font-size: 1rem; cursor: pointer;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08); transition: all 0.3s ease;
+        }
+        #theme-toggle:hover { border-color: var(--brand-orange); transform: scale(1.05); }
+
+        /* Калкулатор — бонус лента под нивата */
+        .calc-tier-progress-wrap {
+            margin: 0 1.25rem 1.25rem; padding: 1rem 1.125rem;
+            background: linear-gradient(180deg, rgba(255,128,0,0.06) 0%, transparent 100%);
+            border: 1px solid rgba(255, 128, 0, 0.15); border-radius: var(--portal-radius-lg);
+            transition: all 0.3s ease;
+        }
+        html.theme-dark .calc-tier-progress-wrap { background: rgba(255,128,0,0.08); border-color: rgba(255,128,0,0.2); }
+        .calc-progress-bar--bonus {
+            height: 14px; border-radius: 999px; background: #E5E7EB;
+            margin: 0.75rem 0 0.5rem; overflow: visible; position: relative;
+        }
+        html.theme-dark .calc-progress-bar--bonus { background: #333; }
+        .calc-progress-bar--bonus .calc-progress-fill {
+            border-radius: 999px;
+            background: linear-gradient(90deg, #FF8000, #FFB347, #FFCC00);
+            box-shadow: 0 0 12px rgba(255, 128, 0, 0.45);
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .calc-tier-markers {
+            display: flex; justify-content: space-between;
+            font-size: 0.625rem; font-weight: 800; text-transform: uppercase;
+            color: var(--text-muted); letter-spacing: 0.03em;
+        }
+        .calc-tier-markers span.active { color: var(--brand-orange); }
+        .calc-tier-markers span.done { color: var(--call-green); }
+
+        button, a, select, input, .portal-section, .app-nav-btn, .hub-card, .quick-pill, .btn-call, .btn-viber {
+            transition: all 0.3s ease;
+        }
+
+        /* Под-навигация (инфо / коли) — хоризонтална лента */
+        .portal-subnav {
+            position: sticky; z-index: 85;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            padding: 0.5rem; margin: -0.25rem 0 0.75rem;
+            border-radius: var(--portal-radius-lg);
+        }
+        .portal-subnav.hidden-subnav { display: none !important; }
+        .portal-subnav .guide-nav-btn,
+        .portal-subnav .car-nav-btn {
+            min-height: var(--touch-min); padding: 0.5rem 0.85rem;
+            font-size: 0.75rem; border-radius: 10px;
+        }
+        @media (min-width: 640px) {
+            .portal-subnav { top: 4.25rem; margin-bottom: 1rem; border-radius: var(--portal-radius-lg); }
+            #guide-section-nav .flex { flex-wrap: wrap; }
+        }
+        @media (max-width: 639px) {
+            .portal-subnav { top: calc(3rem + env(safe-area-inset-top, 0px)); margin-left: -0.125rem; margin-right: -0.125rem; border-radius: 0 0 12px 12px; }
+            .portal-subnav .flex { gap: 0.35rem !important; }
+            #car-tabs-nav.portal-subnav .flex { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            #car-tabs-nav.portal-subnav .car-nav-btn { flex: 0 0 auto; white-space: nowrap; min-width: max-content; }
+        }
+
+        /* Бутони за обаждане и Viber */
+        .btn-call, a.btn-call {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            min-height: var(--touch-min); padding: 0.75rem 1rem; width: 100%;
+            background: var(--call-green); color: #fff !important;
+            font-weight: 800; font-size: 0.9375rem; border-radius: var(--portal-radius);
+            border: none; text-decoration: none;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            transition: background var(--portal-transition), transform 0.2s;
+        }
+        .btn-call:hover, .btn-call:focus-visible { background: var(--call-green-hover); }
+        .btn-call:active { transform: scale(0.98); }
+        .btn-viber, a.btn-viber {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            min-height: var(--touch-min); padding: 0.75rem 1rem; width: 100%;
+            background: var(--viber-purple); color: #fff !important;
+            font-weight: 800; font-size: 0.9375rem; border-radius: var(--portal-radius);
+            border: none; text-decoration: none;
+            box-shadow: 0 4px 12px rgba(115, 96, 242, 0.3);
+            transition: background var(--portal-transition), transform 0.2s;
+        }
+        .btn-viber:hover, .btn-viber:focus-visible { background: var(--viber-purple-hover); }
+        .btn-viber:active { transform: scale(0.98); }
+        .btn-emergency {
+            background: var(--danger-red) !important;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.35) !important;
+        }
+        .btn-call-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+
+        /* Карти */
+        .portal-section {
+            background: var(--surface-card);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: var(--portal-radius-lg);
+            box-shadow: var(--portal-shadow-card);
+            transition: box-shadow var(--portal-transition);
+        }
+
+        /* PTP stepper */
+        .ptp-stepper {
+            display: flex; align-items: center; justify-content: center;
+            gap: 0; width: 100%; padding: 0.75rem 0.5rem;
+        }
+        .ptp-stepper-step {
+            display: flex; flex-direction: column; align-items: center; gap: 0.25rem; flex: 1; max-width: 4.5rem;
+        }
+        .ptp-stepper-circle {
+            width: 2.25rem; height: 2.25rem; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8125rem; font-weight: 900;
+            background: #E5E7EB; color: var(--text-muted);
+            transition: all 0.35s var(--portal-ease);
+            position: relative; z-index: 1;
+        }
+        .ptp-stepper-step.done .ptp-stepper-circle { background: var(--call-green); color: #fff; }
+        .ptp-stepper-step.active .ptp-stepper-circle {
+            background: var(--brand-orange); color: #fff;
+            box-shadow: 0 0 0 4px rgba(255, 128, 0, 0.25);
+            transform: scale(1.08);
+        }
+        .ptp-stepper-label {
+            font-size: 0.5625rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.04em; color: var(--text-muted); text-align: center; line-height: 1.2;
+        }
+        .ptp-stepper-step.active .ptp-stepper-label { color: var(--brand-orange); }
+        .ptp-stepper-step.done .ptp-stepper-label { color: var(--call-green); }
+        .ptp-stepper-line {
+            flex: 1; height: 3px; background: #E5E7EB; margin: 0 -0.25rem;
+            margin-bottom: 1.25rem; border-radius: 999px; transition: background 0.35s;
+        }
+        .ptp-stepper-line.done { background: var(--call-green); }
+        .ptp-panel { animation: ptpPanelIn 0.35s var(--portal-ease) both; }
+        @keyframes ptpPanelIn {
+            from { opacity: 0; transform: translateX(12px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .ptp-choice-btn { min-height: 3.25rem; border-radius: var(--portal-radius) !important; font-size: 0.9375rem !important; }
+        .ptp-choice-btn:active { transform: scale(0.98); }
+        #ptp-wizard.ptp-wizard-hero {
+            border: 2px solid rgba(220, 53, 69, 0.2);
+            border-radius: var(--portal-radius-lg);
+            box-shadow: var(--portal-shadow-card);
+            background: var(--surface-card);
+        }
+
+        /* Глобални touch targets */
+        button:not(.compact-btn), select, .quick-pill, .hub-card, .guide-nav-btn, .sos-subnav-btn, .app-nav-btn {
+            min-height: var(--touch-min);
+        }
+        select, input[type="text"], input[type="number"] { min-height: var(--touch-min); font-size: 16px; }
+
+        .portal-hero {
+            background: var(--surface-card);
+            border: 1px solid rgba(255, 128, 0, 0.15);
+        }
+        .portal-hero::after { display: none; }
+
+        .hub-card--brand { --hub-accent: var(--brand-orange); }
+        .section-eyebrow { color: var(--brand-orange); }
+        .section-eyebrow::before { background: var(--brand-orange); }
+
+        .guide-nav-btn.active {
+            background-color: var(--brand-orange) !important;
+            border-color: var(--brand-orange) !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(255, 128, 0, 0.3);
+        }
+        .sos-subnav-btn.active {
+            border-color: var(--brand-orange); background: var(--brand-orange);
+            box-shadow: 0 4px 12px rgba(255, 128, 0, 0.3);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--brand-orange); }
+        .search-input:focus { box-shadow: 0 0 0 4px rgba(255, 128, 0, 0.2); border-color: var(--brand-orange) !important; }
+        :focus-visible { outline: 2px solid rgba(255, 128, 0, 0.55); outline-offset: 2px; }
+
+        /* Legacy aliases — keep compatibility */
+        .section-eyebrow {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.6875rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+            color: var(--brand-orange);
+        }
+        .section-eyebrow::before {
+            content: ''; width: 1.25rem; height: 2px; border-radius: 999px; background: var(--brand-orange);
+        }
+
+        .hub-section-head { margin-bottom: 0.25rem; }
+        .hub-card {
+            position: relative; overflow: hidden; text-align: left;
+            border-radius: var(--portal-radius-xl) !important;
+            box-shadow: var(--portal-shadow);
+            transition: transform var(--portal-transition), box-shadow var(--portal-transition), border-color var(--portal-transition);
+        }
+        .hub-card::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+            background: var(--hub-accent, var(--portal-orange));
+            opacity: 0; transform: scaleY(0.4); transform-origin: center;
+            transition: opacity var(--portal-transition), transform var(--portal-transition);
+        }
+        .hub-card:hover::before, .hub-card:focus-visible::before { opacity: 1; transform: scaleY(1); }
+        .hub-card:hover, .hub-card:focus-visible {
+            transform: translateY(-3px);
+            box-shadow: var(--portal-shadow-hover);
+        }
+        .hub-card--brand { --hub-accent: var(--brand-orange); }
+        .hub-card--purple { --hub-accent: #9333ea; }
+        .hub-card--blue { --hub-accent: #2563eb; }
+        .hub-card--navy { --hub-accent: #1d4ed8; }
+        .hub-card-arrow {
+            position: absolute; right: 1.25rem; top: 50%; transform: translateY(-50%) translateX(0);
+            width: 2rem; height: 2rem; border-radius: 999px;
+            display: flex; align-items: center; justify-content: center;
+            background: #f3f4f6; color: #9ca3af; font-size: 0.75rem;
+            transition: transform var(--portal-transition), background var(--portal-transition), color var(--portal-transition);
+        }
+        .hub-card:hover .hub-card-arrow, .hub-card:focus-visible .hub-card-arrow {
+            transform: translateY(-50%) translateX(4px);
+            background: var(--hub-accent, var(--portal-orange)); color: #fff;
+        }
+        .hub-card .hub-card-body { padding-right: 2.75rem; }
+
+        #portal-hub .grid > .hub-card { animation: hubCardIn 0.55s var(--portal-ease) both; }
+        #portal-hub .grid > .hub-card:nth-child(1) { animation-delay: 0.05s; }
+        #portal-hub .grid > .hub-card:nth-child(2) { animation-delay: 0.12s; }
+        #portal-hub .grid > .hub-card:nth-child(3) { animation-delay: 0.19s; }
+        #portal-hub .grid > .hub-card:nth-child(4) { animation-delay: 0.26s; }
+        @keyframes hubCardIn {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .portal-search-panel {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%);
+            border: 1px solid rgba(229, 231, 235, 0.9);
+            position: relative;
+        }
+        .portal-search-panel::before {
+            content: ''; position: absolute; top: 0; left: 1.5rem; right: 1.5rem; height: 3px;
+            border-radius: 0 0 999px 999px;
+            background: linear-gradient(90deg, transparent, var(--portal-orange), var(--portal-orange-light), transparent);
+            opacity: 0.85;
+        }
+        .search-input-wrap { position: relative; }
+        .search-input-wrap::after {
+            content: ''; position: absolute; inset: -2px; border-radius: 1.15rem; z-index: -1;
+            background: linear-gradient(135deg, rgba(255, 122, 0, 0.35), rgba(255, 161, 66, 0.15));
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .search-input-wrap:focus-within::after { opacity: 1; }
+
+        .quick-pill {
+            padding: 0.5rem 0.95rem; border-radius: 999px;
+            font-size: 0.8125rem; font-weight: 700; color: var(--portal-slate);
+            background: #fff; border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04);
+            transition: all 0.25s var(--portal-ease);
+            cursor: pointer;
+        }
+        .quick-pill:hover, .quick-pill:focus-visible {
+            color: var(--portal-orange); border-color: rgba(255, 122, 0, 0.45);
+            background: #fff8f3; transform: translateY(-2px);
+            box-shadow: 0 6px 16px -6px rgba(255, 122, 0, 0.35);
+        }
+
+        .portal-cta {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            font-weight: 800; border-radius: 1rem; transition: all 0.3s var(--portal-ease);
+        }
+        .portal-cta--primary {
+            background: linear-gradient(135deg, var(--brand-orange) 0%, var(--brand-orange-light) 100%);
+            color: #fff;
+            box-shadow: 0 8px 24px -8px rgba(255, 128, 0, 0.45);
+        }
+        .portal-cta--primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -8px rgba(255, 128, 0, 0.55); }
+        .portal-cta--purple {
+            background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+            box-shadow: 0 8px 24px -8px rgba(124, 58, 237, 0.55);
+        }
+        .portal-cta--purple:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -8px rgba(124, 58, 237, 0.65); }
+
+        .reveal-on-scroll {
+            opacity: 0; transform: translateY(22px);
+            transition: opacity 0.65s var(--portal-ease), transform 0.65s var(--portal-ease);
+        }
+        .reveal-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+        .reveal-on-scroll.reveal-delay-1 { transition-delay: 0.08s; }
+        .reveal-on-scroll.reveal-delay-2 { transition-delay: 0.16s; }
+        .reveal-on-scroll.reveal-delay-3 { transition-delay: 0.24s; }
+
+        .global-page.page-enter-active { animation: pageEnter 0.48s var(--portal-ease) both; }
+        @keyframes pageEnter {
+            from { opacity: 0; transform: translateY(14px) scale(0.992); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .guide-nav-btn, .car-nav-btn, .sos-subnav-btn, .mobile-tab-btn {
+            transition: all 0.28s var(--portal-ease);
+        }
+        .guide-nav-btn:not(.active):hover { transform: translateY(-1px); border-color: rgba(255, 122, 0, 0.35); color: var(--portal-orange); }
+
+        #main-header .portal-header-inner {
+            box-shadow: var(--portal-shadow);
+            transition: box-shadow 0.3s, transform 0.3s var(--portal-ease);
+        }
+        #main-header.is-scrolled .portal-header-inner {
+            box-shadow: 0 8px 28px -10px rgba(17, 24, 39, 0.15);
+        }
+
+        .result-card {
+            transition: transform 0.25s var(--portal-ease), box-shadow 0.25s var(--portal-ease);
+        }
+        .result-card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px -12px rgba(17, 24, 39, 0.12); }
+
+        .car-tab-section.portal-section { border-radius: var(--portal-radius-xl); }
+
+        :focus-visible {
+            outline: 2px solid rgba(255, 122, 0, 0.65);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .portal-bg-mesh span, #portal-hub .grid > .hub-card, .reveal-on-scroll, .global-page.page-enter-active { animation: none !important; transition-duration: 0.01ms !important; }
+            .reveal-on-scroll { opacity: 1; transform: none; }
+            .hub-card:hover, .interactive-card:hover, .quick-pill:hover { transform: none; }
+        }
+
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #FF7A00; border-radius: 10px; }
@@ -64,8 +530,8 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         .glass-header { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); }
         .interactive-card { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        .interactive-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08); border-color: rgba(255, 122, 0, 0.3); }
-        .guide-nav-btn.active { background-color: #FF7A00; color: white; border-color: #FF7A00; box-shadow: 0 4px 12px -2px rgba(255, 122, 0, 0.35); }
+        .interactive-card:not(.hub-card):hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08); border-color: rgba(255, 122, 0, 0.3); }
+        .guide-nav-btn.active { background-color: var(--brand-orange); color: white; border-color: var(--brand-orange); box-shadow: 0 4px 12px -2px rgba(255, 128, 0, 0.35); }
         .guide-nav-btn.active i { color: white !important; }
         html { scroll-behavior: smooth; }
 
@@ -153,6 +619,7 @@
         }
         .splash-dots span:nth-child(2) { animation-delay: 0.15s; opacity: 0.7; }
         .splash-dots span:nth-child(3) { animation-delay: 0.3s; opacity: 0.45; }
+        body.splash-revealed #top-controls,
         body.splash-revealed #lang-fixed,
         body.splash-revealed #main-header,
         body.splash-revealed main,
@@ -198,7 +665,7 @@
         /* PTP wizard */
         .ptp-panel { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
         .ptp-progress-dot { width: 8px; height: 8px; border-radius: 999px; background: #e5e7eb; transition: all 0.3s; flex-shrink: 0; }
-        .ptp-progress-dot.active { width: 24px; background: #FF7A00; }
+        .ptp-progress-dot.active { width: 24px; background: var(--brand-orange); }
         .ptp-progress-dot.done { background: #fdba74; }
         .ptp-choice-btn {
             display: flex; align-items: center; gap: 0.75rem; width: 100%; text-align: left;
@@ -234,8 +701,8 @@
         }
         .sos-subnav-btn i { font-size: 1rem; }
         .sos-subnav-btn.active {
-            border-color: #FF7A00; background: #FF7A00; color: white;
-            box-shadow: 0 4px 14px -4px rgba(255, 122, 0, 0.5);
+            border-color: var(--brand-orange); background: var(--brand-orange); color: white;
+            box-shadow: 0 4px 14px -4px rgba(255, 128, 0, 0.5);
         }
         .sos-subnav-btn.active i { color: white !important; }
         .sos-subnav-btn:not(.active):hover { border-color: #fdba74; color: #ea580c; background: #fff8f3; }
@@ -275,10 +742,10 @@
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             -webkit-tap-highlight-color: transparent;
         }
-        .mobile-tab-btn i { font-size: 1.05rem; color: #FF7A00; transition: color 0.2s; }
+        .mobile-tab-btn i { font-size: 1.05rem; color: var(--brand-orange); transition: color 0.2s; }
         .mobile-tab-btn.active {
-            color: #fff; background: #FF7A00;
-            box-shadow: 0 3px 10px -2px rgba(255, 122, 0, 0.45);
+            color: #fff; background: var(--brand-orange);
+            box-shadow: 0 3px 10px -2px rgba(255, 128, 0, 0.45);
         }
         .mobile-tab-btn.active i { color: #fff !important; }
         .mobile-tab-btn:active:not(.active) { background: #f3f4f6; transform: scale(0.97); }
@@ -313,7 +780,7 @@
                 z-index: 90;
                 top: calc(3.1rem + env(safe-area-inset-top, 0px));
             }
-            #lang-fixed { top: max(0.5rem, env(safe-area-inset-top)); right: max(0.5rem, env(safe-area-inset-right)); z-index: 110; }
+            #top-controls { top: max(0.5rem, env(safe-area-inset-top)); right: max(0.5rem, env(safe-area-inset-right)); z-index: 110; }
             #lang-btn { padding: 0.5rem 0.65rem; font-size: 0.75rem; min-height: 2.5rem; }
             #lang-menu { max-width: calc(100vw - 1rem); }
 
@@ -326,8 +793,8 @@
             #header-page-title { font-size: 0.8125rem; }
 
             main { padding-top: 0.5rem; padding-left: 0.625rem; padding-right: 0.625rem; }
-            body:not(.has-mobile-nav) main { padding-bottom: 1rem; }
-            body:not(.has-mobile-nav) footer { margin-bottom: 0; }
+            body:not(.has-app-nav) main { padding-bottom: 1rem; }
+            body:not(.has-app-nav) footer { margin-bottom: 0; }
 
             .global-page { gap: 0.625rem !important; }
             .global-page > section,
@@ -339,6 +806,8 @@
             #page-welcome .hub-card { padding: 1rem !important; border-radius: 1.125rem !important; }
             #page-welcome .hub-card h3 { font-size: 1rem !important; }
             #page-welcome .hub-card p { font-size: 0.8125rem !important; line-height: 1.4; }
+            .hub-card-arrow { display: none; }
+            .hub-card .hub-card-body { padding-right: 0 !important; }
             #smart-contact-helper { padding: 0 !important; }
             #smart-contact-helper > div { padding: 1rem !important; }
             #smart-contact-helper h2 { font-size: 1.125rem !important; }
@@ -487,7 +956,8 @@
             .ptp-choice-btn { font-size: 0.8125rem; padding: 0.75rem 0.875rem; min-height: 3rem; }
             .ptp-detail-box { font-size: 0.75rem; padding: 0.75rem; }
 
-            .interactive-card:hover { transform: none; }
+            .interactive-card:not(.hub-card):hover { transform: none; }
+            .hub-card:hover, .hub-card:focus-visible { transform: none; }
 
             /* Долна навигация */
             .mobile-tab-bar { padding-left: 0.25rem; padding-right: 0.25rem; }
@@ -656,7 +1126,9 @@
         }
     </style>
 </head>
-<body class="bg-[#F3F4F6] text-gray-800 font-sans antialiased min-h-screen relative selection:bg-brand-orange selection:text-white splash-active">
+<body class="portal-body text-gray-800 font-sans antialiased min-h-screen relative selection:bg-brand-orange selection:text-white splash-active">
+
+    <div class="portal-bg-mesh" aria-hidden="true"><span></span><span></span><span></span></div>
 
     <!-- Intro splash -->
     <div id="site-splash" class="site-splash" aria-hidden="false" aria-label="Зареждане">
@@ -678,8 +1150,12 @@
 
     <div id="menu-backdrop" onclick="closeAllMenus()" aria-hidden="true"></div>
 
-    <!-- Език – фиксиран горе вдясно -->
-    <div id="lang-fixed" class="fixed top-4 right-4 z-[110]">
+    <!-- Горни контроли: тема + език -->
+    <div id="top-controls" class="fixed top-4 right-4 z-[110]">
+        <button type="button" id="theme-toggle" onclick="toggleTheme()" aria-label="Тъмен режим" title="Тъмен режим">
+            <i id="theme-icon" class="fa-solid fa-moon"></i>
+        </button>
+        <div id="lang-fixed" class="relative">
         <button type="button" id="lang-btn" onclick="toggleLangMenu()" class="flex items-center gap-2 bg-white/95 backdrop-blur-md border border-gray-200/80 px-3.5 py-2.5 rounded-full text-sm font-bold text-brand-dark shadow-lg hover:border-brand-orange transition-all duration-300 cursor-pointer">
             <i class="fa-solid fa-globe text-brand-orange"></i>
             <span id="current-lang" class="hidden sm:inline">БГ | Български</span>
@@ -692,10 +1168,11 @@
                 <li><button type="button" onclick="setLang('en')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">EN | English</button></li>
             </ul>
         </div>
+        </div>
     </div>
 
     <header id="main-header" class="sticky top-0 sm:top-4 z-[100] mx-auto px-3 sm:px-4 max-w-2xl w-full transition-all duration-300 hidden">
-        <div class="bg-white/90 backdrop-blur-md rounded-2xl px-3 sm:px-4 py-2.5 shadow-lg border border-gray-200/80 flex items-center gap-2 sm:gap-3">
+        <div class="portal-header-inner bg-white/90 backdrop-blur-md rounded-2xl px-3 sm:px-4 py-2.5 shadow-lg border border-gray-200/80 flex items-center gap-2 sm:gap-3">
             <button type="button" onclick="goToWelcome()" class="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-gray-500 hover:text-brand-orange hover:bg-brand-orange/5 transition-all" title="Начало">
                 <i class="fa-solid fa-house"></i>
                 <span class="hidden sm:inline" data-i18n="nav_home">Начало</span>
@@ -713,20 +1190,26 @@
     <main class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
 
         <div id="page-welcome" class="global-page space-y-6 sm:space-y-5 lg:space-y-4 block">
-            <section class="bg-white border border-gray-200 rounded-[2rem] sm:rounded-2xl p-6 sm:p-6 lg:p-5 shadow-sm relative overflow-hidden">
+            <section class="portal-section portal-hero rounded-[2rem] sm:rounded-2xl p-6 sm:p-6 lg:p-5 relative overflow-hidden">
                 <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-orange opacity-10 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute right-8 top-8 hidden lg:block text-brand-orange opacity-10 pointer-events-none"><i class="fa-solid fa-motorcycle text-[160px]"></i></div>
                 <div class="relative z-10 max-w-3xl space-y-4">
                     <span class="bg-brand-orange/10 text-brand-orange text-xs sm:text-sm font-extrabold px-3 py-1.5 rounded-md tracking-wider border border-brand-orange/20 inline-block">Takeaway.com</span>
                     <h1 data-i18n="welcome_title" class="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark leading-tight">Добре дошли!</h1>
-                    <p data-i18n="welcome_desc" class="text-brand-slate text-base sm:text-lg leading-relaxed">Изберете раздел — обща информация, калкулатор, стартови зони София или служебни коли.</p>
+                    <p data-i18n="welcome_desc" class="text-brand-slate text-base sm:text-lg leading-relaxed max-w-2xl">Изберете раздел — обща информация, калкулатор, стартови зони София или служебни коли.</p>
                 </div>
             </section>
 
-            <section id="portal-hub" class="space-y-4">
+            <section id="portal-hub" class="space-y-4 reveal-on-scroll">
+                <div class="hub-section-head px-1 space-y-1.5">
+                    <span data-i18n="hub_section_eyebrow" class="section-eyebrow">Портал</span>
+                    <h2 data-i18n="hub_section_title" class="text-xl sm:text-2xl font-black text-brand-dark">Избери раздел</h2>
+                    <p data-i18n="hub_section_desc" class="text-sm text-brand-slate max-w-xl">Всичко важно на едно място — от заплата до ПТП.</p>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <button type="button" onclick="openCommonInfo()" class="hub-card interactive-card text-left bg-white border-2 border-gray-200 rounded-[2rem] sm:rounded-2xl p-6 sm:p-5 shadow-sm hover:border-brand-orange/50 transition-all group">
-                        <div class="flex items-start gap-4">
+                    <button type="button" onclick="openCommonInfo()" class="hub-card hub-card--brand interactive-card text-left bg-white border-2 border-gray-200/80 p-6 sm:p-5 group">
+                        <span class="hub-card-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+                        <div class="hub-card-body flex items-start gap-4">
                             <div class="w-14 h-14 rounded-2xl bg-brand-orange/10 text-brand-orange flex items-center justify-center text-2xl shrink-0 group-hover:bg-brand-orange group-hover:text-white transition-colors"><i class="fa-solid fa-book-open"></i></div>
                             <div class="min-w-0 space-y-1">
                                 <h2 data-i18n="hub_common_title" class="text-xl font-black text-brand-dark">Обща информация</h2>
@@ -734,8 +1217,9 @@
                             </div>
                         </div>
                     </button>
-                    <button type="button" onclick="openCalculator()" class="hub-card interactive-card text-left bg-white border-2 border-gray-200 rounded-[2rem] sm:rounded-2xl p-6 sm:p-5 shadow-sm hover:border-purple-400/60 transition-all group">
-                        <div class="flex items-start gap-4">
+                    <button type="button" onclick="openCalculator()" class="hub-card hub-card--purple interactive-card text-left bg-white border-2 border-gray-200/80 p-6 sm:p-5 group">
+                        <span class="hub-card-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+                        <div class="hub-card-body flex items-start gap-4">
                             <div class="w-14 h-14 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-2xl shrink-0 group-hover:bg-purple-600 group-hover:text-white transition-colors"><i class="fa-solid fa-calculator"></i></div>
                             <div class="min-w-0 space-y-1">
                                 <h2 data-i18n="hub_calc_title" class="text-xl font-black text-brand-dark">Калкулатор</h2>
@@ -743,8 +1227,9 @@
                             </div>
                         </div>
                     </button>
-                    <button type="button" onclick="openSofiaZones()" class="hub-card interactive-card text-left bg-white border-2 border-gray-200 rounded-[2rem] sm:rounded-2xl p-6 sm:p-5 shadow-sm hover:border-blue-400/60 transition-all group">
-                        <div class="flex items-start gap-4">
+                    <button type="button" onclick="openSofiaZones()" class="hub-card hub-card--blue interactive-card text-left bg-white border-2 border-gray-200/80 p-6 sm:p-5 group">
+                        <span class="hub-card-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+                        <div class="hub-card-body flex items-start gap-4">
                             <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i class="fa-solid fa-map-location-dot"></i></div>
                             <div class="min-w-0 space-y-1">
                                 <h2 data-i18n="hub_zones_title" class="text-xl font-black text-brand-dark">Стартови зони — София</h2>
@@ -752,9 +1237,10 @@
                             </div>
                         </div>
                     </button>
-                    <button type="button" onclick="openCompanyCars('София', 'СФ')" class="hub-card interactive-card text-left bg-white border-2 border-gray-200 rounded-[2rem] sm:rounded-2xl p-6 sm:p-5 shadow-sm hover:border-blue-500/60 transition-all group">
-                        <div class="flex items-start gap-4">
-                            <div class="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-2xl shrink-0"><i class="fa-solid fa-car-side"></i></div>
+                    <button type="button" onclick="openCompanyCars('София', 'СФ')" class="hub-card hub-card--navy interactive-card text-left bg-white border-2 border-gray-200/80 p-6 sm:p-5 group">
+                        <span class="hub-card-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
+                        <div class="hub-card-body flex items-start gap-4">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-2xl shrink-0 group-hover:scale-105 transition-transform"><i class="fa-solid fa-car-side"></i></div>
                             <div class="min-w-0 space-y-1">
                                 <h2 data-i18n="hub_cars_title" class="text-xl font-black text-brand-dark">Служебни коли — София</h2>
                                 <p data-i18n="hub_cars_desc" class="text-sm text-brand-slate leading-snug">Паркинг, поддръжка, ПТП и уведомяване на капитан.</p>
@@ -781,14 +1267,14 @@
                 </div>
             </section>
 
-            <section id="smart-contact-helper" class="bg-white rounded-[2rem] sm:rounded-2xl shadow-sm border border-gray-200 overflow-hidden relative">
+            <section id="smart-contact-helper" class="portal-section portal-search-panel rounded-[2rem] sm:rounded-2xl overflow-hidden relative reveal-on-scroll reveal-delay-1">
                 <div class="p-6 sm:p-5 lg:p-5 relative z-10">
                     <div class="text-center mb-5 sm:mb-4">
                         <div class="w-14 h-14 sm:w-12 sm:h-12 bg-brand-orange/10 text-brand-orange rounded-full flex items-center justify-center text-2xl sm:text-xl mx-auto mb-3 border border-brand-orange/20 shadow-sm"><i class="fa-solid fa-magnifying-glass-location"></i></div>
                         <h2 data-i18n="helper_title" class="text-2xl sm:text-xl font-black text-brand-dark mb-1.5">Намери бързо това, което търсиш</h2>
                         <p data-i18n="helper_desc" class="text-brand-slate text-sm max-w-2xl mx-auto">Не сте сигурни към кого да се обърнете? Напишете какво ви трябва — ще ви насочим към <strong>диспечерски чат</strong> или <strong>формуляр за контакт</strong> в Scoober. За <strong>ПТП със служебна кола</strong> — към наръчника в портала.</p>
                     </div>
-                    <div class="relative max-w-3xl mx-auto mb-5 sm:mb-4">
+                    <div class="search-input-wrap relative max-w-3xl mx-auto mb-5 sm:mb-4">
                         <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none"><i class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i></div>
                         <input type="text" id="searchInput" autocomplete="off" class="search-input block w-full pl-12 pr-12 py-3.5 sm:py-3 text-base border-2 border-gray-200 rounded-2xl text-brand-dark bg-gray-50 focus:bg-white transition-all duration-300 shadow-sm">
                         <button id="clearBtn" class="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-400 hover:text-brand-orange hidden transition-colors"><i class="fa-solid fa-circle-xmark text-2xl"></i></button>
@@ -805,7 +1291,7 @@
         <div id="page-home" class="global-page space-y-8 sm:space-y-10 hidden">
 
             <!-- Навигация по раздели -->
-            <nav id="guide-section-nav" class="hidden sm:block sticky top-[4.25rem] z-[90] bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-sm p-2 overflow-x-auto custom-scrollbar">
+            <nav id="guide-section-nav" class="portal-subnav hidden-subnav sticky top-[4.25rem] z-[90] overflow-x-auto custom-scrollbar">
                 <div class="flex items-center min-w-max gap-1.5 sm:gap-2">
                     <button type="button" onclick="scrollToGuideSection('section-pay')" class="guide-nav-btn active flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-pay"><i class="fa-solid fa-sack-dollar text-brand-orange"></i><span data-i18n="nav_sec_pay">Плащания</span></button>
                     <button type="button" onclick="scrollToGuideSection('section-schedule')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-schedule"><i class="fa-solid fa-calendar-days text-brand-orange"></i><span data-i18n="nav_sec_schedule">Графици</span></button>
@@ -917,7 +1403,7 @@
                     </div>
                     <div id="contracts-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6"></div>
                 </div>
-                <button type="button" onclick="openCalculator()" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl text-sm shadow-md transition-all">
+                <button type="button" onclick="openCalculator()" class="portal-cta portal-cta--primary w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-4 text-white font-bold rounded-2xl text-sm transition-all">
                     <i class="fa-solid fa-calculator"></i>
                     <span data-i18n="open_calc_btn">Отвори калкулатор на заплата →</span>
                 </button>
@@ -1129,7 +1615,23 @@
                             </div>
                         </div>
                     </div>
-                    <div id="tiersDetail" class="px-5 pb-5"></div>
+                    <div id="tiersDetail" class="px-5 pb-2"></div>
+                    <div id="calc-tier-progress-wrap" class="calc-tier-progress-wrap hidden">
+                        <div class="flex justify-between items-center gap-2 flex-wrap mb-1">
+                            <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500" data-i18n="calc_bonus_progress">Бонус прогрес</span>
+                            <span id="curLevelTextTier" class="text-xs font-black text-brand-orange">BASE</span>
+                        </div>
+                        <div class="calc-tier-markers" id="tierMarkers">
+                            <span data-tier="0">BASE</span>
+                            <span data-tier="1">MID</span>
+                            <span data-tier="2">HIGH</span>
+                            <span data-tier="3">SUPER</span>
+                        </div>
+                        <div class="calc-progress-bar calc-progress-bar--bonus">
+                            <div id="progFillTier" class="calc-progress-fill" style="width:0%"></div>
+                        </div>
+                        <p id="progNoteTier" class="text-xs m-0 mt-2 text-center text-gray-500 font-semibold"></p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1151,7 +1653,7 @@
                 </div>
             </section>
 
-            <nav id="car-tabs-nav" class="hidden sm:block bg-white rounded-2xl p-2 shadow-sm border border-gray-200">
+            <nav id="car-tabs-nav" class="portal-subnav hidden-subnav bg-white rounded-2xl p-2 shadow-sm border border-gray-200">
                 <div class="flex items-center gap-2">
                     <button id="btn-car-map" data-car-tab="car-map" onclick="openCarTab('car-map')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all shadow-sm bg-brand-orange text-white"><i class="fa-solid fa-map-location-dot"></i> <span data-i18n="car_tab_map">1. Карта & Старт</span></button>
                     <button id="btn-car-maint" data-car-tab="car-maint" onclick="openCarTab('car-maint')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all bg-white text-gray-500 hover:bg-gray-50 hover:text-brand-dark"><i class="fa-solid fa-wrench"></i> <span data-i18n="car_tab_maint">2. Поддръжка</span></button>
@@ -1234,18 +1736,33 @@
                             <p data-i18n="ptp_intro" class="text-sm font-bold text-brand-dark">Следвай стъпките — избираш отговор и продължаваш напред</p>
                         </div>
                         <div class="flex items-center justify-between gap-2">
-                            <button type="button" id="ptp-back-btn" onclick="ptpGoBack()" class="hidden shrink-0 flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-brand-orange px-2 py-1.5 rounded-lg border border-gray-200 bg-white">
-                                <i class="fa-solid fa-arrow-left text-[10px]"></i> <span data-i18n="ptp_back">Назад</span>
+                            <button type="button" id="ptp-back-btn" onclick="ptpGoBack()" class="hidden shrink-0 flex items-center gap-1.5 text-sm font-bold text-gray-600 hover:text-brand-orange px-3 py-2.5 rounded-xl border border-gray-200 bg-white min-h-[48px]">
+                                <i class="fa-solid fa-arrow-left"></i> <span data-i18n="ptp_back">Назад</span>
                             </button>
-                            <div class="flex items-center gap-1.5 flex-1 min-w-0 justify-center" id="ptp-progress" aria-hidden="true">
-                                <span class="ptp-progress-dot active" data-ptp-dot="1"></span>
-                                <span class="ptp-progress-dot" data-ptp-dot="2"></span>
-                                <span class="ptp-progress-dot" data-ptp-dot="3"></span>
-                                <span class="ptp-progress-dot" data-ptp-dot="4"></span>
-                            </div>
-                            <button type="button" onclick="ptpReset()" class="shrink-0 text-xs font-bold text-gray-400 hover:text-brand-orange px-2 py-1 rounded-lg" data-i18n="ptp_reset">↺ Начало</button>
+                            <button type="button" onclick="ptpReset()" class="ml-auto shrink-0 text-sm font-bold text-gray-500 hover:text-brand-orange px-3 py-2.5 rounded-xl border border-gray-200 bg-white min-h-[48px]" data-i18n="ptp_reset">↺ Начало</button>
                         </div>
-                        <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest text-center" id="ptp-progress-label">Стъпка 1 · Оглед</p>
+                        <div class="ptp-stepper" id="ptp-progress" aria-label="ПТП прогрес">
+                                <div class="ptp-stepper-step active" data-ptp-step="1">
+                                    <div class="ptp-stepper-circle">1</div>
+                                    <span class="ptp-stepper-label" data-i18n="ptp_step_lbl_1">Оглед</span>
+                                </div>
+                                <div class="ptp-stepper-line" data-ptp-line="1"></div>
+                                <div class="ptp-stepper-step" data-ptp-step="2">
+                                    <div class="ptp-stepper-circle">2</div>
+                                    <span class="ptp-stepper-label" data-i18n="ptp_step_lbl_2">Протокол</span>
+                                </div>
+                                <div class="ptp-stepper-line" data-ptp-line="2"></div>
+                                <div class="ptp-stepper-step" data-ptp-step="3">
+                                    <div class="ptp-stepper-circle">3</div>
+                                    <span class="ptp-stepper-label" data-i18n="ptp_step_lbl_3">Капитан</span>
+                                </div>
+                                <div class="ptp-stepper-line" data-ptp-line="3"></div>
+                                <div class="ptp-stepper-step" data-ptp-step="4">
+                                    <div class="ptp-stepper-circle">4</div>
+                                    <span class="ptp-stepper-label" data-i18n="ptp_step_lbl_4">Паркинг</span>
+                                </div>
+                            </div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider text-center" id="ptp-progress-label">Стъпка 1 · Оглед</p>
 
                         <div class="ptp-panel space-y-3" data-ptp="1">
                             <div class="flex items-center gap-3">
@@ -1293,7 +1810,7 @@
                                 <p data-i18n="ptp_s112_title" class="font-black text-lg mb-2"><i class="fa-solid fa-phone-volume mr-2"></i>Обади се на 112</p>
                                 <p data-i18n="ptp_s112_text" class="text-sm">При пострадали КАТ и спешна помощ са задължителни. След това уведоми Капитана.</p>
                             </div>
-                            <a href="tel:112" class="flex items-center justify-center gap-2 w-full py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-sm"><i class="fa-solid fa-phone"></i> 112</a>
+                            <a href="tel:112" class="btn-call btn-emergency"><i class="fa-solid fa-phone"></i> 112</a>
                             <button type="button" onclick="showPtpStep('3')" class="ptp-choice-btn"><i class="bg-blue-100 text-blue-600"><i class="fa-solid fa-arrow-right"></i></i><span data-i18n="ptp_s112_next">След 112 → уведомяване на Капитан</span></button>
                         </div>
 
@@ -1322,7 +1839,7 @@
                                 <p data-i18n="ptp_kat_title" class="font-black mb-1"><i class="fa-solid fa-building-shield mr-1"></i> Викате КАТ (112)</p>
                                 <p data-i18n="ptp_kat_text" class="text-sm">При спор за вина или тежко ПТП — официален протокол от органите.</p>
                             </div>
-                            <a href="tel:112" class="flex items-center justify-center gap-2 w-full py-3.5 bg-red-600 text-white font-bold rounded-xl text-sm"><i class="fa-solid fa-phone"></i> 112</a>
+                            <a href="tel:112" class="btn-call btn-emergency"><i class="fa-solid fa-phone"></i> 112</a>
                             <button type="button" onclick="showPtpStep('3')" class="ptp-choice-btn"><i class="bg-blue-100 text-blue-600"><i class="fa-solid fa-arrow-right"></i></i><span data-i18n="ptp_kat_next">Напред → уведомяване</span></button>
                         </div>
 
@@ -1371,7 +1888,7 @@
                         <div class="ptp-panel hidden space-y-3" data-ptp="3weekday">
                             <div class="ptp-detail-box bg-white border border-gray-200">
                                 <p data-i18n="ptp_s3wd_call" class="font-bold text-brand-dark mb-3">Обади се веднага:</p>
-                                <a href="tel:+359889627470" class="flex items-center justify-center gap-2 w-full py-3.5 bg-brand-orange text-white font-bold rounded-xl text-sm mb-2"><i class="fa-solid fa-phone"></i> Владимир Ненков</a>
+                                <a href="tel:+359889627470" class="btn-call"><i class="fa-solid fa-phone"></i> Владимир Ненков</a>
                                 <p data-i18n="ptp_s3wd_hours" class="text-xs text-gray-500 text-center">Пон–Пет · 10:00–18:00</p>
                             </div>
                             <button type="button" onclick="showPtpStep('4')" class="w-full py-3.5 bg-brand-dark text-white font-bold rounded-xl text-sm" data-i18n="ptp_s3wd_done">Готово → Стъпка 4</button>
@@ -1384,7 +1901,7 @@
                                 <div class="ptp-check-item"><i class="fa-solid fa-hashtag text-purple-600 mt-0.5"></i><span data-i18n="ptp_s3off_v2">Рег. № на <strong>колата, с която сте се ударили</strong></span></div>
                                 <div class="ptp-check-item"><i class="fa-solid fa-file-image text-purple-600 mt-0.5"></i><span data-i18n="ptp_s3off_v3">Снимка на <strong>цветния екземпляр</strong> от ДКП</span></div>
                             </div>
-                            <a href="viber://chat?number=%2B359889627470" class="flex items-center justify-center gap-2 w-full py-3.5 bg-[#7360f2] hover:bg-[#5f4ed4] text-white font-bold rounded-xl text-sm shadow-sm transition"><i class="fa-brands fa-viber text-lg"></i> <span data-i18n="ptp_s3off_viber">Владимир Ненков · Viber</span></a>
+                            <a href="viber://chat?number=%2B359889627470" class="btn-viber"><i class="fa-brands fa-viber text-lg"></i> <span data-i18n="ptp_s3off_viber">Владимир Ненков · Viber</span></a>
                             <button type="button" onclick="showPtpStep('4')" class="w-full py-3.5 bg-brand-dark text-white font-bold rounded-xl text-sm" data-i18n="ptp_s3off_done">Изпратено → Стъпка 4</button>
                         </div>
 
@@ -1437,7 +1954,7 @@
                                 <div class="ptp-check-item"><i class="fa-solid fa-gears text-gray-600 mt-0.5"></i><span data-i18n="ptp_tow_i3">Блокирали скорости</span></div>
                                 <div class="ptp-check-item"><i class="fa-solid fa-ban text-gray-600 mt-0.5"></i><span data-i18n="ptp_tow_i4">Друга невъзможност за движение на собствен ход</span></div>
                             </div>
-                            <a href="tel:+359887239391" class="flex items-center justify-center gap-2 w-full py-3.5 bg-brand-orange hover:bg-brand-orangeLight text-white font-bold rounded-xl text-sm shadow-sm"><i class="fa-solid fa-phone"></i> <span data-i18n="ptp_tow_phone">Пътна помощ · 0887 239 391</span></a>
+                            <a href="tel:+359887239391" class="btn-call"><i class="fa-solid fa-phone"></i> <span data-i18n="ptp_tow_phone">Пътна помощ · 0887 239 391</span></a>
                             <button type="button" onclick="switchSosPanel('wizard')" class="w-full py-2.5 text-sm font-bold text-gray-500 hover:text-brand-orange transition-colors" data-i18n="ptp_back_wizard">← Обратно към ПТП наръчника</button>
                         </div>
                     </div>
@@ -1563,7 +2080,10 @@
                                 <p data-i18n="car_c1_desc" class="car-contact-desc text-xs text-gray-500 mb-3">Осребряване и проблеми с разпределението на колите. При промяна по графика — задължително го уведоми.</p>
                                 <div class="car-contact-hours text-[11px] text-gray-600 bg-gray-200/60 px-2.5 py-1.5 rounded-lg inline-block font-bold"><i class="fa-regular fa-clock mr-1"></i> <span data-i18n="car_c1_hours">Пон-Пет | 12:00 - 18:00</span></div>
                             </div>
-                            <a href="tel:+359877021585" class="car-contact-call w-full bg-white border border-gray-200 hover:border-brand-orange hover:text-brand-orange text-brand-dark font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
+                            <div class="btn-call-row">
+                                <a href="tel:+359877021585" class="btn-call car-contact-call"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
+                                <a href="viber://chat?number=%2B359877021585" class="btn-viber"><i class="fa-brands fa-viber"></i> <span data-i18n="car_btn_viber">Viber</span></a>
+                            </div>
                         </div>
                         <div class="car-contact-card bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-sm transition">
                             <div class="car-contact-body mb-4">
@@ -1573,7 +2093,10 @@
                                 <p data-i18n="car_c2_desc" class="car-contact-desc text-xs text-gray-500 mb-3">Проблеми с колата, ПТП и поддръжка на служебните автомобили.</p>
                                 <div class="car-contact-hours text-[11px] text-gray-600 bg-gray-200/60 px-2.5 py-1.5 rounded-lg inline-block font-bold"><i class="fa-regular fa-clock mr-1"></i> <span data-i18n="car_c2_hours">Пон-Пет | 10:00 - 18:00</span></div>
                             </div>
-                            <a href="tel:+359889627470" class="car-contact-call w-full bg-white border border-gray-200 hover:border-brand-orange hover:text-brand-orange text-brand-dark font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
+                            <div class="btn-call-row">
+                                <a href="tel:+359889627470" class="btn-call car-contact-call"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
+                                <a href="viber://chat?number=%2B359889627470" class="btn-viber"><i class="fa-brands fa-viber"></i> <span data-i18n="car_btn_viber">Viber</span></a>
+                            </div>
                         </div>
                         <div class="car-contact-card bg-brand-orange/5 border border-brand-orange/20 rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-sm transition">
                             <div class="car-contact-body mb-4">
@@ -1582,7 +2105,7 @@
                                 <div data-i18n="car_c3_role" class="text-[10px] font-bold text-brand-orange uppercase tracking-wider mt-0.5 mb-2">Денонощен репатрак</div>
                                 <p data-i18n="car_c3_desc" class="car-contact-desc text-xs text-gray-500">Звънете на този номер само след предварително съгласуване с Капитан.</p>
                             </div>
-                            <a href="tel:+359887239391" class="car-contact-call w-full bg-brand-orange hover:bg-brand-orangeLight text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
+                            <a href="tel:+359887239391" class="btn-call car-contact-call"><i class="fa-solid fa-phone"></i> <span data-i18n="car_btn_call">Позвъни</span></a>
                         </div>
                     </div>
                     </div>
@@ -1592,7 +2115,28 @@
 
     </main>
 
-    <nav id="guide-mobile-nav" class="mobile-tab-bar sm:hidden hidden" aria-label="Навигация по раздели">
+    <button type="button" id="ptp-fab" onclick="openPtpEmergency()" aria-label="ПТП / Авария" title="ПТП / Авария">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+    </button>
+
+    <nav id="app-bottom-nav" class="app-shell-nav hidden" aria-label="Главна навигация">
+        <div class="app-shell-nav-inner">
+            <button type="button" data-app-nav="home" onclick="switchAppTab('home')" class="app-nav-btn active" aria-current="page">
+                <i class="fa-solid fa-house"></i><span data-i18n="app_nav_home">Начало</span>
+            </button>
+            <button type="button" data-app-nav="calculator" onclick="switchAppTab('calculator')" class="app-nav-btn">
+                <i class="fa-solid fa-calculator"></i><span data-i18n="app_nav_calc">Заплата</span>
+            </button>
+            <button type="button" data-app-nav="zones" onclick="switchAppTab('zones')" class="app-nav-btn">
+                <i class="fa-solid fa-map-location-dot"></i><span data-i18n="app_nav_zones">Зони</span>
+            </button>
+            <button type="button" data-app-nav="cars" onclick="switchAppTab('cars')" class="app-nav-btn">
+                <i class="fa-solid fa-car-side"></i><span data-i18n="app_nav_cars">Автопарк</span>
+            </button>
+        </div>
+    </nav>
+
+    <nav id="guide-mobile-nav" class="mobile-tab-bar sm:hidden hidden" aria-hidden="true">
         <div class="flex items-stretch gap-0.5 max-w-lg mx-auto">
             <button type="button" onclick="scrollToGuideSection('section-pay')" class="mobile-tab-btn guide-nav-btn active" data-section="section-pay"><i class="fa-solid fa-sack-dollar"></i><span data-i18n="nav_mob_pay">Плащ.</span></button>
             <button type="button" onclick="scrollToGuideSection('section-schedule')" class="mobile-tab-btn guide-nav-btn" data-section="section-schedule"><i class="fa-solid fa-calendar-days"></i><span data-i18n="nav_mob_schedule">График</span></button>
@@ -1623,6 +2167,81 @@
     </footer>
 
     <script>
+        /** Критични данни — винаги в страницата за офлайн достъп (ПТП, телефони) */
+        const OFFLINE_CRITICAL_DATA = {
+            version: 1,
+            emergency: { tel: '112', label: '112' },
+            captains: [
+                { name: 'Християн Борисов', tel: '+359877021585', viber: '+359877021585', role: 'Капитан · Осребряване' },
+                { name: 'Владимир Ненков', tel: '+359889627470', viber: '+359889627470', role: 'Капитан · ПТП' }
+            ],
+            roadside: { tel: '+359887239391', label: 'Пътна помощ' },
+            ptpRoute: { page: 'cars', tab: 'car-sos', panel: 'wizard' }
+        };
+
+        const THEME_STORAGE_KEY = 'takeaway-portal-theme';
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('theme-dark');
+            localStorage.setItem(THEME_STORAGE_KEY, isDark ? 'dark' : 'light');
+            applyThemeMeta(isDark);
+            updateThemeToggleIcon(isDark);
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem(THEME_STORAGE_KEY);
+            const preferDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('theme-dark', preferDark);
+            applyThemeMeta(preferDark);
+            updateThemeToggleIcon(preferDark);
+        }
+
+        function applyThemeMeta(isDark) {
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', isDark ? '#121212' : '#FF8000');
+            const fab = document.getElementById('ptp-fab');
+            const t = translations[currentLangCode] || translations.bg;
+            if (fab) fab.setAttribute('title', t.fab_ptp || 'ПТП / Авария');
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) themeBtn.setAttribute('aria-label', isDark ? (t.theme_light || 'Светъл') : (t.theme_dark || 'Тъмен'));
+        }
+
+        function updateThemeToggleIcon(isDark) {
+            const icon = document.getElementById('theme-icon');
+            if (!icon) return;
+            icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+
+        function registerServiceWorker() {
+            if (!('serviceWorker' in navigator) || location.protocol === 'file:') return;
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+
+        function getTierProgressPercent(orders, th, idx) {
+            if (idx >= 3) return 100;
+            const prev = idx === 0 ? 0 : th[idx - 1];
+            const next = th[idx];
+            if (!next || next <= prev) return 0;
+            return Math.min(100, Math.max(0, ((orders - prev) / (next - prev)) * 100));
+        }
+
+        function updateCalcTierProgressUI(orders, th, idx, levels, noteText, t) {
+            const tierWrap = document.getElementById('calc-tier-progress-wrap');
+            const progFillTier = document.getElementById('progFillTier');
+            const curLevelTier = document.getElementById('curLevelTextTier');
+            const progNoteTier = document.getElementById('progNoteTier');
+            if (!tierWrap) return;
+            tierWrap.classList.remove('hidden');
+            const pct = getTierProgressPercent(orders, th, idx);
+            if (progFillTier) progFillTier.style.width = pct + '%';
+            if (curLevelTier) curLevelTier.textContent = `${t.calc_level_prefix || 'НИВО:'} ${levels[idx]}`;
+            if (progNoteTier) progNoteTier.textContent = noteText;
+            document.querySelectorAll('#tierMarkers span').forEach((el, i) => {
+                el.classList.toggle('done', i < idx);
+                el.classList.toggle('active', i === idx);
+            });
+        }
+
         const CITIES_LIST = [
             { name: 'София', short: 'СФ' },
             { name: 'Пловдив', short: 'ПЛ' },
@@ -2066,13 +2685,57 @@
             }
         }
 
+        function setAppNavActive(pageId) {
+            const mainTabs = ['home', 'calculator', 'zones', 'cars'];
+            document.querySelectorAll('.app-nav-btn').forEach((btn) => {
+                const nav = btn.getAttribute('data-app-nav');
+                const active = nav === pageId && mainTabs.includes(pageId);
+                btn.classList.toggle('active', active);
+                btn.setAttribute('aria-current', active ? 'page' : 'false');
+            });
+        }
+
+        function switchAppTab(pageId) {
+            if (pageId === 'home') openCommonInfo();
+            else if (pageId === 'calculator') openCalculator();
+            else if (pageId === 'zones') openSofiaZones();
+            else if (pageId === 'cars') openCompanyCars('София', 'СФ');
+            setAppNavActive(pageId);
+        }
+
+        function openPtpEmergency() {
+            switchGlobalPage('cars');
+            setTimeout(() => {
+                openCarTab('car-sos');
+                switchSosPanel('wizard');
+                ptpReset();
+                setTimeout(() => document.getElementById('ptp-wizard')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+            }, 160);
+        }
+
         function updateMobileNavVisibility() {
             const onGuide = currentPage === 'home';
             const onCars = currentPage === 'cars';
             const mobile = isMobileView();
-            document.body.classList.toggle('has-mobile-nav', mobile && (onGuide || onCars));
-            document.getElementById('guide-mobile-nav')?.classList.toggle('hidden', !(mobile && onGuide));
-            document.getElementById('car-mobile-nav')?.classList.toggle('hidden', !(mobile && onCars));
+            document.body.classList.toggle('has-app-nav', mobile);
+            document.body.classList.toggle('has-fab', !document.body.classList.contains('splash-active'));
+            document.body.classList.toggle('has-mobile-nav', false);
+            document.getElementById('app-bottom-nav')?.classList.toggle('hidden', !mobile);
+            setAppNavActive(currentPage);
+
+            const guideNav = document.getElementById('guide-section-nav');
+            if (guideNav) {
+                const showGuideSub = onGuide && (mobile || window.innerWidth >= 640);
+                guideNav.classList.toggle('hidden-subnav', !showGuideSub);
+            }
+            const carTabs = document.getElementById('car-tabs-nav');
+            if (carTabs) {
+                const showCarSub = onCars && (mobile || window.innerWidth >= 640);
+                carTabs.classList.toggle('hidden-subnav', !showCarSub);
+            }
+
+            document.getElementById('guide-mobile-nav')?.classList.add('hidden');
+            document.getElementById('car-mobile-nav')?.classList.add('hidden');
             const locBar = document.getElementById('mobile-location-bar');
             if (locBar) {
                 const showLoc = mobile && (onGuide || onCars || currentPage === 'zones' || currentPage === 'calculator');
@@ -2176,8 +2839,13 @@
         }
 
         function switchGlobalPage(pageId) {
-            document.querySelectorAll('.global-page').forEach(page => page.classList.replace('block', 'hidden'));
-            document.getElementById('page-' + pageId).classList.replace('hidden', 'block');
+            document.querySelectorAll('.global-page').forEach(page => {
+                page.classList.remove('page-enter-active');
+                page.classList.replace('block', 'hidden');
+            });
+            const pageEl = document.getElementById('page-' + pageId);
+            pageEl.classList.replace('hidden', 'block');
+            requestAnimationFrame(() => pageEl.classList.add('page-enter-active'));
             
             currentPage = pageId;
             updateHeaderForPage();
@@ -2208,6 +2876,15 @@
             }
             updateMobileNavVisibility();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(refreshPageReveals, 120);
+        }
+
+        function refreshPageReveals() {
+            const activePage = document.querySelector('.global-page.block');
+            if (!activePage) return;
+            activePage.querySelectorAll('.reveal-on-scroll:not(.is-visible)').forEach((el, i) => {
+                setTimeout(() => el.classList.add('is-visible'), 40 + i * 45);
+            });
         }
 
         window.addEventListener('resize', () => updateMobileNavVisibility());
@@ -2215,8 +2892,10 @@
         window.addEventListener('scroll', () => {
             const header = document.getElementById('main-header');
             if (header && !header.classList.contains('hidden')) {
-                header.classList.toggle('opacity-95', window.scrollY > 20);
-                header.classList.toggle('shadow-md', window.scrollY > 20);
+                const scrolled = window.scrollY > 20;
+                header.classList.toggle('is-scrolled', scrolled);
+                header.classList.toggle('opacity-95', scrolled);
+                header.classList.toggle('shadow-md', scrolled);
             }
             updateGuideNavActive();
         });
@@ -2271,11 +2950,15 @@
             const meta = PTP_STEP_PROGRESS[stepId] || { progress: 1 };
             const labelEl = document.getElementById('ptp-progress-label');
             if (labelEl) labelEl.textContent = getPtpProgressLabel(stepId);
-            document.querySelectorAll('[data-ptp-dot]').forEach((dot) => {
-                const n = parseInt(dot.getAttribute('data-ptp-dot'), 10);
-                dot.classList.remove('active', 'done');
-                if (n < meta.progress) dot.classList.add('done');
-                else if (n === meta.progress) dot.classList.add('active');
+            document.querySelectorAll('[data-ptp-step]').forEach((step) => {
+                const n = parseInt(step.getAttribute('data-ptp-step'), 10);
+                step.classList.remove('active', 'done');
+                if (n < meta.progress) step.classList.add('done');
+                else if (n === meta.progress) step.classList.add('active');
+            });
+            document.querySelectorAll('[data-ptp-line]').forEach((line) => {
+                const n = parseInt(line.getAttribute('data-ptp-line'), 10);
+                line.classList.toggle('done', n < meta.progress);
             });
             if (stepId === '4') {
                 document.getElementById('ptp-parking-block')?.classList.toggle('hidden', !ptpNeedsParking);
@@ -2321,10 +3004,10 @@
             bg: {
                 lang_name: "БГ | Български", nav_home: "Начало",
                 city_topics_label: "Раздели за този град", city_link_guide: "Куриерски наръчник", city_link_guide_desc: "Стартови точки, плащания, графици", city_link_cars: "Служебни коли", city_link_cars_desc: "Паркинг, поддръжка, аварии", city_link_captain: "Капитан", city_link_captain_desc: "Обаждане и Viber", cars_back_guide: "Обратно към наръчника",
-                welcome_title: "Добре дошли!", welcome_desc: "Изберете раздел — обща информация, калкулатор, стартови зони София или служебни коли.", hub_common_title: "Обща информация", hub_common_desc: "Плащания, графици, доходи, диспечери и администрация — за всички градове.", hub_calc_title: "Калкулатор", hub_calc_desc: "Симулатор на заплата — изберете град и въведете данни.", hub_zones_title: "Стартови зони — София", hub_zones_desc: "Карта с 4-те официални зони за пускане на смяна.", hub_cars_title: "Служебни коли — София", hub_cars_desc: "Паркинг, поддръжка, ПТП и уведомяване на капитан.", common_badge: "За всички градове", common_title: "Обща информация", common_desc: "Плащания, графици, доходи и контакти — еднакви правила за всички куриери. Изберете град за доходи и капитан.", common_city_lbl: "Град", common_city_hint: "Доходи, бонуси и капитан", open_calc_btn: "Отвори калкулатор на заплата →", calc_page_title: "Калкулатор на заплата", calc_page_desc: "Изберете град и въведете данни, за да видите очакван бруто и нето.", calc_city_lbl: "Град", zones_page_title: "Стартови зони (София)", zones_badge: "София", cars_back_home: "Обратно към началото",
+                welcome_title: "Добре дошли!", welcome_desc: "Изберете раздел — обща информация, калкулатор, стартови зони София или служебни коли.", hub_section_eyebrow: "Портал", hub_section_title: "Избери раздел", hub_section_desc: "Всичко важно на едно място — от заплата до ПТП.", hub_common_title: "Обща информация", hub_common_desc: "Плащания, графици, доходи, диспечери и администрация — за всички градове.", hub_calc_title: "Калкулатор", hub_calc_desc: "Симулатор на заплата — изберете град и въведете данни.", hub_zones_title: "Стартови зони — София", hub_zones_desc: "Карта с 4-те официални зони за пускане на смяна.", hub_cars_title: "Служебни коли — София", hub_cars_desc: "Паркинг, поддръжка, ПТП и уведомяване на капитан.", common_badge: "За всички градове", common_title: "Обща информация", common_desc: "Плащания, графици, доходи и контакти — еднакви правила за всички куриери. Изберете град за доходи и капитан.", common_city_lbl: "Град", common_city_hint: "Доходи, бонуси и капитан", open_calc_btn: "Отвори калкулатор на заплата →", calc_page_title: "Калкулатор на заплата", calc_page_desc: "Изберете град и въведете данни, за да видите очакван бруто и нето.", calc_city_lbl: "Град", zones_page_title: "Стартови зони (София)", zones_badge: "София", cars_back_home: "Обратно към началото",
                 city_sofia: "София", city_plovdiv: "Пловдив", city_varna: "Варна", city_burgas: "Бургас", city_ruse: "Русе", city_stara_zagora: "Стара Загора", city_pleven: "Плевен", city_pernik: "Перник", city_blagoevgrad: "Благоевград", city_veliko_tarnovo: "Велико Търново", city_kazanlak: "Казанлък", city_gabrovo: "Габрово",
                 city_captain_title: "Капитан", city_captain_desc: "Директен контакт с капитана на града.", city_captain_role: "Капитан", city_captain_reimburse_role: "Капитан · Осребряване",
-                nav_sec_intro: "Въведение", nav_sec_map: "Стартови точки", nav_sec_pay: "Плащания", nav_sec_schedule: "Графици", nav_sec_income: "Доходи", nav_sec_contacts: "Контакти", nav_mob_pay: "Плащ.", nav_mob_schedule: "График", nav_mob_income: "Доход", nav_mob_contacts: "Контакт", nav_mob_car_map: "Карта", nav_mob_car_maint: "Поддр.", nav_mob_car_sos: "ПТП", nav_mob_car_notify: "Увед.",
+                nav_sec_intro: "Въведение", nav_sec_map: "Стартови точки", nav_sec_pay: "Плащания", nav_sec_schedule: "Графици", nav_sec_income: "Доходи", nav_sec_contacts: "Контакти", nav_mob_pay: "Плащ.", nav_mob_schedule: "График", nav_mob_income: "Доход", nav_mob_contacts: "Контакт", nav_mob_car_map: "Карта", nav_mob_car_maint: "Поддр.", nav_mob_car_sos: "ПТП", nav_mob_car_notify: "Увед.", app_nav_home: "Начало", app_nav_calc: "Заплата", app_nav_zones: "Зони", app_nav_cars: "Автопарк", theme_dark: "Тъмен режим", theme_light: "Светъл режим", fab_ptp: "ПТП / Авария", ptp_step_lbl_1: "Оглед", ptp_step_lbl_2: "Протокол", ptp_step_lbl_3: "Капитан", ptp_step_lbl_4: "Паркинг",
                 hero_badge: "АКТУАЛЕН НАРЪЧНИК 2026", hero_title: "Всичко за твоя успешен старт в Takeaway", hero_desc: "Добре дошли в нашия портал! Тук сме събрали актуалната информация за стартовите точки, методологията на плащане и директни контакти към ключовите отдели.",
                 map_title: "1. Стартови точки (София)", map_desc: "Интерактивна GPS карта с разпределение на официалните четири стартови зони в столицата.",
                 map_subtitle: "Ключови райони", map_text: "Официалните стартови точки са съобразени с гъстотата на поръчките и гарантират бърз старт на работния ви ден.",
@@ -2397,16 +3080,16 @@
                 car_protocol_p13: "Чертаят схема на инцидента.",
                 car_protocol_p14: "В забележката пишат: <strong>НЕВИНЕН</strong> или <strong>ВИНОВЕН</strong> съм.",
                 car_protocol_p15: "Подписи в бялото поле от двамата водачи.",
-                car_contact_title: "4. Телефонен указател", car_contact_desc: "Списък с отговорниците за автопарка. Използвайте бутоните за директно набиране.", car_c1_role: "Капитан", car_c1_desc: "Осребряване и проблеми с разпределението на колите. При промяна по графика — задължително го уведоми.", car_c1_hours: "Пон-Пет | 12:00 - 18:00", car_c2_role: "Капитан", car_c2_desc: "Проблеми с колата, ПТП и поддръжка на служебните автомобили.", car_c2_hours: "Пон-Пет | 10:00 - 18:00", car_c3_title: "Пътна помощ", car_c3_role: "Денонощен репатрак", car_c3_desc: "Звънете на този номер само след предварително съгласуване с Капитан.", car_btn_call: "Позвъни", car_cap_hours: "Пон-Пет | 10:00 - 18:00",
+                car_contact_title: "4. Телефонен указател", car_contact_desc: "Списък с отговорниците за автопарка. Позвъни или пиши по Viber.", car_c1_role: "Капитан", car_c1_desc: "Осребряване и проблеми с разпределението на колите. При промяна по графика — задължително го уведоми.", car_c1_hours: "Пон-Пет | 12:00 - 18:00", car_c2_role: "Капитан", car_c2_desc: "Проблеми с колата, ПТП и поддръжка на служебните автомобили.", car_c2_hours: "Пон-Пет | 10:00 - 18:00", car_c3_title: "Пътна помощ", car_c3_role: "Денонощен репатрак", car_c3_desc: "Звънете на този номер само след предварително съгласуване с Капитан.", car_btn_call: "Позвъни", car_btn_viber: "Viber", car_cap_hours: "Пон-Пет | 10:00 - 18:00",
                 btn_show_sample: "Виж примерния протокол"
             },
             en: {
                 lang_name: "EN | English", nav_home: "Home",
                 city_topics_label: "Sections for this city", city_link_guide: "Courier guide", city_link_guide_desc: "Starting points, payments, schedules", city_link_cars: "Company cars", city_link_cars_desc: "Parking, maintenance, accidents", city_link_captain: "Captain", city_link_captain_desc: "Call and Viber", cars_back_guide: "Back to city guide",
-                welcome_title: "Welcome!", welcome_desc: "Choose a section — common information, calculator, Sofia starting zones, or company cars.", hub_common_title: "Common information", hub_common_desc: "Payments, schedules, income, dispatchers and administration — for all cities.", hub_calc_title: "Calculator", hub_calc_desc: "Salary simulator — select city and enter your data.", hub_zones_title: "Starting zones — Sofia", hub_zones_desc: "Map with the 4 official shift-start zones.", hub_cars_title: "Company cars — Sofia", hub_cars_desc: "Parking, maintenance, accidents and captain notification.", common_badge: "All cities", common_title: "Common information", common_desc: "Payments, schedules, income and contacts — same rules for all couriers. Select city for income and captain.", common_city_lbl: "City", common_city_hint: "Income, bonuses and captain", open_calc_btn: "Open salary calculator →", calc_page_title: "Salary calculator", calc_page_desc: "Select city and enter data to see expected gross and net.", calc_city_lbl: "City", zones_page_title: "Starting zones (Sofia)", zones_badge: "Sofia", cars_back_home: "Back to home",
+                welcome_title: "Welcome!", welcome_desc: "Choose a section — common information, calculator, Sofia starting zones, or company cars.", hub_section_eyebrow: "Portal", hub_section_title: "Choose a section", hub_section_desc: "Everything that matters in one place — from pay to accidents.", hub_common_title: "Common information", hub_common_desc: "Payments, schedules, income, dispatchers and administration — for all cities.", hub_calc_title: "Calculator", hub_calc_desc: "Salary simulator — select city and enter your data.", hub_zones_title: "Starting zones — Sofia", hub_zones_desc: "Map with the 4 official shift-start zones.", hub_cars_title: "Company cars — Sofia", hub_cars_desc: "Parking, maintenance, accidents and captain notification.", common_badge: "All cities", common_title: "Common information", common_desc: "Payments, schedules, income and contacts — same rules for all couriers. Select city for income and captain.", common_city_lbl: "City", common_city_hint: "Income, bonuses and captain", open_calc_btn: "Open salary calculator →", calc_page_title: "Salary calculator", calc_page_desc: "Select city and enter data to see expected gross and net.", calc_city_lbl: "City", zones_page_title: "Starting zones (Sofia)", zones_badge: "Sofia", cars_back_home: "Back to home",
                 city_sofia: "Sofia", city_plovdiv: "Plovdiv", city_varna: "Varna", city_burgas: "Burgas", city_ruse: "Ruse", city_stara_zagora: "Stara Zagora", city_pleven: "Pleven", city_pernik: "Pernik", city_blagoevgrad: "Blagoevgrad", city_veliko_tarnovo: "Veliko Tarnovo", city_kazanlak: "Kazanlak", city_gabrovo: "Gabrovo",
                 city_captain_title: "Captain", city_captain_desc: "Direct contact with the city captain.", city_captain_role: "Captain", city_captain_reimburse_role: "Captain · Reimbursement",
-                nav_sec_intro: "Introduction", nav_sec_map: "Starting points", nav_sec_pay: "Payments", nav_sec_schedule: "Schedules", nav_sec_income: "Income", nav_sec_contacts: "Contacts", nav_mob_pay: "Pay", nav_mob_schedule: "Sched.", nav_mob_income: "Income", nav_mob_contacts: "Contact", nav_mob_car_map: "Map", nav_mob_car_maint: "Maint.", nav_mob_car_sos: "SOS", nav_mob_car_notify: "Notify",
+                nav_sec_intro: "Introduction", nav_sec_map: "Starting points", nav_sec_pay: "Payments", nav_sec_schedule: "Schedules", nav_sec_income: "Income", nav_sec_contacts: "Contacts", nav_mob_pay: "Pay", nav_mob_schedule: "Sched.", nav_mob_income: "Income", nav_mob_contacts: "Contact", nav_mob_car_map: "Map", nav_mob_car_maint: "Maint.", nav_mob_car_sos: "SOS", nav_mob_car_notify: "Notify", app_nav_home: "Home", app_nav_calc: "Pay", app_nav_zones: "Zones", app_nav_cars: "Fleet", theme_dark: "Dark mode", theme_light: "Light mode", fab_ptp: "Accident / SOS", ptp_step_lbl_1: "Check", ptp_step_lbl_2: "Protocol", ptp_step_lbl_3: "Captain", ptp_step_lbl_4: "Parking",
                 hero_badge: "LATEST GUIDE 2026", hero_title: "Everything for your successful start at Takeaway", hero_desc: "Welcome to our portal! Here we have gathered the latest information about the starting points, payment methodology, and direct contacts to key departments.",
                 map_title: "1. Starting Points (Sofia)", map_desc: "Interactive GPS map with the distribution of the official four starting zones in the capital.",
                 map_subtitle: "Key Areas", map_text: "The official starting points are tailored to order density and guarantee a quick start to your working day.",
@@ -2479,7 +3162,7 @@
                 car_protocol_p13: "Draw an accident diagram.",
                 car_protocol_p14: "In remarks write: I am <strong>NOT AT FAULT</strong> / <strong>AT FAULT</strong>.",
                 car_protocol_p15: "Signatures in the white field by both drivers.",
-                car_contact_title: "4. Phone Directory", car_contact_desc: "List of fleet managers. Use the buttons for direct calling.", car_c1_role: "Captain", car_c1_desc: "Reimbursement and car distribution issues. Notify him of any schedule changes.", car_c1_hours: "Mon-Fri | 12:00 - 18:00", car_c2_role: "Captain", car_c2_desc: "Car problems, accidents (PTP), and fleet maintenance.", car_c2_hours: "Mon-Fri | 10:00 - 18:00", car_c3_title: "Tow Truck / Assistance", car_c3_role: "24/7 Service", car_c3_desc: "Call this number only after prior consultation with a Captain.", car_btn_call: "Call Now", car_cap_hours: "Mon-Fri | 10:00 - 18:00",
+                car_contact_title: "4. Phone Directory", car_contact_desc: "Fleet contacts. Call or message on Viber.", car_c1_role: "Captain", car_c1_desc: "Reimbursement and car distribution issues. Notify him of any schedule changes.", car_c1_hours: "Mon-Fri | 12:00 - 18:00", car_c2_role: "Captain", car_c2_desc: "Car problems, accidents (PTP), and fleet maintenance.", car_c2_hours: "Mon-Fri | 10:00 - 18:00", car_c3_title: "Tow Truck / Assistance", car_c3_role: "24/7 Service", car_c3_desc: "Call this number only after prior consultation with a Captain.", car_btn_call: "Call Now", car_btn_viber: "Viber", car_cap_hours: "Mon-Fri | 10:00 - 18:00",
                 btn_show_sample: "View sample sheet"
             }
         };
@@ -2573,9 +3256,9 @@
                         ${hoursHtml}
                         <p class="text-xs text-gray-500 mt-2 font-mono">${cap.phone}</p>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <a href="tel:${tel}" class="flex items-center justify-center gap-2 py-2.5 bg-white border border-gray-200 hover:border-brand-orange hover:text-brand-orange text-brand-dark font-bold rounded-xl text-sm shadow-sm transition"><i class="fa-solid fa-phone"></i> ${t.car_btn_call || 'Позвъни'}</a>
-                        <a href="${viberLink(cap.phone)}" class="flex items-center justify-center gap-2 py-2.5 bg-[#7360f2] hover:bg-[#5f4ed4] text-white font-bold rounded-xl text-sm shadow-sm transition"><i class="fa-brands fa-viber"></i> Viber</a>
+                    <div class="btn-call-row">
+                        <a href="tel:${tel}" class="btn-call"><i class="fa-solid fa-phone"></i> ${t.car_btn_call || 'Позвъни'}</a>
+                        <a href="${viberLink(cap.phone)}" class="btn-viber"><i class="fa-brands fa-viber"></i> Viber</a>
                     </div>
                 </div>`;
             }).join('');
@@ -2621,8 +3304,8 @@
         window.addEventListener('click', (e) => {
             const langBtn = document.getElementById('lang-btn');
             const langMenu = document.getElementById('lang-menu');
-            const langFixed = document.getElementById('lang-fixed');
-            if (langBtn && langMenu && langFixed && !langFixed.contains(e.target)) {
+            const topControls = document.getElementById('top-controls');
+            if (langBtn && langMenu && topControls && !topControls.contains(e.target)) {
                 langMenu.classList.add('hidden');
             }
         });
@@ -2652,6 +3335,7 @@
                 updateUI();
             }
             updateHeaderForPage();
+            applyThemeMeta(document.documentElement.classList.contains('theme-dark'));
             renderContractCards();
             if (currentPage === 'zones') {
                 updateMapSectionForCity('София');
@@ -2859,6 +3543,9 @@
             set('outNet', '0.00 €');
             const progFill = document.getElementById('progFill');
             if (progFill) progFill.style.width = '0%';
+            const progFillTier = document.getElementById('progFillTier');
+            if (progFillTier) progFillTier.style.width = '0%';
+            document.getElementById('calc-tier-progress-wrap')?.classList.add('hidden');
             const tiersDiv = document.getElementById('tiersDetail');
             if (tiersDiv) tiersDiv.innerHTML = '';
             const rowAmort = document.getElementById('rowAmort');
@@ -2917,12 +3604,13 @@
                 const progFill = document.getElementById('progFill');
                 if (curLevel) curLevel.textContent = `${t.calc_level_prefix || 'НИВО:'} ${levels[idx]}`;
                 if (nextLevel) nextLevel.textContent = idx < 3 ? `${t.calc_next_level || 'СЛЕДВАЩ:'} ${levels[idx + 1]}` : (t.calc_max_level || 'МАКСИМУМ');
-                if (progFill) progFill.style.width = Math.min((orders / (th[idx] || th[2])) * 100, 100) + '%';
-                if (progNote) {
-                    progNote.textContent = idx < 3
-                        ? (t.calc_orders_to_next || 'Още {n} поръчки до следващо ниво').replace('{n}', Math.max(0, th[idx] - orders))
-                        : (t.calc_max_level_note || 'Максимално ниво!');
-                }
+                const pct = getTierProgressPercent(orders, th, idx);
+                if (progFill) progFill.style.width = pct + '%';
+                const noteText = idx < 3
+                    ? (t.calc_orders_to_next || 'Още {n} поръчки до следващо ниво').replace('{n}', Math.max(0, th[idx] - orders))
+                    : (t.calc_max_level_note || 'Максимално ниво!');
+                if (progNote) progNote.textContent = noteText;
+                updateCalcTierProgressUI(orders, th, idx, levels, noteText, t);
 
                 n.forEach((val, i) => {
                     if (val > 0 && tiersDiv) {
@@ -2936,6 +3624,7 @@
                 bonusGross = orders * FIXED_BONUS_RATE;
                 const progFill = document.getElementById('progFill');
                 if (progFill) progFill.style.width = '100%';
+                document.getElementById('calc-tier-progress-wrap')?.classList.add('hidden');
                 const curLevel = document.getElementById('curLevelText');
                 const nextLevel = document.getElementById('nextLevelText');
                 const progNote = document.getElementById('progNote');
@@ -2984,7 +3673,9 @@
         function renderHelperQuickLinks() {
             const container = document.getElementById('quickLinksContainer'); container.innerHTML = '';
             helperQuickLinks[currentLangCode].forEach(link => {
-                const btn = document.createElement('button'); btn.className = "px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold text-brand-slate hover:border-brand-orange hover:text-brand-orange hover:shadow-md transition-all cursor-pointer"; btn.innerText = link.l;
+                const btn = document.createElement('button');
+                btn.className = 'quick-pill';
+                btn.innerText = link.l;
                 btn.onclick = () => { document.getElementById('searchInput').value = link.t; document.getElementById('searchInput').dispatchEvent(new Event('input')); };
                 container.appendChild(btn);
             });
@@ -3234,6 +3925,36 @@
             }
         }
 
+        function initDesignUX() {
+            const revealSelectors = '#page-home > section, #page-zones section, .car-tab-section, #car-page-hero';
+            document.querySelectorAll(revealSelectors).forEach((el, i) => {
+                el.classList.add('portal-section');
+                if (!el.classList.contains('reveal-on-scroll')) {
+                    el.classList.add('reveal-on-scroll');
+                    if (i % 3 === 1) el.classList.add('reveal-delay-1');
+                    if (i % 3 === 2) el.classList.add('reveal-delay-2');
+                }
+            });
+
+            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (!prefersReduced && 'IntersectionObserver' in window) {
+                const revealObserver = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            revealObserver.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+                document.querySelectorAll('.reveal-on-scroll').forEach((el) => {
+                    if (!el.classList.contains('is-visible')) revealObserver.observe(el);
+                });
+            } else {
+                document.querySelectorAll('.reveal-on-scroll').forEach((el) => el.classList.add('is-visible'));
+            }
+            setTimeout(refreshPageReveals, 300);
+        }
+
         function initMobileUX() {
             document.querySelectorAll('.tooltip-container .fa-circle-info').forEach((icon) => {
                 icon.setAttribute('tabindex', '0');
@@ -3278,11 +3999,15 @@
             splash.setAttribute('aria-hidden', 'true');
             document.body.classList.remove('splash-active');
             document.body.classList.add('splash-revealed');
+            updateMobileNavVisibility();
             setTimeout(() => splash.remove(), 800);
         }
 
         window.onload = function() {
+            initTheme();
+            registerServiceWorker();
             initMaps();
+            initDesignUX();
             initMobileUX();
             setLang('bg');
             renderHelperQuickLinks();
