@@ -1063,6 +1063,55 @@
         .car-notify-platform li { margin-bottom: 0.35rem; }
         .car-notify-platform li:last-child { margin-bottom: 0; }
 
+        .guide-zoomable {
+            cursor: zoom-in;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .guide-zoomable:active { opacity: 0.9; transform: scale(0.99); }
+        .guide-zoom-hint {
+            text-align: center; font-size: 0.68rem; font-weight: 800;
+            color: #64748b; margin: 0.5rem 0 0; letter-spacing: 0.02em;
+        }
+        html.theme-dark .guide-zoom-hint { color: #94a3b8; }
+
+        .image-lightbox {
+            position: fixed; inset: 0; z-index: 300;
+            background: rgba(0, 0, 0, 0.94);
+            display: flex; flex-direction: column;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+        .image-lightbox.hidden { display: none; }
+        body.lightbox-open { overflow: hidden; }
+        .image-lightbox-close {
+            position: absolute;
+            top: max(0.65rem, env(safe-area-inset-top));
+            right: max(0.65rem, env(safe-area-inset-right));
+            z-index: 2; width: 2.75rem; height: 2.75rem; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.18); color: #fff; border: 1px solid rgba(255,255,255,0.25);
+            font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(6px);
+        }
+        .image-lightbox-close:hover { background: rgba(255, 255, 255, 0.28); }
+        .image-lightbox-scroll {
+            flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch;
+            display: flex; align-items: flex-start; justify-content: center;
+            padding: 3.25rem 0.35rem 0.75rem;
+        }
+        #image-lightbox-img {
+            display: block; width: auto; height: auto;
+            max-width: min(100%, 1200px);
+            object-fit: contain;
+            border-radius: 0.35rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+        }
+        @media (max-width: 640px) {
+            #image-lightbox-img { max-width: none; min-width: 100%; }
+        }
+        .image-lightbox-foot {
+            flex-shrink: 0; text-align: center; padding: 0.5rem 1rem 0.75rem;
+            font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.65);
+        }
+
         /* Salary calculator */
         .calc-shell { max-width: 1000px; margin: 0 auto; padding: 0 4px 16px; }
         .calc-header-container {
@@ -3059,6 +3108,14 @@
         </div>
     </footer>
 
+    <div id="image-lightbox" class="image-lightbox hidden" role="dialog" aria-modal="true" aria-label="Снимка на цял екран" onclick="closeImageLightboxOnBackdrop(event)">
+        <button type="button" class="image-lightbox-close" onclick="closeImageLightbox()" aria-label="Затвори"><i class="fa-solid fa-xmark"></i></button>
+        <div class="image-lightbox-scroll">
+            <img id="image-lightbox-img" src="" alt="">
+        </div>
+        <p class="image-lightbox-foot" data-i18n="guide_zoom_close">Плъзни за преглед · натисни извън снимката или ✕ за затваряне</p>
+    </div>
+
     <script>
         /** Критични данни — винаги в страницата за офлайн достъп (ПТП, телефони) */
         const OFFLINE_CRITICAL_DATA = {
@@ -4184,7 +4241,7 @@
                 car_protocol_p14: "В забележката пишат: <strong>НЕВИНЕН</strong> или <strong>ВИНОВЕН</strong> съм.",
                 car_protocol_p15: "Подписи в бялото поле от двамата водачи.",
                 car_contact_title: "4. Телефонен указател", car_contact_desc: "Списък с отговорниците за автопарка. Позвъни или пиши по Viber.", car_c1_role: "Капитан", car_c1_desc: "Осребряване и проблеми с разпределението на колите. При промяна по графика — задължително го уведоми.", car_c1_hours: "Пон-Пет | 12:00 - 18:00", car_c2_role: "Капитан", car_c2_desc: "Проблеми с колата, ПТП и поддръжка на служебните автомобили.", car_c2_hours: "Пон-Пет | 10:00 - 18:00", car_c3_title: "Пътна помощ", car_c3_role: "Денонощен репатрак", car_c3_desc: "Звънете на този номер само след предварително съгласуване с Капитан.", car_btn_call: "Позвъни", car_btn_viber: "Viber", car_cap_hours: "Пон-Пет | 10:00 - 18:00",
-                btn_show_sample: "Виж примерния протокол", btn_show_car_notify: "Виж визуален наръчник (Авто Иконом)", btn_hide_car_notify: "Скрий наръчника"
+                btn_show_sample: "Виж примерния протокол", btn_show_car_notify: "Виж визуален наръчник (Авто Иконом)", btn_hide_car_notify: "Скрий наръчника", guide_zoom_hint: "Натисни за цял екран", guide_zoom_close: "Плъзни за преглед · натисни извън снимката или ✕ за затваряне"
             },
             en: {
                 lang_name: "EN | English", nav_home: "Home",
@@ -4267,7 +4324,7 @@
                 car_protocol_p14: "In remarks write: I am <strong>NOT AT FAULT</strong> / <strong>AT FAULT</strong>.",
                 car_protocol_p15: "Signatures in the white field by both drivers.",
                 car_contact_title: "4. Phone Directory", car_contact_desc: "Fleet contacts. Call or message on Viber.", car_c1_role: "Captain", car_c1_desc: "Reimbursement and car distribution issues. Notify him of any schedule changes.", car_c1_hours: "Mon-Fri | 12:00 - 18:00", car_c2_role: "Captain", car_c2_desc: "Car problems, accidents (PTP), and fleet maintenance.", car_c2_hours: "Mon-Fri | 10:00 - 18:00", car_c3_title: "Tow Truck / Assistance", car_c3_role: "24/7 Service", car_c3_desc: "Call this number only after prior consultation with a Captain.", car_btn_call: "Call Now", car_btn_viber: "Viber", car_cap_hours: "Mon-Fri | 10:00 - 18:00",
-                btn_show_sample: "View sample sheet", btn_show_car_notify: "View visual guide (Avto Ikonom)", btn_hide_car_notify: "Hide guide"
+                btn_show_sample: "View sample sheet", btn_show_car_notify: "View visual guide (Avto Ikonom)", btn_hide_car_notify: "Hide guide", guide_zoom_hint: "Tap for full screen", guide_zoom_close: "Swipe to view · tap outside or ✕ to close"
             }
         };
 
@@ -4919,6 +4976,54 @@
         }
 
         // --- ПОКАЗВАНЕ / СКРИВАНЕ НА ПРОТОКОЛА ---
+        function appendGuideImage(container, src, alt) {
+            const wrap = document.createElement('div');
+            wrap.className = 'guide-image-wrap';
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = alt;
+            img.className = 'guide-zoomable w-full h-auto rounded-lg object-contain';
+            img.loading = 'lazy';
+            img.addEventListener('click', () => openImageLightbox(src, alt));
+            const hint = document.createElement('p');
+            hint.className = 'guide-zoom-hint';
+            hint.setAttribute('data-i18n', 'guide_zoom_hint');
+            const t = translations[currentLangCode] || translations.bg;
+            hint.textContent = t.guide_zoom_hint || 'Натисни за цял екран';
+            wrap.appendChild(img);
+            wrap.appendChild(hint);
+            container.appendChild(wrap);
+        }
+
+        function openImageLightbox(src, alt) {
+            const lb = document.getElementById('image-lightbox');
+            const img = document.getElementById('image-lightbox-img');
+            if (!lb || !img) return;
+            img.src = src;
+            img.alt = alt || '';
+            lb.classList.remove('hidden');
+            document.body.classList.add('lightbox-open');
+        }
+
+        function closeImageLightbox() {
+            const lb = document.getElementById('image-lightbox');
+            if (!lb) return;
+            lb.classList.add('hidden');
+            document.body.classList.remove('lightbox-open');
+        }
+
+        function closeImageLightboxOnBackdrop(e) {
+            if (e.target.id === 'image-lightbox' || e.target.classList.contains('image-lightbox-scroll')) {
+                closeImageLightbox();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !document.getElementById('image-lightbox')?.classList.contains('hidden')) {
+                closeImageLightbox();
+            }
+        });
+
         function toggleProtocolImage() {
             const container = document.getElementById('protocol-image-container');
             const btn = document.getElementById('btn-toggle-protocol');
@@ -4926,12 +5031,11 @@
             
             if (container.classList.contains('hidden')) {
                 if (!container.querySelector('img')) {
-                    const img = document.createElement('img');
-                    img.src = 'protokol.jpg';
-                    img.alt = lang === 'en' ? 'Accident protocol sample' : 'Примерен протокол';
-                    img.className = 'w-full h-auto rounded-lg object-contain';
-                    img.loading = 'lazy';
-                    container.appendChild(img);
+                    appendGuideImage(
+                        container,
+                        'protokol.jpg',
+                        lang === 'en' ? 'Accident protocol sample' : 'Примерен протокол'
+                    );
                 }
                 container.classList.remove('hidden');
                 btn.innerHTML = `<i class="fa-solid fa-eye-slash"></i> <span>${lang === 'en' ? 'Hide sample' : 'Скрий примера'}</span>`;
@@ -4954,12 +5058,11 @@
 
             if (container.classList.contains('hidden')) {
                 if (!container.querySelector('img')) {
-                    const img = document.createElement('img');
-                    img.src = 'avto-ikonom-notify.jpg';
-                    img.alt = lang === 'en' ? 'Avto Ikonom captain notification guide' : 'Визуален наръчник за уведомяване в Авто Иконом';
-                    img.className = 'w-full h-auto rounded-lg object-contain';
-                    img.loading = 'lazy';
-                    container.appendChild(img);
+                    appendGuideImage(
+                        container,
+                        'avto-ikonom-notify.png',
+                        lang === 'en' ? 'Avto Ikonom captain notification guide' : 'Визуален наръчник за уведомяване в Авто Иконом'
+                    );
                 }
                 container.classList.remove('hidden');
                 btn.innerHTML = `<i class="fa-solid fa-eye-slash"></i> <span>${t.btn_hide_car_notify || (lang === 'en' ? 'Hide guide' : 'Скрий наръчника')}</span>`;
