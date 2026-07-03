@@ -177,8 +177,12 @@
         html.theme-dark .calc-field select, html.theme-dark .calc-field input, html.theme-dark #searchInput { background: #2a2a2a; color: #f5f5f5; border-color: rgba(255,255,255,0.12); }
         html.theme-dark #lang-btn, html.theme-dark #theme-toggle { background: rgba(30,30,30,0.95); border-color: rgba(255,255,255,0.12); color: var(--text-primary); }
         html.theme-dark .quick-pill { background: #2a2a2a; border-color: rgba(255,255,255,0.12); color: var(--text-secondary); }
+        html.theme-dark .learn-card { border-color: rgba(255,255,255,0.08); }
+        html.theme-dark .learn-modal-panel,
+        html.theme-dark .learn-prompt-card { background: var(--surface-card); }
+        html.theme-dark .learn-btn--ghost { background: rgba(255,255,255,0.08); color: var(--text-secondary); }
 
-        #top-controls { display: flex; align-items: center; gap: 0.5rem; }
+        #top-controls { display: flex; align-items: center; gap: 0.5rem; flex-wrap: nowrap; }
         #theme-toggle {
             width: 2.75rem; height: 2.75rem; min-height: 2.75rem;
             display: flex; align-items: center; justify-content: center;
@@ -520,6 +524,16 @@
         .tooltip-content { display: none; opacity: 0; transition: opacity 0.3s; }
         .tooltip-container:hover .tooltip-content, .tooltip-container:focus-within .tooltip-content { display: block; opacity: 1; }
         .search-input:focus { box-shadow: 0 0 0 4px rgba(255, 122, 0, 0.25); }
+        .search-help-btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            margin-top: 0.5rem; padding: 0.4rem 0.85rem; border-radius: 999px;
+            font-size: 0.72rem; font-weight: 800; line-height: 1;
+            border: 1px solid rgba(255, 128, 0, 0.35);
+            background: rgba(255, 128, 0, 0.08); color: var(--brand-orange);
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .search-help-btn:hover { background: rgba(255, 128, 0, 0.16); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255, 128, 0, 0.15); }
+        html.theme-dark .search-help-btn { background: rgba(255, 128, 0, 0.12); border-color: rgba(255, 128, 0, 0.3); }
         .result-card { animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse-orange { 0% { box-shadow: 0 0 0 0 rgba(255, 122, 0, 0.8); } 70% { box-shadow: 0 0 0 12px rgba(255, 122, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 122, 0, 0); } }
@@ -1124,6 +1138,558 @@
             .calc-breakdown-val-net { font-size: 11px; }
             .calc-breakdown-final-net { font-size: 26px; }
         }
+
+        /* ── Обучение: анимирани мини-демота ── */
+        #learn-help-btn {
+            width: 2.75rem; height: 2.75rem; min-height: 2.75rem;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 999px; border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            color: #2563eb; font-size: 1rem; cursor: pointer;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08); transition: all 0.3s ease;
+        }
+        #learn-help-btn:hover { border-color: #2563eb; transform: scale(1.05); }
+        html.theme-dark #learn-help-btn { background: rgba(30,30,30,0.95); border-color: rgba(255,255,255,0.12); color: #60a5fa; }
+
+        .learn-section { margin-top: 0.5rem; }
+        .learn-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;
+        }
+        @media (min-width: 640px) { .learn-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; } }
+        .learn-card {
+            display: flex; flex-direction: column; align-items: stretch; text-align: left;
+            padding: 0; border: 2px solid rgba(0,0,0,0.06); border-radius: 1.25rem;
+            background: var(--surface-card); overflow: hidden; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .learn-card:hover, .learn-card:focus-visible {
+            border-color: rgba(37, 99, 235, 0.35); transform: translateY(-3px);
+            box-shadow: 0 12px 28px -10px rgba(37, 99, 235, 0.2);
+        }
+        .learn-card-preview {
+            height: 7.5rem; background: linear-gradient(180deg, #f0f4ff 0%, #e8ecf8 100%);
+            position: relative; overflow: hidden; flex-shrink: 0;
+        }
+        html.theme-dark .learn-card-preview { background: linear-gradient(180deg, #1a1f2e 0%, #121820 100%); }
+        .learn-card-body { padding: 0.85rem 1rem 1rem; }
+        .learn-card-body h3 { font-size: 0.8rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.25rem; line-height: 1.25; }
+        .learn-card-body p { font-size: 0.7rem; color: var(--text-secondary); margin: 0; line-height: 1.35; }
+        .learn-card-badge {
+            position: absolute; top: 0.5rem; right: 0.5rem;
+            font-size: 0.55rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+            background: rgba(255,128,0,0.15); color: var(--brand-orange); padding: 0.15rem 0.45rem; border-radius: 999px;
+        }
+
+        /* Мини-превю в картите */
+        .learn-thumb { transform: scale(0.42); transform-origin: top center; width: 240%; margin-left: -70%; pointer-events: none; }
+        .learn-thumb .phone-mock { margin: 0 auto; }
+
+        body.learn-open { overflow: hidden; }
+        .learn-modal {
+            position: fixed; inset: 0; z-index: 200;
+            display: flex; align-items: flex-end; justify-content: center;
+            padding: 0; transition: opacity 0.3s ease;
+        }
+        .learn-modal.hidden { display: none; }
+        .learn-modal-backdrop {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(4px);
+        }
+        .learn-modal-panel {
+            position: relative; z-index: 1; width: 100%; max-width: 28rem;
+            max-height: 92vh; max-height: 92dvh;
+            background: var(--surface-card); border-radius: 1.5rem 1.5rem 0 0;
+            box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column;
+            animation: learnPanelIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        @media (min-width: 640px) {
+            .learn-modal { align-items: center; padding: 1.5rem; }
+            .learn-modal-panel { border-radius: 1.5rem; max-height: 88vh; }
+        }
+        @keyframes learnPanelIn {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .learn-modal-head {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 1rem 1.25rem 0.75rem; border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        html.theme-dark .learn-modal-head { border-color: rgba(255,255,255,0.08); }
+        .learn-modal-icon {
+            width: 2.5rem; height: 2.5rem; border-radius: 0.75rem;
+            background: rgba(37,99,235,0.12); color: #2563eb;
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;
+        }
+        .learn-modal-head h2 { font-size: 1rem; font-weight: 800; margin: 0; color: var(--text-primary); }
+        .learn-modal-close {
+            margin-left: auto; width: 2.25rem; height: 2.25rem; border-radius: 999px;
+            border: none; background: rgba(0,0,0,0.05); color: var(--text-secondary);
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .learn-modal-close:hover { background: rgba(220,53,69,0.1); color: #dc3545; }
+        .learn-demo-stage {
+            padding: 1rem 1.25rem; min-height: 280px;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(180deg, rgba(255,128,0,0.05) 0%, transparent 100%);
+        }
+        .learn-step-text {
+            padding: 0 1.25rem 0.75rem; font-size: 0.875rem; line-height: 1.5;
+            color: var(--text-secondary); margin: 0; min-height: 3.5rem;
+        }
+        .learn-step-dots {
+            display: flex; justify-content: center; gap: 0.35rem; padding: 0 1.25rem 0.5rem;
+        }
+        .learn-step-dots span {
+            width: 0.45rem; height: 0.45rem; border-radius: 999px;
+            background: rgba(0,0,0,0.12); transition: all 0.3s ease;
+        }
+        .learn-step-dots span.active { width: 1.25rem; background: var(--brand-orange); }
+        .learn-modal-foot {
+            display: flex; gap: 0.5rem; padding: 0.75rem 1.25rem 1.25rem;
+        }
+        .learn-btn {
+            flex: 1; min-height: var(--touch-min); padding: 0.65rem 1rem;
+            border-radius: 0.875rem; font-size: 0.8rem; font-weight: 800;
+            border: none; cursor: pointer; transition: all 0.3s ease;
+        }
+        .learn-btn--ghost { background: rgba(0,0,0,0.05); color: var(--text-secondary); }
+        .learn-btn--primary { background: var(--brand-orange); color: #fff; flex: 1.4; }
+        .learn-btn--primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        .learn-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+        .learn-prompt {
+            position: fixed; inset: 0; z-index: 195;
+            display: flex; align-items: center; justify-content: center; padding: 1.25rem;
+        }
+        .learn-prompt.hidden { display: none; }
+        .learn-prompt-card {
+            max-width: 22rem; width: 100%; background: var(--surface-card);
+            border-radius: 1.5rem; padding: 1.5rem; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25); position: relative; z-index: 1;
+            animation: learnPanelIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .learn-prompt-icon {
+            width: 3.5rem; height: 3.5rem; margin: 0 auto 1rem;
+            border-radius: 1rem; background: linear-gradient(135deg, #2563eb, #60a5fa);
+            color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+        }
+
+        /* Телефонен мокап за демота */
+        .phone-mock {
+            width: 200px; background: #1a1a1a; border-radius: 22px;
+            padding: 8px; box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+            border: 2px solid #333;
+        }
+        .phone-mock-screen {
+            background: #f7f7f9; border-radius: 14px; overflow: hidden;
+            min-height: 280px; position: relative;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+        .phone-mock-screen.theme-dark-demo { background: #121212; color: #f5f5f5; }
+        .phone-notch {
+            height: 18px; background: #1a1a1a; border-radius: 0 0 10px 10px;
+            width: 60px; margin: 0 auto;
+        }
+        .phone-status { height: 6px; }
+
+        /* Демо: общи UI елементи */
+        .demo-mini-header {
+            margin: 8px 10px 0; padding: 6px 8px; background: rgba(255,255,255,0.95);
+            border: 1px solid #e5e7eb; border-radius: 10px; font-size: 8px; font-weight: 800;
+            color: #222; text-align: center;
+        }
+        .demo-bottom-nav {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            display: flex; background: #fff; border-top: 1px solid rgba(0,0,0,0.06);
+            padding: 3px 2px 5px; gap: 2px;
+        }
+        .demo-nav-item {
+            flex: 1; text-align: center; font-size: 6.5px; font-weight: 800;
+            color: #9ca3af; padding: 3px 0; border-radius: 8px;
+        }
+        .demo-nav-item i { display: block; font-size: 11px; margin-bottom: 1px; }
+        .demo-nav-item.is-active { color: var(--brand-orange); background: rgba(255,128,0,0.12); }
+
+        /* Демо: търсачка */
+        .demo-welcome-title { margin: 10px 10px 4px; font-size: 10px; font-weight: 900; color: #222; }
+        .demo-search-bar {
+            margin: 0 10px 6px; padding: 7px 8px 7px 26px;
+            background: #fff; border: 2px solid #FF8000; border-radius: 12px;
+            font-size: 9px; font-weight: 600; color: #222; position: relative;
+            min-height: 30px; display: flex; align-items: center;
+            box-shadow: 0 0 0 3px rgba(255,128,0,0.15);
+        }
+        .demo-search-bar i { position: absolute; left: 9px; color: #9ca3af; font-size: 8px; }
+        .demo-typed { display: inline-block; overflow: hidden; white-space: nowrap; border-right: 2px solid var(--brand-orange); max-width: 100%; }
+        .demo-scene--search .demo-typed { width: 0; animation: demoTypeSearch 5s steps(18, end) infinite; }
+        @keyframes demoTypeSearch {
+            0%, 10% { width: 0; }
+            42%, 68% { width: 11.5ch; border-color: var(--brand-orange); }
+            82%, 100% { width: 11.5ch; border-color: transparent; }
+        }
+        .demo-result {
+            margin: 0 10px 6px; padding: 8px 9px; background: #fff;
+            border: 1px solid #e5e7eb; border-left: 3px solid var(--brand-orange);
+            border-radius: 10px; font-size: 8px; line-height: 1.35;
+            opacity: 0; transform: translateY(-6px);
+            animation: demoResultIn 5s ease infinite;
+        }
+        .demo-result strong { color: var(--brand-orange); display: block; margin-bottom: 2px; font-size: 8.5px; }
+        .demo-result-path { color: #64748b; font-size: 7px; }
+        .demo-result-open {
+            display: inline-block; margin-top: 3px; font-size: 7px; font-weight: 800;
+            color: var(--brand-orange);
+        }
+        @keyframes demoResultIn {
+            0%, 36% { opacity: 0; transform: translateY(-6px); }
+            46%, 72% { opacity: 1; transform: translateY(0); }
+            88%, 100% { opacity: 1; transform: translateY(0); }
+        }
+        .demo-tap-ring {
+            position: absolute; bottom: 58px; left: 50%; transform: translateX(-50%);
+            width: 32px; height: 32px; border-radius: 999px;
+            border: 2px solid var(--brand-orange); opacity: 0;
+            animation: demoTap 5s ease infinite;
+        }
+        @keyframes demoTap {
+            0%, 58% { opacity: 0; transform: translateX(-50%) scale(1.3); }
+            65% { opacity: 0.85; transform: translateX(-50%) scale(1); }
+            76%, 100% { opacity: 0; transform: translateX(-50%) scale(0.85); }
+        }
+
+        /* Демо: търсачка — обучение */
+        .demo-search-section-title {
+            margin: 8px 10px 4px; font-size: 8px; font-weight: 900; color: #222; text-align: center;
+        }
+        .demo-search-pills-row {
+            display: flex; flex-wrap: wrap; gap: 3px; justify-content: center;
+            margin: 6px 8px 10px; padding: 0 2px;
+        }
+        .demo-search-pill {
+            font-size: 5.5px; font-weight: 700; padding: 3px 5px; border-radius: 999px;
+            background: #fff; border: 1px solid #e5e7eb; color: #64748b;
+            transition: all 0.3s ease;
+        }
+        .demo-scene--search-overview .demo-search-bar {
+            border-color: #e5e7eb; box-shadow: none;
+            animation: demoOverviewSearch 5s ease infinite;
+        }
+        .demo-scene--search-overview .demo-search-pill:nth-child(2) {
+            animation: demoOverviewPillHi 5s ease infinite;
+        }
+        @keyframes demoOverviewSearch {
+            0%, 42% { border-color: #FF8000; box-shadow: 0 0 0 3px rgba(255,128,0,0.2); }
+            52%, 100% { border-color: #e5e7eb; box-shadow: none; }
+        }
+        @keyframes demoOverviewPillHi {
+            0%, 48% { border-color: #e5e7eb; background: #fff; color: #64748b; transform: scale(1); }
+            58%, 88% { border-color: #FF8000; background: rgba(255,128,0,0.12); color: var(--brand-orange); transform: scale(1.06); }
+            100% { border-color: #e5e7eb; background: #fff; transform: scale(1); }
+        }
+        .demo-scene--search-type .demo-search-bar { animation: demoTypeFocus 4s ease infinite; }
+        .demo-scene--search-type .demo-typed { width: 0; animation: demoTypeSick 4s steps(10, end) infinite; }
+        @keyframes demoTypeSick {
+            0%, 15% { width: 0; }
+            40%, 75% { width: 8ch; border-color: var(--brand-orange); }
+            88%, 100% { width: 8ch; border-color: transparent; }
+        }
+        .demo-scene--search-type .demo-result,
+        .demo-scene--search-type .demo-tap-ring { display: none; }
+        @keyframes demoTypeFocus {
+            0%, 15% { border-color: #e5e7eb; box-shadow: none; }
+            25%, 75% { border-color: #FF8000; box-shadow: 0 0 0 3px rgba(255,128,0,0.2); }
+            85%, 100% { border-color: #e5e7eb; box-shadow: none; }
+        }
+        .demo-scene--search-pills .demo-search-bar { border-color: #e5e7eb; box-shadow: none; }
+        .demo-scene--search-pills .demo-search-pill--tap {
+            animation: demoPillTap 4s ease infinite;
+        }
+        @keyframes demoPillTap {
+            0%, 30% { border-color: #e5e7eb; background: #fff; transform: scale(1); }
+            38% { border-color: #FF8000; background: rgba(255,128,0,0.15); transform: scale(0.94); }
+            48%, 100% { border-color: #FF8000; background: rgba(255,128,0,0.12); transform: scale(1.05); }
+        }
+        .demo-scene--search-pills .demo-search-bar-fill {
+            margin: 0 10px; font-size: 8px; font-weight: 700; color: var(--brand-orange);
+            opacity: 0; animation: demoPillFillIn 4s ease infinite;
+        }
+        @keyframes demoPillFillIn {
+            0%, 42% { opacity: 0; }
+            52%, 100% { opacity: 1; }
+        }
+        .demo-path-label {
+            font-size: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+            color: #94a3b8; margin: 0 10px 4px;
+        }
+        .demo-path-steps {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 2px; margin: 0 10px 6px;
+        }
+        .demo-path-step {
+            font-size: 5.5px; font-weight: 800; padding: 2px 5px; border-radius: 6px;
+            background: #fff; border: 1px solid #e5e7eb; color: #334155;
+        }
+        .demo-path-step.is-last {
+            background: var(--brand-orange); color: #fff; border-color: var(--brand-orange);
+        }
+        .demo-path-arrow { font-size: 5px; color: #cbd5e1; }
+        .demo-scene--search-path .demo-result-card {
+            margin: 4px 10px 8px; padding: 8px; background: #fff;
+            border: 1px solid #e5e7eb; border-radius: 10px;
+            animation: demoPathCardIn 4s ease infinite;
+        }
+        @keyframes demoPathCardIn {
+            0%, 12% { opacity: 0; transform: translateY(6px); }
+            22%, 100% { opacity: 1; transform: translateY(0); }
+        }
+        .demo-scene--search-path .demo-path-steps span:nth-child(1) { animation: demoPathStep 4s ease infinite; animation-delay: 0.2s; }
+        .demo-scene--search-path .demo-path-steps span:nth-child(3) { animation: demoPathStep 4s ease infinite; animation-delay: 0.5s; }
+        .demo-scene--search-path .demo-path-steps span:nth-child(5) { animation: demoPathStep 4s ease infinite; animation-delay: 0.8s; }
+        .demo-scene--search-path .demo-path-steps span:nth-child(7) { animation: demoPathStep 4s ease infinite; animation-delay: 1.1s; }
+        @keyframes demoPathStep {
+            0%, 15% { opacity: 0.3; transform: scale(0.92); }
+            25%, 100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Демо: долна навигация */
+        .demo-scene--nav .demo-nav-item:nth-child(1) { animation: demoNavActive 5s ease infinite; animation-delay: 0s; }
+        .demo-scene--nav .demo-nav-item:nth-child(2) { animation: demoNavActive 5s ease infinite; animation-delay: 1.25s; }
+        .demo-scene--nav .demo-nav-item:nth-child(3) { animation: demoNavActive 5s ease infinite; animation-delay: 2.5s; }
+        .demo-scene--nav .demo-nav-item:nth-child(4) { animation: demoNavActive 5s ease infinite; animation-delay: 3.75s; }
+        @keyframes demoNavActive {
+            0%, 18%, 100% { color: #9ca3af; background: transparent; }
+            5%, 13% { color: var(--brand-orange); background: rgba(255,128,0,0.12); }
+        }
+
+        /* Демо: FAB → ПТП */
+        .demo-app-fab {
+            position: absolute; right: 8px; bottom: 46px;
+            width: 34px; height: 34px; border-radius: 999px;
+            background: linear-gradient(135deg, #DC3545 0%, #FF8000 100%);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; z-index: 2;
+            box-shadow: 0 4px 14px rgba(220,53,69,0.45);
+            animation: demoFabPulse 4s ease infinite;
+        }
+        @keyframes demoFabPulse {
+            0%, 100% { box-shadow: 0 4px 14px rgba(220,53,69,0.45), 0 0 0 0 rgba(255,128,0,0.45); }
+            50% { box-shadow: 0 6px 18px rgba(220,53,69,0.55), 0 0 0 7px rgba(255,128,0,0); }
+        }
+        .demo-fab-tap {
+            position: absolute; right: 12px; bottom: 50px; z-index: 3;
+            width: 22px; height: 22px; border-radius: 999px;
+            border: 2px solid #fff; opacity: 0;
+            animation: demoFabTap 4s ease infinite;
+        }
+        @keyframes demoFabTap {
+            0%, 22% { opacity: 0; transform: scale(1.4); }
+            30% { opacity: 0.95; transform: scale(1); }
+            40%, 100% { opacity: 0; }
+        }
+        .demo-page-fade {
+            position: absolute; inset: 22px 0 38px; background: #f7f7f9;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 8px; font-weight: 700; color: #94a3b8; padding: 8px;
+            text-align: center;
+        }
+        .demo-cars-screen {
+            position: absolute; inset: 22px 0 38px; background: #f7f7f9;
+            opacity: 1;
+        }
+        .demo-scene--fab-open .demo-cars-screen {
+            opacity: 1; animation: none;
+        }
+        .demo-scene--ptp-flow .demo-ptp-panel-b,
+        .demo-scene--ptp-112 .demo-ptp-112 { animation: none; opacity: 1; max-height: none; }
+        @keyframes demoCarsIn {
+            0%, 32% { opacity: 0; }
+            42%, 100% { opacity: 1; }
+        }
+        .demo-car-tabs {
+            display: flex; gap: 2px; margin: 6px 6px 4px; overflow: hidden;
+        }
+        .demo-car-tab {
+            flex: 1; font-size: 5.5px; font-weight: 800; padding: 4px 2px;
+            border-radius: 6px; text-align: center; background: #fff; color: #64748b;
+            border: 1px solid #e5e7eb; line-height: 1.2;
+        }
+        .demo-car-tab.is-sos {
+            background: #dc3545; color: #fff; border-color: #dc3545;
+            animation: demoSosTabOn 4s ease infinite;
+        }
+        @keyframes demoSosTabOn {
+            0%, 38% { background: #fff; color: #64748b; border-color: #e5e7eb; }
+            45%, 100% { background: #dc3545; color: #fff; border-color: #dc3545; }
+        }
+        .demo-sos-subnav {
+            display: flex; margin: 0 6px 4px; gap: 2px;
+        }
+        .demo-sos-tab {
+            flex: 1; font-size: 5px; font-weight: 800; padding: 3px 2px;
+            border-radius: 5px; background: #fff; color: #64748b; text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+        .demo-sos-tab.is-active {
+            background: #fef2f2; color: #dc3545; border-color: #fecaca;
+            animation: demoSosSubOn 4s ease infinite;
+        }
+        @keyframes demoSosSubOn {
+            0%, 42% { background: #fff; color: #64748b; }
+            50%, 100% { background: #fef2f2; color: #dc3545; border-color: #fecaca; }
+        }
+        .demo-ptp-mini {
+            margin: 0 6px; padding: 6px; background: linear-gradient(180deg, #fef2f2, #fff);
+            border: 1px solid #fecaca; border-radius: 8px; font-size: 6px;
+            opacity: 0; animation: demoPtpMiniIn 4s ease infinite;
+        }
+        @keyframes demoPtpMiniIn {
+            0%, 48% { opacity: 0; transform: translateY(4px); }
+            58%, 100% { opacity: 1; transform: translateY(0); }
+        }
+        .demo-ptp-mini-badge {
+            display: inline-block; font-size: 5px; font-weight: 900; text-transform: uppercase;
+            color: #dc3545; background: #fee2e2; padding: 1px 4px; border-radius: 4px; margin-bottom: 3px;
+        }
+
+        /* Демо: ПТП наръчник */
+        .demo-ptp-wizard {
+            margin: 6px; padding: 6px; background: linear-gradient(180deg, rgba(254,242,242,0.95), #fff);
+            border: 1px solid #fecaca; border-radius: 10px;
+        }
+        .demo-ptp-stepper {
+            display: flex; align-items: center; justify-content: center; gap: 2px; margin-bottom: 5px;
+        }
+        .demo-ptp-step {
+            display: flex; flex-direction: column; align-items: center; gap: 1px;
+        }
+        .demo-ptp-step-circle {
+            width: 14px; height: 14px; border-radius: 999px; font-size: 6px; font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            background: #e5e7eb; color: #64748b;
+        }
+        .demo-ptp-step.is-done .demo-ptp-step-circle { background: #22c55e; color: #fff; }
+        .demo-ptp-step.is-active .demo-ptp-step-circle { background: #dc3545; color: #fff; }
+        .demo-ptp-step-lbl { font-size: 4.5px; font-weight: 800; color: #94a3b8; }
+        .demo-ptp-step.is-active .demo-ptp-step-lbl { color: #dc3545; }
+        .demo-ptp-step-line { width: 8px; height: 2px; background: #e5e7eb; margin-bottom: 8px; }
+        .demo-ptp-q-title { font-size: 7px; font-weight: 900; color: #222; margin-bottom: 4px; }
+        .demo-ptp-choice {
+            display: flex; align-items: center; gap: 4px; padding: 5px 6px;
+            border-radius: 7px; border: 1px solid #e5e7eb; background: #fff;
+            font-size: 6px; font-weight: 700; color: #334155; margin-bottom: 3px;
+        }
+        .demo-ptp-choice i {
+            width: 14px; height: 14px; border-radius: 5px; display: flex; align-items: center;
+            justify-content: center; font-size: 7px; flex-shrink: 0;
+        }
+        .demo-ptp-choice--safe i { background: #dcfce7; color: #16a34a; }
+        .demo-ptp-choice--danger i { background: #fee2e2; color: #dc3545; }
+        .demo-ptp-choice.is-tapped {
+            border-color: #16a34a; box-shadow: 0 0 0 2px rgba(22,163,74,0.25);
+            animation: demoChoiceTap 4.5s ease infinite;
+        }
+        @keyframes demoChoiceTap {
+            0%, 35% { border-color: #e5e7eb; box-shadow: none; }
+            42%, 58% { border-color: #16a34a; box-shadow: 0 0 0 2px rgba(22,163,74,0.25); }
+            68%, 100% { border-color: #e5e7eb; box-shadow: none; }
+        }
+        .demo-ptp-panel-b { opacity: 0; max-height: 0; overflow: hidden; animation: demoPtpPanelB 4.5s ease infinite; }
+        @keyframes demoPtpPanelB {
+            0%, 55% { opacity: 0; max-height: 0; }
+            65%, 100% { opacity: 1; max-height: 80px; }
+        }
+        .demo-ptp-112 {
+            margin-top: 4px; padding: 5px; background: #fee2e2; border: 1px solid #fecaca;
+            border-radius: 7px; text-align: center; font-size: 7px; font-weight: 900; color: #dc3545;
+            animation: demo112Pulse 3.5s ease infinite;
+        }
+        @keyframes demo112Pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); box-shadow: 0 0 0 4px rgba(220,53,69,0.15); }
+        }
+        .demo-scene--ptp-flow .demo-ptp-step:nth-child(1) .demo-ptp-step-circle { animation: demoStepProg 6s ease infinite; }
+        @keyframes demoStepProg {
+            0%, 70% { background: #dc3545; color: #fff; }
+            78%, 100% { background: #22c55e; color: #fff; }
+        }
+
+        /* Демо: калкулатор */
+        .demo-calc-header {
+            margin: 8px 8px 0; padding: 8px; border-radius: 10px 10px 0 0;
+            background: linear-gradient(135deg, #FF7A00, #FFA142); text-align: center;
+        }
+        .demo-calc-header span { font-size: 7px; font-weight: 900; color: #fff; }
+        .demo-calc-card {
+            margin: 0 8px 8px; padding: 6px; background: #fff; border: 1px solid #eef0f3;
+            border-radius: 0 0 10px 10px;
+        }
+        .demo-calc-field label { display: block; font-size: 6px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
+        .demo-calc-input {
+            padding: 4px 6px; border: 1px solid #e2e8f0; border-radius: 6px;
+            font-size: 8px; font-weight: 800; color: #222;
+        }
+        .demo-tier-markers {
+            display: flex; justify-content: space-between; margin: 6px 0 4px; font-size: 5.5px; font-weight: 800; color: #94a3b8;
+        }
+        .demo-tier-markers span.is-active { color: var(--brand-orange); }
+        .demo-prog-bar {
+            height: 10px; background: #e5e7eb; border-radius: 999px; overflow: hidden;
+        }
+        .demo-prog-fill {
+            height: 100%; width: 0; border-radius: 999px;
+            background: linear-gradient(90deg, #FF8000, #ffcc00);
+            animation: demoProgFill 4s ease infinite;
+        }
+        @keyframes demoProgFill {
+            0%, 12% { width: 22%; }
+            35%, 58% { width: 54%; }
+            72%, 100% { width: 78%; }
+        }
+
+        /* Демо: тъмен режим */
+        .demo-top-bar {
+            position: absolute; top: 24px; right: 8px; display: flex; gap: 3px;
+        }
+        .demo-top-btn {
+            width: 18px; height: 18px; border-radius: 999px; background: #fff;
+            border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center;
+            font-size: 8px; color: #2563eb;
+        }
+        .demo-top-btn.is-theme { color: var(--brand-orange); animation: demoThemeBtnTap 4s ease infinite; }
+        @keyframes demoThemeBtnTap {
+            0%, 38% { transform: scale(1); box-shadow: none; }
+            42% { transform: scale(0.92); box-shadow: 0 0 0 3px rgba(255,128,0,0.3); }
+            48%, 100% { transform: scale(1); }
+        }
+        .demo-scene--theme .phone-mock-screen { animation: demoThemeToggle 4s ease infinite; }
+        @keyframes demoThemeToggle {
+            0%, 40% { background: #f7f7f9; }
+            50%, 90% { background: #121212; }
+            100% { background: #f7f7f9; }
+        }
+        .demo-theme-content { padding: 48px 10px 16px; font-size: 8px; text-align: center; color: #64748b; }
+        .demo-card-sample {
+            margin-top: 8px; padding: 8px; border-radius: 8px;
+            background: #fff; border: 1px solid #e5e7eb; color: #222;
+            animation: demoThemeCard 4s ease infinite;
+        }
+        @keyframes demoThemeCard {
+            0%, 40% { background: #fff; border-color: #e5e7eb; color: #222; }
+            50%, 90% { background: #1e1e1e; border-color: rgba(255,255,255,0.1); color: #f5f5f5; }
+            100% { background: #fff; border-color: #e5e7eb; color: #222; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .demo-typed, .demo-result, .demo-tap-ring, .demo-nav-item, .demo-app-fab, .demo-fab-tap,
+            .demo-cars-screen, .demo-car-tab, .demo-sos-tab, .demo-ptp-mini, .demo-ptp-choice,
+            .demo-ptp-panel-b, .demo-ptp-112, .demo-prog-fill, .phone-mock-screen, .demo-top-btn,
+            .demo-card-sample, .learn-modal-panel, .learn-prompt-card { animation: none !important; }
+            .demo-typed { width: 11.5ch; }
+            .demo-result, .demo-cars-screen, .demo-ptp-mini, .demo-ptp-panel-b { opacity: 1; transform: none; max-height: none; }
+            .demo-prog-fill { width: 65%; }
+            .demo-car-tab.is-sos, .demo-sos-tab.is-active { background: #dc3545; color: #fff; }
+        }
     </style>
 </head>
 <body class="portal-body text-gray-800 font-sans antialiased min-h-screen relative selection:bg-brand-orange selection:text-white splash-active">
@@ -1152,6 +1718,9 @@
 
     <!-- Горни контроли: тема + език -->
     <div id="top-controls" class="fixed top-4 right-4 z-[110]">
+        <button type="button" id="learn-help-btn" onclick="openLearnHub()" aria-label="Обучение" title="Обучение">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </button>
         <button type="button" id="theme-toggle" onclick="toggleTheme()" aria-label="Тъмен режим" title="Тъмен режим">
             <i id="theme-icon" class="fa-solid fa-moon"></i>
         </button>
@@ -1273,6 +1842,10 @@
                         <div class="w-14 h-14 sm:w-12 sm:h-12 bg-brand-orange/10 text-brand-orange rounded-full flex items-center justify-center text-2xl sm:text-xl mx-auto mb-3 border border-brand-orange/20 shadow-sm"><i class="fa-solid fa-magnifying-glass-location"></i></div>
                         <h2 data-i18n="helper_title" class="text-2xl sm:text-xl font-black text-brand-dark mb-1.5">Намери бързо това, което търсиш</h2>
                         <p data-i18n="helper_desc" class="text-brand-slate text-sm max-w-2xl mx-auto">Не сте сигурни към кого да се обърнете? Напишете какво ви трябва — ще ви насочим към <strong>диспечерски чат</strong> или <strong>формуляр за контакт</strong> в Scoober. За <strong>ПТП със служебна кола</strong> — към наръчника в портала.</p>
+                        <button type="button" class="search-help-btn" onclick="openSearchHelp()" aria-label="Как работи търсачката">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span data-i18n="helper_how_btn">Как работи?</span>
+                        </button>
                     </div>
                     <div class="search-input-wrap relative max-w-3xl mx-auto mb-5 sm:mb-4">
                         <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none"><i class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i></div>
@@ -1285,6 +1858,20 @@
                         <div id="quickLinksContainer" class="flex flex-wrap justify-center gap-2 sm:gap-3"></div>
                     </div>
                 </div>
+            </section>
+        </div>
+
+        <div id="page-learn" class="global-page space-y-4 hidden">
+            <section id="portal-learn" class="portal-section learn-section rounded-[2rem] sm:rounded-2xl p-5 sm:p-6">
+                <button type="button" onclick="goToWelcome()" class="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-brand-orange mb-4 transition-all">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span data-i18n="learn_back_btn">Назад към началото</span>
+                </button>
+                <div class="hub-section-head px-0 space-y-1.5 mb-4">
+                    <span data-i18n="learn_section_eyebrow" class="section-eyebrow">Обучение</span>
+                    <h2 data-i18n="learn_section_title" class="text-xl sm:text-2xl font-black text-brand-dark">Как да ползваш портала</h2>
+                </div>
+                <div id="learn-cards-grid" class="learn-grid"></div>
             </section>
         </div>
         
@@ -2029,12 +2616,12 @@
                     <div id="car-notify-section" class="space-y-5">
                         <div class="space-y-2">
                             <h3 data-i18n="car_notify_title" class="text-xl sm:text-2xl font-extrabold text-brand-dark">Уведомяване на капитана</h3>
-                            <p data-i18n="car_notify_intro" class="text-sm text-brand-slate leading-relaxed">За <strong>отпуска, болничен и предизвестие</strong> уведомявай през платформата <strong>Шофьор автопарк</strong>. При <strong>промяна в графика</strong> — следвай отделния ред по-долу.</p>
+                            <p data-i18n="car_notify_intro" class="text-sm text-brand-slate leading-relaxed">За <strong>отпуска, болничен и предизвестие</strong> уведомявай през приложението <strong>Авто Иконом</strong>. При <strong>промяна в графика</strong> — следвай отделния ред по-долу.</p>
                         </div>
 
                         <div class="car-notify-block border-blue-200/80 space-y-4">
                             <h4 data-i18n="car_notify_leave_title" class="font-black text-brand-dark text-base sm:text-lg flex items-center gap-2"><i class="fa-solid fa-calendar-xmark text-blue-600"></i> Отпуска / болничен / предизвестие</h4>
-                            <p data-i18n="car_notify_leave_desc" class="text-xs sm:text-sm text-gray-600">Изпрати запитване в <strong>Шофьор автопарк</strong> по стъпките:</p>
+                            <p data-i18n="car_notify_leave_desc" class="text-xs sm:text-sm text-gray-600">Изпрати запитване в <strong>Авто Иконом</strong> по стъпките:</p>
                             <ol class="car-notify-platform list-decimal list-inside space-y-1.5 text-xs sm:text-sm text-brand-dark">
                                 <li data-i18n="car_notify_p1">Натисни големия червен <strong>+</strong> долу по средата — <strong>„Създай“</strong></li>
                                 <li data-i18n="car_notify_p2">Избери <strong>„Запитване“</strong></li>
@@ -2042,6 +2629,11 @@
                                 <li data-i18n="car_notify_p4"><strong>Бележки</strong> — опиши случая, напр.: „Здравей, ще бъда в отпуска 01.07–08.07.2026.“</li>
                                 <li data-i18n="car_notify_p5"><strong>Документи</strong> (по желание) — снимка на болничен, отпуска или предизвестие</li>
                             </ol>
+                            <p data-i18n="car_notify_p6" class="text-xs sm:text-sm text-blue-800 bg-blue-50 border border-blue-200/80 rounded-xl px-3 py-2.5 flex gap-2 items-start leading-snug"><i class="fa-solid fa-circle-info mt-0.5 shrink-0"></i><span>След като натиснете <strong>„Напред“</strong>, запитването се изпраща към вашия капитан.</span></p>
+                            <button type="button" onclick="toggleCarNotifyGuide()" id="btn-toggle-car-notify" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-2 w-full sm:w-auto">
+                                <i class="fa-solid fa-images"></i> <span data-i18n="btn_show_car_notify">Виж визуален наръчник (Авто Иконом)</span>
+                            </button>
+                            <div id="car-notify-image-container" class="hidden max-w-3xl mx-auto border border-blue-200 rounded-xl overflow-hidden bg-white p-2 shadow-inner"></div>
                         </div>
 
                         <div class="car-notify-block border-brand-orange/30 bg-gradient-to-b from-orange-50/50 to-white space-y-4">
@@ -2050,7 +2642,7 @@
                             <div class="space-y-1">
                                 <div class="car-notify-step">
                                     <div class="car-notify-step-num">1</div>
-                                    <p data-i18n="car_notify_sched_s1" class="text-xs sm:text-sm text-brand-dark leading-snug pt-0.5"><strong>Уведоми капитана</strong> (Християн Борисов) в <strong>Шофьор автопарк</strong> — същите стъпки като горе. В бележките опиши желаната дата/смяна.</p>
+                                    <p data-i18n="car_notify_sched_s1" class="text-xs sm:text-sm text-brand-dark leading-snug pt-0.5"><strong>Уведоми капитана</strong> (Християн Борисов) в <strong>Авто Иконом</strong> — същите стъпки като горе (виж и визуалния наръчник). В бележките опиши желаната дата/смяна.</p>
                                 </div>
                                 <div class="car-notify-step">
                                     <div class="car-notify-step-num blue">2</div>
@@ -2119,6 +2711,307 @@
         <i class="fa-solid fa-triangle-exclamation"></i>
     </button>
 
+    <!-- Първо посещение: покана за обучение -->
+    <div id="learn-prompt" class="learn-prompt hidden" role="dialog" aria-labelledby="learn-prompt-title">
+        <div class="learn-modal-backdrop" onclick="dismissLearnPrompt()"></div>
+        <div class="learn-prompt-card">
+            <div class="learn-prompt-icon"><i class="fa-solid fa-play"></i></div>
+            <h2 id="learn-prompt-title" data-i18n="learn_prompt_title" class="text-lg font-black text-brand-dark mb-2">Бърз тур на 2 минути?</h2>
+            <p data-i18n="learn_prompt_desc" class="text-sm text-brand-slate mb-5 leading-relaxed">Виж анимирани демота за търсачката, навигацията, ПТП бутона и още.</p>
+            <div class="flex flex-col gap-2">
+                <button type="button" onclick="startLearnFromPrompt()" class="learn-btn learn-btn--primary w-full" data-i18n="learn_prompt_start">Започни обучението</button>
+                <button type="button" onclick="dismissLearnPrompt()" class="learn-btn learn-btn--ghost w-full" data-i18n="learn_prompt_skip">Пропусни засега</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модал за обучение -->
+    <div id="learn-modal" class="learn-modal hidden" role="dialog" aria-labelledby="learn-modal-title" aria-modal="true">
+        <div class="learn-modal-backdrop" onclick="closeLearnTour()"></div>
+        <div class="learn-modal-panel">
+            <div class="learn-modal-head">
+                <div id="learn-modal-icon" class="learn-modal-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <h2 id="learn-modal-title">Умна търсачка</h2>
+                <button type="button" class="learn-modal-close" onclick="closeLearnTour()" aria-label="Затвори"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="learn-demo-stage" class="learn-demo-stage"></div>
+            <p id="learn-step-text" class="learn-step-text"></p>
+            <div id="learn-step-dots" class="learn-step-dots"></div>
+            <div class="learn-modal-foot">
+                <button type="button" id="learn-btn-prev" class="learn-btn learn-btn--ghost" onclick="prevLearnStep()" data-i18n="learn_btn_prev">Назад</button>
+                <button type="button" id="learn-btn-next" class="learn-btn learn-btn--primary" onclick="nextLearnStep()" data-i18n="learn_btn_next">Напред</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Шаблони за анимирани демота -->
+    <div id="learn-demo-templates" hidden aria-hidden="true">
+        <template id="demo-tpl-search">
+            <div class="demo-scene demo-scene--search">
+                <div class="phone-mock">
+                    <div class="phone-notch"></div>
+                    <div class="phone-mock-screen">
+                        <div class="demo-welcome-title" data-i18n="welcome_title">Добре дошли!</div>
+                        <div class="demo-search-bar">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span class="demo-typed" data-i18n="learn_demo_search_text">птп служебна</span>
+                        </div>
+                        <div class="demo-result">
+                            <strong data-i18n="learn_demo_search_result">ПТП със служебна кола</strong>
+                            <div class="demo-result-path" data-i18n="learn_demo_search_hint">Къде в портала: Автопарк → Аварии & ПТП</div>
+                            <span class="demo-result-open" data-i18n="helper_open_btn">Отвори →</span>
+                        </div>
+                        <div class="demo-tap-ring"></div>
+                        <div class="demo-bottom-nav">
+                            <div class="demo-nav-item"><i class="fa-solid fa-house"></i><span data-i18n="app_nav_home">Начало</span></div>
+                            <div class="demo-nav-item"><i class="fa-solid fa-calculator"></i><span data-i18n="app_nav_calc">Заплата</span></div>
+                            <div class="demo-nav-item"><i class="fa-solid fa-map-location-dot"></i><span data-i18n="app_nav_zones">Зони</span></div>
+                            <div class="demo-nav-item"><i class="fa-solid fa-car-side"></i><span data-i18n="app_nav_cars">Автопарк</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="demo-tpl-search-overview">
+            <div class="demo-scene demo-scene--search-overview">
+                <div class="phone-mock">
+                    <div class="phone-notch"></div>
+                    <div class="phone-mock-screen" style="min-height:290px">
+                        <div class="demo-search-section-title" data-i18n="helper_title">Намери бързо</div>
+                        <div class="demo-search-bar" style="margin-top:6px">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span style="font-size:8px;color:#94a3b8" data-i18n="learn_demo_search_ph">Твоят проблем...</span>
+                        </div>
+                        <p style="font-size:6px;text-align:center;color:#94a3b8;margin:4px 0" data-i18n="helper_quick">Бързи търсения</p>
+                        <div class="demo-search-pills-row">
+                            <span class="demo-search-pill">💊 <span data-i18n="learn_demo_pill_sick">Болничен</span></span>
+                            <span class="demo-search-pill">📅 <span data-i18n="learn_demo_pill_sched">График</span></span>
+                            <span class="demo-search-pill">💰 <span data-i18n="learn_demo_pill_pay">Заплата</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="demo-tpl-search-type">
+            <div class="demo-scene demo-scene--search demo-scene--search-type">
+                <div class="phone-mock">
+                    <div class="phone-notch"></div>
+                    <div class="phone-mock-screen">
+                        <div class="demo-search-section-title" data-i18n="learn_demo_type_lbl">Напиши проблема</div>
+                        <div class="demo-search-bar">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span class="demo-typed" data-i18n="learn_demo_type_text">болничен</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="demo-tpl-search-pills">
+            <div class="demo-scene demo-scene--search-pills">
+                <div class="phone-mock">
+                    <div class="phone-notch"></div>
+                    <div class="phone-mock-screen" style="min-height:260px">
+                        <div class="demo-search-section-title" data-i18n="learn_demo_pill_lbl">Или избери категория</div>
+                        <div class="demo-search-pills-row" style="margin-top:10px">
+                            <span class="demo-search-pill">🚗 ПТП</span>
+                            <span class="demo-search-pill demo-search-pill--tap">📅 <span data-i18n="learn_demo_pill_sched">График</span></span>
+                            <span class="demo-search-pill">✈️ <span data-i18n="learn_demo_pill_leave">Отпуска</span></span>
+                        </div>
+                        <div class="demo-search-bar demo-search-bar-fill">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span data-i18n="learn_demo_pill_fill">график</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="demo-tpl-search-path">
+            <div class="demo-scene demo-scene--search-path">
+                <div class="phone-mock">
+                    <div class="phone-notch"></div>
+                    <div class="phone-mock-screen" style="min-height:300px">
+                        <div class="demo-result-card">
+                            <strong style="font-size:9px;color:#222;display:block;margin-bottom:4px" data-i18n="learn_demo_path_title">Въпроси за смени и Графици</strong>
+                            <div class="demo-path-label" data-i18n="helper_path">Как да стигна до там:</div>
+                            <div class="demo-path-steps">
+                                <span class="demo-path-step" data-i18n="learn_demo_path_m1">Меню</span>
+                                <span class="demo-path-arrow">›</span>
+                                <span class="demo-path-step" data-i18n="learn_demo_path_m2">Профил</span>
+                                <span class="demo-path-arrow">›</span>
+                                <span class="demo-path-step" data-i18n="learn_demo_path_m3">Формуляр</span>
+                                <span class="demo-path-arrow">›</span>
+                                <span class="demo-path-step is-last" data-i18n="learn_demo_path_m4">График</span>
+                            </div>
+                            <p style="font-size:6px;color:#64748b;margin:0;line-height:1.4" data-i18n="learn_demo_path_note">Тук в Scoober подаваш запитването за проблема.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="demo-tpl-nav">
+            <div class="demo-scene demo-scene--nav">
+                <div class="phone-mock">
+                    <div class="phone-notch"></div>
+                    <div class="phone-mock-screen">
+                        <div class="demo-mini-header" data-i18n="learn_demo_nav_header">Takeaway · Портал</div>
+                        <div class="demo-bottom-nav" style="position:absolute;bottom:0">
+                            <div class="demo-nav-item"><i class="fa-solid fa-house"></i><span data-i18n="app_nav_home">Начало</span></div>
+                            <div class="demo-nav-item"><i class="fa-solid fa-calculator"></i><span data-i18n="app_nav_calc">Заплата</span></div>
+                            <div class="demo-nav-item"><i class="fa-solid fa-map-location-dot"></i><span data-i18n="app_nav_zones">Зони</span></div>
+                            <div class="demo-nav-item"><i class="fa-solid fa-car-side"></i><span data-i18n="app_nav_cars">Автопарк</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="demo-tpl-fab-1">
+            <div class="demo-scene demo-scene--fab">
+                <div class="phone-mock">
+                    <div class="phone-notch"></div>
+                    <div class="phone-mock-screen">
+                        <div class="demo-page-fade" data-i18n="learn_demo_fab_anypage">Всяка страница на портала</div>
+                        <div class="demo-app-fab"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="demo-fab-tap"></div>
+                        <div class="demo-bottom-nav">
+                            <div class="demo-nav-item"><i class="fa-solid fa-house"></i><span data-i18n="app_nav_home">Начало</span></div>
+                            <div class="demo-nav-item"><i class="fa-solid fa-calculator"></i><span data-i18n="app_nav_calc">Заплата</span></div>
+                            <div class="demo-nav-item"><i class="fa-solid fa-map-location-dot"></i><span data-i18n="app_nav_zones">Зони</span></div>
+                            <div class="demo-nav-item"><i class="fa-solid fa-car-side"></i><span data-i18n="app_nav_cars">Автопарк</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="demo-tpl-fab-2">
+            <div class="demo-scene demo-scene--fab-open">
+                <div class="phone-mock">
+                    <div class="phone-notch"></div>
+                    <div class="phone-mock-screen">
+                        <div class="demo-cars-screen">
+                            <div class="demo-mini-header" data-i18n="car_hero_title">Служебен автомобил</div>
+                            <div class="demo-car-tabs">
+                                <div class="demo-car-tab" data-i18n="nav_mob_car_map">Карта</div>
+                                <div class="demo-car-tab" data-i18n="nav_mob_car_maint">Поддр.</div>
+                                <div class="demo-car-tab is-sos" data-i18n="nav_mob_car_sos">ПТП</div>
+                                <div class="demo-car-tab" data-i18n="nav_mob_car_notify">Увед.</div>
+                            </div>
+                            <div class="demo-sos-subnav">
+                                <div class="demo-sos-tab is-active" data-i18n="sos_tab_wizard">ПТП — стъпка по стъпка</div>
+                                <div class="demo-sos-tab" data-i18n="sos_tab_tow">Репатрак</div>
+                            </div>
+                            <div class="demo-ptp-mini">
+                                <span class="demo-ptp-mini-badge" data-i18n="ptp_badge">Главен наръчник</span>
+                                <div data-i18n="ptp_intro">Следвай стъпките — избираш отговор</div>
+                            </div>
+                        </div>
+                        <div class="demo-bottom-nav">
+                            <div class="demo-nav-item"><i class="fa-solid fa-house"></i>—</div>
+                            <div class="demo-nav-item"><i class="fa-solid fa-calculator"></i>—</div>
+                            <div class="demo-nav-item"><i class="fa-solid fa-map-location-dot"></i>—</div>
+                            <div class="demo-nav-item is-active"><i class="fa-solid fa-car-side"></i><span data-i18n="app_nav_cars">Автопарк</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="demo-tpl-ptp-wizard">
+            <div class="demo-scene demo-scene--ptp-flow">
+                <div class="phone-mock">
+                    <div class="phone-notch"></div>
+                    <div class="phone-mock-screen" style="min-height:300px">
+                        <div class="demo-ptp-wizard" style="margin-top:24px">
+                            <div class="demo-ptp-stepper">
+                                <div class="demo-ptp-step is-active"><div class="demo-ptp-step-circle">1</div><span class="demo-ptp-step-lbl" data-i18n="ptp_step_lbl_1">Оглед</span></div>
+                                <div class="demo-ptp-step-line"></div>
+                                <div class="demo-ptp-step"><div class="demo-ptp-step-circle">2</div><span class="demo-ptp-step-lbl" data-i18n="ptp_step_lbl_2">Протокол</span></div>
+                                <div class="demo-ptp-step-line"></div>
+                                <div class="demo-ptp-step"><div class="demo-ptp-step-circle">3</div><span class="demo-ptp-step-lbl" data-i18n="ptp_step_lbl_3">Капитан</span></div>
+                                <div class="demo-ptp-step-line"></div>
+                                <div class="demo-ptp-step"><div class="demo-ptp-step-circle">4</div><span class="demo-ptp-step-lbl" data-i18n="ptp_step_lbl_4">Паркинг</span></div>
+                            </div>
+                            <div class="demo-ptp-q-title" data-i18n="ptp_s1_title">Установяване на щети</div>
+                            <div class="demo-ptp-choice demo-ptp-choice--safe is-tapped">
+                                <i class="fa-solid fa-check"></i>
+                                <span data-i18n="ptp_s1_ok">Няма пострадали — продължавам</span>
+                            </div>
+                            <div class="demo-ptp-choice demo-ptp-choice--danger">
+                                <i class="fa-solid fa-phone"></i>
+                                <span data-i18n="ptp_s1_112">Има пострадали — викам 112</span>
+                            </div>
+                            <div class="demo-ptp-panel-b">
+                                <div class="demo-ptp-q-title" data-i18n="ptp_s1b_title">Състояние на колата</div>
+                                <div class="demo-ptp-choice demo-ptp-choice--safe">
+                                    <i class="fa-solid fa-car-side"></i>
+                                    <span data-i18n="ptp_s1b_light">Лека щета — колата се движи</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="demo-tpl-ptp-112">
+            <div class="demo-scene demo-scene--ptp-112">
+                <div class="phone-mock">
+                    <div class="phone-notch"></div>
+                    <div class="phone-mock-screen" style="min-height:280px">
+                        <div class="demo-ptp-wizard" style="margin-top:28px">
+                            <div class="demo-ptp-q-title" data-i18n="ptp_s1_title">Установяване на щети</div>
+                            <div class="demo-ptp-choice demo-ptp-choice--danger" style="border-color:#dc3545">
+                                <i class="fa-solid fa-phone"></i>
+                                <span data-i18n="ptp_s1_112">Има пострадали — викам 112</span>
+                            </div>
+                            <div class="demo-ptp-112"><i class="fa-solid fa-phone"></i> 112</div>
+                            <div class="demo-ptp-choice" style="margin-top:4px">
+                                <i class="fa-solid fa-arrow-right" style="background:#dbeafe;color:#2563eb;width:14px;height:14px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:7px"></i>
+                                <span data-i18n="ptp_s112_next">След 112 → уведомяване на Капитан</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="demo-tpl-calc">
+            <div class="demo-scene demo-scene--calc">
+                <div class="phone-mock">
+                    <div class="phone-notch"></div>
+                    <div class="phone-mock-screen">
+                        <div class="demo-calc-header"><span data-i18n="calc_page_title">Калкулатор на заплата</span></div>
+                        <div class="demo-calc-card">
+                            <div class="demo-calc-field">
+                                <label data-i18n="calc_eff_lbl">Ефективност (ч)</label>
+                                <div class="demo-calc-input">2.4</div>
+                            </div>
+                            <div style="font-size:6px;font-weight:800;color:#64748b;margin:6px 0 2px" data-i18n="calc_bonus_progress">Бонус прогрес</div>
+                            <div class="demo-tier-markers">
+                                <span>BASE</span><span class="is-active">MID</span><span>HIGH</span><span>SUPER</span>
+                            </div>
+                            <div class="demo-prog-bar"><div class="demo-prog-fill"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="demo-tpl-theme">
+            <div class="demo-scene demo-scene--theme">
+                <div class="phone-mock">
+                    <div class="phone-notch"></div>
+                    <div class="phone-mock-screen">
+                        <div class="demo-top-bar">
+                            <div class="demo-top-btn"><i class="fa-solid fa-graduation-cap"></i></div>
+                            <div class="demo-top-btn is-theme"><i class="fa-solid fa-moon"></i></div>
+                            <div class="demo-top-btn"><i class="fa-solid fa-globe"></i></div>
+                        </div>
+                        <div class="demo-theme-content">
+                            <span data-i18n="learn_demo_theme_lbl">Тъмен режим за нощни смени</span>
+                            <div class="demo-card-sample" data-i18n="learn_demo_theme_card">Примерен раздел</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
     <nav id="app-bottom-nav" class="app-shell-nav hidden" aria-label="Главна навигация">
         <div class="app-shell-nav-inner">
             <button type="button" data-app-nav="home" onclick="switchAppTab('home')" class="app-nav-btn active" aria-current="page">
@@ -2180,6 +3073,209 @@
         };
 
         const THEME_STORAGE_KEY = 'takeaway-portal-theme';
+        const LEARN_DISMISS_KEY = 'takeaway-learn-dismissed';
+
+        function getLearnStepMeta(tour, stepIndex) {
+            const step = tour.steps[stepIndex];
+            if (typeof step === 'string') return { textKey: step, demoTpl: tour.demoTpl };
+            return { textKey: step.key, demoTpl: step.demo || tour.demoTpl };
+        }
+
+        const LEARN_TOURS = [
+            {
+                id: 'search',
+                icon: 'fa-magnifying-glass',
+                titleKey: 'learn_card_search_title',
+                descKey: 'learn_card_search_desc',
+                demoTpl: 'demo-tpl-search-overview',
+                tryAction: () => { closeLearnTour(); if (currentPage !== 'welcome') switchGlobalPage('welcome'); setTimeout(() => document.getElementById('searchInput')?.focus({ preventScroll: false }), 300); },
+                steps: [
+                    { key: 'learn_search_h1', demo: 'demo-tpl-search-overview' },
+                    { key: 'learn_search_h2', demo: 'demo-tpl-search-type' },
+                    { key: 'learn_search_h3', demo: 'demo-tpl-search-pills' },
+                    { key: 'learn_search_h4', demo: 'demo-tpl-search-path' }
+                ]
+            },
+            {
+                id: 'nav',
+                icon: 'fa-mobile-screen',
+                titleKey: 'learn_card_nav_title',
+                descKey: 'learn_card_nav_desc',
+                demoTpl: 'demo-tpl-nav',
+                tryAction: () => { closeLearnTour(); switchAppTab('calculator'); },
+                steps: ['learn_nav_s1', 'learn_nav_s2']
+            },
+            {
+                id: 'fab',
+                icon: 'fa-triangle-exclamation',
+                titleKey: 'learn_card_fab_title',
+                descKey: 'learn_card_fab_desc',
+                demoTpl: 'demo-tpl-fab-1',
+                tryAction: () => { closeLearnTour(); openPtpEmergency(); },
+                steps: [
+                    { key: 'learn_fab_s1', demo: 'demo-tpl-fab-1' },
+                    { key: 'learn_fab_s2', demo: 'demo-tpl-fab-2' },
+                    { key: 'learn_fab_s3', demo: 'demo-tpl-ptp-wizard' },
+                    { key: 'learn_fab_s4', demo: 'demo-tpl-ptp-wizard' },
+                    { key: 'learn_fab_s5', demo: 'demo-tpl-ptp-112' }
+                ]
+            },
+            {
+                id: 'calc',
+                icon: 'fa-calculator',
+                titleKey: 'learn_card_calc_title',
+                descKey: 'learn_card_calc_desc',
+                demoTpl: 'demo-tpl-calc',
+                tryAction: () => { closeLearnTour(); switchAppTab('calculator'); },
+                steps: ['learn_calc_s1', 'learn_calc_s2']
+            },
+            {
+                id: 'theme',
+                icon: 'fa-moon',
+                titleKey: 'learn_card_theme_title',
+                descKey: 'learn_card_theme_desc',
+                demoTpl: 'demo-tpl-theme',
+                tryAction: () => { closeLearnTour(); toggleTheme(); },
+                steps: ['learn_theme_s1', 'learn_theme_s2']
+            }
+        ];
+
+        let learnState = { tourIndex: 0, stepIndex: 0 };
+
+        function renderLearnCards() {
+            const grid = document.getElementById('learn-cards-grid');
+            if (!grid) return;
+            const t = translations[currentLangCode] || translations.bg;
+            grid.innerHTML = LEARN_TOURS.map((tour) => `
+                <button type="button" class="learn-card" onclick="openLearnTour('${tour.id}')" aria-label="${t[tour.titleKey] || ''}">
+                    <div class="learn-card-preview">
+                        <span class="learn-card-badge" data-i18n="learn_badge">Урок</span>
+                        <div class="learn-thumb">${getLearnThumbHtml(tour.demoTpl)}</div>
+                    </div>
+                    <div class="learn-card-body">
+                        <h3 data-i18n="${tour.titleKey}">${t[tour.titleKey] || ''}</h3>
+                        <p data-i18n="${tour.descKey}">${t[tour.descKey] || ''}</p>
+                    </div>
+                </button>
+            `).join('');
+            applyTranslations();
+        }
+
+        function applyTranslations(root) {
+            const scope = root || document;
+            const lang = currentLangCode || 'bg';
+            scope.querySelectorAll('[data-i18n]').forEach((el) => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang]?.[key]) el.innerHTML = translations[lang][key];
+            });
+        }
+
+        function getLearnThumbHtml(tplId) {
+            const tpl = document.getElementById(tplId);
+            return tpl ? tpl.innerHTML : '';
+        }
+
+        function openLearnHub() {
+            switchGlobalPage('learn');
+        }
+
+        function openLearnPage() {
+            openLearnHub();
+        }
+
+        function openSearchHelp() {
+            if (currentPage !== 'welcome') {
+                switchGlobalPage('welcome');
+                setTimeout(() => {
+                    document.getElementById('smart-contact-helper')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    openLearnTour('search');
+                }, 280);
+            } else {
+                openLearnTour('search');
+            }
+        }
+
+        function openLearnTour(tourId) {
+            const idx = LEARN_TOURS.findIndex((t) => t.id === tourId);
+            if (idx < 0) return;
+            learnState = { tourIndex: idx, stepIndex: 0 };
+            const modal = document.getElementById('learn-modal');
+            modal?.classList.remove('hidden');
+            document.body.classList.add('learn-open');
+            renderLearnStep();
+        }
+
+        function closeLearnTour() {
+            document.getElementById('learn-modal')?.classList.add('hidden');
+            document.body.classList.remove('learn-open');
+        }
+
+        function renderLearnStep() {
+            const tour = LEARN_TOURS[learnState.tourIndex];
+            if (!tour) return;
+            const t = translations[currentLangCode] || translations.bg;
+            const { textKey, demoTpl } = getLearnStepMeta(tour, learnState.stepIndex);
+            const isLast = learnState.stepIndex >= tour.steps.length - 1;
+
+            document.getElementById('learn-modal-title').textContent = t[tour.titleKey] || '';
+            const iconEl = document.querySelector('#learn-modal-icon i');
+            if (iconEl) iconEl.className = `fa-solid ${tour.icon}`;
+            document.getElementById('learn-step-text').textContent = t[textKey] || '';
+
+            const stage = document.getElementById('learn-demo-stage');
+            if (stage) {
+                stage.innerHTML = '';
+                const tpl = document.getElementById(demoTpl);
+                if (tpl?.content) {
+                    stage.appendChild(tpl.content.cloneNode(true));
+                    applyTranslations(stage);
+                    void stage.offsetWidth;
+                }
+            }
+
+            const dots = document.getElementById('learn-step-dots');
+            if (dots) {
+                dots.innerHTML = tour.steps.map((_, i) =>
+                    `<span class="${i === learnState.stepIndex ? 'active' : ''}" aria-hidden="true"></span>`
+                ).join('');
+            }
+
+            const prevBtn = document.getElementById('learn-btn-prev');
+            const nextBtn = document.getElementById('learn-btn-next');
+            if (prevBtn) prevBtn.disabled = learnState.stepIndex === 0;
+            if (nextBtn) {
+                nextBtn.textContent = isLast ? (t.learn_btn_try || 'Опитай') : (t.learn_btn_next || 'Напред');
+                nextBtn.onclick = isLast ? () => { tour.tryAction?.(); } : nextLearnStep;
+            }
+        }
+
+        function nextLearnStep() {
+            const tour = LEARN_TOURS[learnState.tourIndex];
+            if (!tour || learnState.stepIndex >= tour.steps.length - 1) return;
+            learnState.stepIndex++;
+            renderLearnStep();
+        }
+
+        function prevLearnStep() {
+            if (learnState.stepIndex <= 0) return;
+            learnState.stepIndex--;
+            renderLearnStep();
+        }
+
+        function startLearnFromPrompt() {
+            dismissLearnPrompt();
+            switchGlobalPage('learn');
+        }
+
+        function dismissLearnPrompt() {
+            localStorage.setItem(LEARN_DISMISS_KEY, '1');
+            document.getElementById('learn-prompt')?.classList.add('hidden');
+        }
+
+        function maybeShowLearnPrompt() {
+            if (localStorage.getItem(LEARN_DISMISS_KEY)) return;
+            setTimeout(() => document.getElementById('learn-prompt')?.classList.remove('hidden'), 600);
+        }
 
         function toggleTheme() {
             const isDark = document.documentElement.classList.toggle('theme-dark');
@@ -2204,6 +3300,8 @@
             if (fab) fab.setAttribute('title', t.fab_ptp || 'ПТП / Авария');
             const themeBtn = document.getElementById('theme-toggle');
             if (themeBtn) themeBtn.setAttribute('aria-label', isDark ? (t.theme_light || 'Светъл') : (t.theme_dark || 'Тъмен'));
+            const learnBtn = document.getElementById('learn-help-btn');
+            if (learnBtn) learnBtn.setAttribute('aria-label', t.learn_help_aria || 'Обучение');
         }
 
         function updateThemeToggleIcon(isDark) {
@@ -2575,8 +3673,8 @@
         var currentPage = 'welcome';
 
         const PAGE_TITLES = {
-            bg: { home: 'Обща информация', calculator: 'Калкулатор', zones: 'Стартови зони — София', cars: 'Служебни коли — София' },
-            en: { home: 'Common information', calculator: 'Calculator', zones: 'Starting zones — Sofia', cars: 'Company cars — Sofia' }
+            bg: { home: 'Обща информация', calculator: 'Калкулатор', zones: 'Стартови зони — София', cars: 'Служебни коли — София', learn: 'Обучение' },
+            en: { home: 'Common information', calculator: 'Calculator', zones: 'Starting zones — Sofia', cars: 'Company cars — Sofia', learn: 'Tutorial' }
         };
 
         function updateHeaderForPage() {
@@ -2682,6 +3780,8 @@
                 text.textContent = titles.zones;
             } else if (currentPage === 'calculator') {
                 text.textContent = `${titles.calculator} · ${getCityLabel(currentCityName)}`;
+            } else if (currentPage === 'learn') {
+                text.textContent = titles.learn;
             }
         }
 
@@ -2873,6 +3973,8 @@
                 if (map) setTimeout(() => map.invalidateSize(), 200);
             } else if (pageId === 'cars') {
                 openCarTab('car-map');
+            } else if (pageId === 'learn') {
+                renderLearnCards();
             }
             updateMobileNavVisibility();
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3007,7 +4109,7 @@
                 welcome_title: "Добре дошли!", welcome_desc: "Изберете раздел — обща информация, калкулатор, стартови зони София или служебни коли.", hub_section_eyebrow: "Портал", hub_section_title: "Избери раздел", hub_section_desc: "Всичко важно на едно място — от заплата до ПТП.", hub_common_title: "Обща информация", hub_common_desc: "Плащания, графици, доходи, диспечери и администрация — за всички градове.", hub_calc_title: "Калкулатор", hub_calc_desc: "Симулатор на заплата — изберете град и въведете данни.", hub_zones_title: "Стартови зони — София", hub_zones_desc: "Карта с 4-те официални зони за пускане на смяна.", hub_cars_title: "Служебни коли — София", hub_cars_desc: "Паркинг, поддръжка, ПТП и уведомяване на капитан.", common_badge: "За всички градове", common_title: "Обща информация", common_desc: "Плащания, графици, доходи и контакти — еднакви правила за всички куриери. Изберете град за доходи и капитан.", common_city_lbl: "Град", common_city_hint: "Доходи, бонуси и капитан", open_calc_btn: "Отвори калкулатор на заплата →", calc_page_title: "Калкулатор на заплата", calc_page_desc: "Изберете град и въведете данни, за да видите очакван бруто и нето.", calc_city_lbl: "Град", zones_page_title: "Стартови зони (София)", zones_badge: "София", cars_back_home: "Обратно към началото",
                 city_sofia: "София", city_plovdiv: "Пловдив", city_varna: "Варна", city_burgas: "Бургас", city_ruse: "Русе", city_stara_zagora: "Стара Загора", city_pleven: "Плевен", city_pernik: "Перник", city_blagoevgrad: "Благоевград", city_veliko_tarnovo: "Велико Търново", city_kazanlak: "Казанлък", city_gabrovo: "Габрово",
                 city_captain_title: "Капитан", city_captain_desc: "Директен контакт с капитана на града.", city_captain_role: "Капитан", city_captain_reimburse_role: "Капитан · Осребряване",
-                nav_sec_intro: "Въведение", nav_sec_map: "Стартови точки", nav_sec_pay: "Плащания", nav_sec_schedule: "Графици", nav_sec_income: "Доходи", nav_sec_contacts: "Контакти", nav_mob_pay: "Плащ.", nav_mob_schedule: "График", nav_mob_income: "Доход", nav_mob_contacts: "Контакт", nav_mob_car_map: "Карта", nav_mob_car_maint: "Поддр.", nav_mob_car_sos: "ПТП", nav_mob_car_notify: "Увед.", app_nav_home: "Начало", app_nav_calc: "Заплата", app_nav_zones: "Зони", app_nav_cars: "Автопарк", theme_dark: "Тъмен режим", theme_light: "Светъл режим", fab_ptp: "ПТП / Авария", ptp_step_lbl_1: "Оглед", ptp_step_lbl_2: "Протокол", ptp_step_lbl_3: "Капитан", ptp_step_lbl_4: "Паркинг",
+                nav_sec_intro: "Въведение", nav_sec_map: "Стартови точки", nav_sec_pay: "Плащания", nav_sec_schedule: "Графици", nav_sec_income: "Доходи", nav_sec_contacts: "Контакти", nav_mob_pay: "Плащ.", nav_mob_schedule: "График", nav_mob_income: "Доход", nav_mob_contacts: "Контакт", nav_mob_car_map: "Карта", nav_mob_car_maint: "Поддр.", nav_mob_car_sos: "ПТП", nav_mob_car_notify: "Увед.", app_nav_home: "Начало", app_nav_calc: "Заплата", app_nav_zones: "Зони", app_nav_cars: "Автопарк", theme_dark: "Тъмен режим", theme_light: "Светъл режим", fab_ptp: "ПТП / Авария", learn_help_aria: "Обучение", learn_back_btn: "Назад към началото", learn_section_eyebrow: "Обучение", learn_section_title: "Как да ползваш портала", learn_badge: "Урок", learn_card_search_title: "Умна търсачка", learn_card_search_desc: "Напиши проблема или избери категория — показва къде в Scoober да подадеш запитване.", learn_card_nav_title: "Долна навигация", learn_card_nav_desc: "4 таба с един палец — Начало, Заплата, Зони, Автопарк.", learn_card_fab_title: "Спешен ПТП бутон", learn_card_fab_desc: "Къде е бутонът, как отваря наръчника и как да минеш стъпка по стъпка.", learn_card_calc_title: "Бонус прогрес", learn_card_calc_desc: "Виж колко си близо до следващото ниво в калкулатора.", learn_card_theme_title: "Тъмен режим", learn_card_theme_desc: "По-лесно за очите през нощни смени.", learn_btn_prev: "Назад", learn_btn_next: "Напред", learn_btn_try: "Опитай сега", learn_prompt_title: "Бърз тур за 2 минути?", learn_prompt_desc: "Научи търсачката, навигацията, спешния ПТП бутон и още.", learn_prompt_start: "Започни обучението", learn_prompt_skip: "Пропусни засега", learn_search_h1: "Два начина: напиши със собствени думи какъв е проблемът, или избери готова категория долу.", learn_search_h2: "В полето опиши накратко — напр. болничен, график, промяна договор, птп служебна.", learn_search_h3: "Или натисни готов бутон (Болничен, График, Заплата…) — търсенето се попълва автоматично.", learn_search_h4: "Появява се карта с точния път в Scoober (или портала), където да подадеш запитването за проблема.", learn_demo_search_ph: "Твоят проблем...", learn_demo_type_lbl: "Напиши проблема", learn_demo_type_text: "болничен", learn_demo_pill_lbl: "Или избери категория", learn_demo_pill_sick: "Болничен", learn_demo_pill_sched: "График", learn_demo_pill_pay: "Заплата", learn_demo_pill_leave: "Отпуска", learn_demo_pill_fill: "график", learn_demo_path_title: "Въпроси за смени и Графици", learn_demo_path_m1: "Меню", learn_demo_path_m2: "Профил", learn_demo_path_m3: "Формуляр", learn_demo_path_m4: "График", learn_demo_path_note: "Тук в Scoober подаваш запитването за проблема.", learn_search_s1: "На началната страница, в полето „Намери бързо…“, напиши какво ти трябва — напр. „птп“, „график“ или „болничен“.", learn_search_s2: "За ПТП със служебна кола порталът показва точния резултат с път: Автопарк → Аварии & ПТП.", learn_search_s3: "Натисни бутона Отвори → — ще те пренасочи направо на правилното място.", learn_nav_s1: "На телефон долу има 4 таба: Начало, Заплата, Зони и Автопарк — с един палец.", learn_nav_s2: "Активният таб свети в оранжево с фон. Превключвай по време на смяна без да търсиш в менюта.", learn_fab_s1: "Червено-оранжевият бутон е долу вдясно, над долната навигация — видим от всяка страница на портала.", learn_fab_s2: "При натискане автоматично отваря Автопарк → таб 3. Аварии & ПТП → наръчникът се скролва до началото.", learn_fab_s3: "Виждаш 4 стъпки горе: Оглед → Протокол → Капитан → Паркинг. Започваш от стъпка 1 — установяване на щети.", learn_fab_s4: "Натискай само бутоните в наръчника — избираш честен отговор за ситуацията. След всеки избор наръчникът те води напред.", learn_fab_s5: "Ако има пострадали — веднага 112, после уведомяване на капитан (стъпка 3). Не прескачай стъпки и не импровизирай.", learn_calc_s1: "В калкулатора въведи ефективност (поръчки на час) — резултатът се обновява веднага.", learn_calc_s2: "Оранжевата лента под нивата BASE / MID / HIGH показва колко си близо до следващия бонус.", learn_theme_s1: "Натисни иконата Луна/Слънце горе вдясно (до езика) за тъмен режим.", learn_theme_s2: "Изборът се запазва — удобно за нощни смени и подземни паркинги.", learn_demo_search_text: "птп служебна", learn_demo_search_result: "ПТП със служебна кола", learn_demo_search_hint: "Къде в портала: Автопарк → Аварии & ПТП", learn_demo_nav_header: "Takeaway · Портал", learn_demo_fab_anypage: "Всяка страница на портала", learn_demo_theme_lbl: "Тъмен режим за нощни смени", learn_demo_theme_card: "Примерен раздел", ptp_step_lbl_1: "Оглед", ptp_step_lbl_2: "Протокол", ptp_step_lbl_3: "Капитан", ptp_step_lbl_4: "Паркинг",
                 hero_badge: "АКТУАЛЕН НАРЪЧНИК 2026", hero_title: "Всичко за твоя успешен старт в Takeaway", hero_desc: "Добре дошли в нашия портал! Тук сме събрали актуалната информация за стартовите точки, методологията на плащане и директни контакти към ключовите отдели.",
                 map_title: "1. Стартови точки (София)", map_desc: "Интерактивна GPS карта с разпределение на официалните четири стартови зони в столицата.",
                 map_subtitle: "Ключови райони", map_text: "Официалните стартови точки са съобразени с гъстотата на поръчките и гарантират бърз старт на работния ви ден.",
@@ -3025,21 +4127,22 @@
                 schedule_title: "3. Планиране на смените", schedule_subtitle: "ГРАФИЦИ И КОРЕКЦИИ", schedule_important_title: "Краен срок за подаване", schedule_important_desc: "Всеки куриер трябва да подаде своите часове за следващата седмица <strong>най-късно до Вторник 23:59 ч.</strong>", schedule_edit_title: "Корекции след Вторник", schedule_edit_desc: "Корекции могат да се правят <strong>до Петък най-късно</strong>, и то <strong>само след изрично разрешение</strong> и връзка с отдел PAS. След публикуване на графика в петък, промени не са възможни.", schedule_how: "Как се подава график в приложението:", schedule_step1: "Отворете <strong>менюто вляво</strong> в приложението Scoober.", schedule_step2: "Изберете секция <strong>Планиране на график (Schedule)</strong>.", schedule_step3: "Маркирайте часовете, в които сте на разположение за новата седмица.",
                 matrix_title: "4. Доходи и Бонусна схема", matrix_info_desc: "Бонусът се трупа на месечна база. Посочените суми са брутни.", tab_personal: "С лична кола", tab_company: "Със служебна", contract_8h: "8-Hour (8ч)", contract_6h: "6-Hour (6ч)", contract_4h: "4-Hour (4ч)", contract_2h: "2-Hour (2ч)", avg_net_title: "Средно Нето Месечно* (заплата плюс бонус)", avg_net_title_2: "Средно Нето Месечно* (заплата плюс бонус)", avg_net_title_3: "Средно Нето Месечно* (заплата плюс бонус)", avg_net_title_4: "Средно Нето Месечно* (заплата плюс бонус)",
                 sim_title: "Симулатор", sim_desc: "Симулирай заплатата си спрямо очакваното представяне.", sim_net: "Очаквано Нето", sim_gross: "Бруто", sim_orders: "Поръчки", sim_hours: "Часове", calc_contract_lbl: "Договор", calc_vehicle_lbl: "Превозно средство", calc_days_lbl: "Работни дни в месеца", calc_month_lbl: "Месец", calc_year_lbl: "Година", calc_eff_lbl: "Ефективност (ч)", calc_eff_tooltip: "Среден брой поръчки за 1 час.", calc_days_tooltip: "Брой делнични дни в избрания месец (без официалните празници). Куриерите са на сумирано работно време — 20 ч/седм. могат да се изработят и за по-малко дни.", calc_days_auto_hint: "{wd} делнични − {h} празника = {work} работни дни", calc_m_1: "Януари", calc_m_2: "Февруари", calc_m_3: "Март", calc_m_4: "Април", calc_m_5: "Май", calc_m_6: "Юни", calc_m_7: "Юли", calc_m_8: "Август", calc_m_9: "Септември", calc_m_10: "Октомври", calc_m_11: "Ноември", calc_m_12: "Декември", calc_bonus_progress: "Бонус прогрес", calc_select_params: "Изберете параметри за изчисление", calc_hours_month: "ЧАСОВЕ / МЕСЕЦ", calc_km_lbl: "КИЛОМЕТРИ", calc_breakdown_title: "Разбивка (БРУТО/НЕТО)", calc_base_salary: "Базова заплата", calc_bonus_orders: "Бонус поръчки", calc_amortization: "Амортизация", calc_total_gross: "Общо бруто", calc_tax_deduction: "Удръжка 22.4%", calc_total_net: "Общо нето", calc_level_prefix: "НИВО:", calc_next_level: "СЛЕДВАЩ:", calc_max_level: "МАКСИМУМ", calc_orders_to_next: "Още {n} поръчки до следващо ниво", calc_max_level_note: "Максимално ниво!", calc_fixed_level: "НИВО: ФИКСИРАН БОНУС", calc_fixed_note: "За този град се прилага фиксирана ставка.", calc_tier_row: "Ниво {level} ({count} поръчки)", calc_net_arrow: " → нето",
-                helper_title: "Намери бързо това, което търсиш", helper_desc: "Не сте сигурни към кого да се обърнете? Напишете какво ви трябва — ще ви насочим към <strong>диспечерски чат</strong> или <strong>формуляр за контакт</strong> в Scoober. За <strong>ПТП със служебна кола</strong> — към наръчника в портала.", helper_quick: "Бързи търсения (Кликни)", helper_ph: "Напр. птп служебна кола, болничен, график, диспечер...", helper_notfound: "Не открихме точна категория за", helper_try: "Опитайте с друга дума.", helper_path: "Как да стигна до там:", helper_portal_path: "Къде в портала:", helper_open_btn: "Отвори →",
+                helper_title: "Намери бързо това, което търсиш", helper_desc: "Не сте сигурни към кого да се обърнете? Напишете какво ви трябва — ще ви насочим към <strong>диспечерски чат</strong> или <strong>формуляр за контакт</strong> в Scoober. За <strong>ПТП със служебна кола</strong> — към наръчника в портала.", helper_how_btn: "Как работи?", helper_quick: "Бързи търсения (Кликни)", helper_ph: "Напр. птп служебна кола, болничен, график, диспечер...", helper_notfound: "Не открихме точна категория за", helper_try: "Опитайте с друга дума.", helper_path: "Как да стигна до там:", helper_portal_path: "Къде в портала:", helper_open_btn: "Отвори →",
                 contact_disp_title: "5. Връзка с Диспечери", contact_disp_subtitle: "ПО ВРЕМЕ НА АКТИВНА СМЯНА", contact_how_title: "Как да се свържете:", contact_step1: "Отворете приложението <strong>Scoober</strong>.", contact_step2: "Кликнете на <strong>иконата за чат</strong> в горния десен ъгъл.", contact_step3: "Опишете ясно казуса си в чата.",
                 contact_admin_title: "6. Директна Администрация", contact_admin_subtitle: "ИЗВЪН АКТИВНА СМЯНА", contact_admin_important: "<i class='fa-solid fa-envelope text-blue-500 mr-2'></i>Отговор до следващия работен ден.", contact_admin_how: "Къде е контактната форма:", admin_step1: "Отворете <strong>менюто вляво</strong> в Scoober.", admin_step2: "Изберете секция <strong>Профил (Profile)</strong>.", admin_step3: "Изберете <strong>Contact Form</strong>.",
                 footer_rights: "© 2026 Всички права запазени.", footer_info: "Вътрешна информационна платформа", select_contract: "Договор...", select_vehicle: "Избери...", hours: "ч",
                 map_popup_title: "(Стартова Точка)", map_popup_desc1: "Стартирайте смяната си вътре в този кръг.", map_popup_desc2: "Зона в границите на София.",
                 car_hero_badge: "СЛУЖЕБНИ АВТОМОБИЛИ 2026", car_hero_title: "Твоят служебен автомобил", car_hero_desc: "Пълен наръчник за експлоатация: локации на паркинга, правила за поддръжка, правилно зареждане с гориво и протоколи за действие при аварии.",
                 car_tab_map: "1. Карта & Старт", car_tab_maint: "2. Поддръжка", car_tab_sos: "3. Аварии & ПТП", car_tab_contacts: "4. Уведомяване",
-                car_notify_title: "Уведомяване на капитана", car_notify_intro: "За <strong>отпуска, болничен и предизвестие</strong> уведомявай през платформата <strong>Шофьор автопарк</strong>. При <strong>промяна в графика</strong> — следвай отделния ред по-долу.",
-                car_notify_leave_title: "Отпуска / болничен / предизвестие", car_notify_leave_desc: "Изпрати запитване в <strong>Шофьор автопарк</strong> по стъпките:",
+                car_notify_title: "Уведомяване на капитана", car_notify_intro: "За <strong>отпуска, болничен и предизвестие</strong> уведомявай през приложението <strong>Авто Иконом</strong>. При <strong>промяна в графика</strong> — следвай отделния ред по-долу.",
+                car_notify_leave_title: "Отпуска / болничен / предизвестие", car_notify_leave_desc: "Изпрати запитване в <strong>Авто Иконом</strong> по стъпките:",
                 car_notify_p1: "Натисни големия червен <strong>+</strong> долу по средата — <strong>„Създай“</strong>", car_notify_p2: "Избери <strong>„Запитване“</strong>",
                 car_notify_p3: "<strong>Име</strong> — трите си имена · <strong>Категория</strong> — „Други“ · <strong>Цена</strong> — 0 · <strong>Партньор</strong> — празно → напред",
                 car_notify_p4: "<strong>Бележки</strong> — опиши случая, напр.: „Здравей, ще бъда в отпуска 01.07–08.07.2026.“",
                 car_notify_p5: "<strong>Документи</strong> (по желание) — снимка на болничен, отпуска или предизвестие",
+                car_notify_p6: "След като натиснете <strong>„Напред“</strong>, запитването се изпраща към вашия капитан.",
                 car_notify_sched_title: "Промяна в графика", car_notify_sched_intro: "При желание за смяна в графика със служебна кола — <strong>задължителен ред</strong>:",
-                car_notify_sched_s1: "<strong>Уведоми капитана</strong> (Християн Борисов) в <strong>Шофьор автопарк</strong> — същите стъпки като горе. В бележките опиши желаната дата/смяна.",
+                car_notify_sched_s1: "<strong>Уведоми капитана</strong> (Християн Борисов) в <strong>Авто Иконом</strong> — същите стъпки като горе (виж и визуалния наръчник). В бележките опиши желаната дата/смяна.",
                 car_notify_sched_s2: "<strong>Изчакай потвърждение</strong> от капитана дали има свободна кола за деня, в който искаш да работиш.",
                 car_notify_sched_s3: "<strong>След потвърждение</strong> — подай заявка в Scoober: <strong>Профил → Формуляр за контакт → График</strong>. Уточни, че <strong>капитанът е потвърдил наличие на кола</strong>.",
                 car_notify_sched_s4: "Отговорникът по графици <strong>одобрява или отказва</strong> според нуждите на фирмата.",
@@ -3081,7 +4184,7 @@
                 car_protocol_p14: "В забележката пишат: <strong>НЕВИНЕН</strong> или <strong>ВИНОВЕН</strong> съм.",
                 car_protocol_p15: "Подписи в бялото поле от двамата водачи.",
                 car_contact_title: "4. Телефонен указател", car_contact_desc: "Списък с отговорниците за автопарка. Позвъни или пиши по Viber.", car_c1_role: "Капитан", car_c1_desc: "Осребряване и проблеми с разпределението на колите. При промяна по графика — задължително го уведоми.", car_c1_hours: "Пон-Пет | 12:00 - 18:00", car_c2_role: "Капитан", car_c2_desc: "Проблеми с колата, ПТП и поддръжка на служебните автомобили.", car_c2_hours: "Пон-Пет | 10:00 - 18:00", car_c3_title: "Пътна помощ", car_c3_role: "Денонощен репатрак", car_c3_desc: "Звънете на този номер само след предварително съгласуване с Капитан.", car_btn_call: "Позвъни", car_btn_viber: "Viber", car_cap_hours: "Пон-Пет | 10:00 - 18:00",
-                btn_show_sample: "Виж примерния протокол"
+                btn_show_sample: "Виж примерния протокол", btn_show_car_notify: "Виж визуален наръчник (Авто Иконом)", btn_hide_car_notify: "Скрий наръчника"
             },
             en: {
                 lang_name: "EN | English", nav_home: "Home",
@@ -3089,7 +4192,7 @@
                 welcome_title: "Welcome!", welcome_desc: "Choose a section — common information, calculator, Sofia starting zones, or company cars.", hub_section_eyebrow: "Portal", hub_section_title: "Choose a section", hub_section_desc: "Everything that matters in one place — from pay to accidents.", hub_common_title: "Common information", hub_common_desc: "Payments, schedules, income, dispatchers and administration — for all cities.", hub_calc_title: "Calculator", hub_calc_desc: "Salary simulator — select city and enter your data.", hub_zones_title: "Starting zones — Sofia", hub_zones_desc: "Map with the 4 official shift-start zones.", hub_cars_title: "Company cars — Sofia", hub_cars_desc: "Parking, maintenance, accidents and captain notification.", common_badge: "All cities", common_title: "Common information", common_desc: "Payments, schedules, income and contacts — same rules for all couriers. Select city for income and captain.", common_city_lbl: "City", common_city_hint: "Income, bonuses and captain", open_calc_btn: "Open salary calculator →", calc_page_title: "Salary calculator", calc_page_desc: "Select city and enter data to see expected gross and net.", calc_city_lbl: "City", zones_page_title: "Starting zones (Sofia)", zones_badge: "Sofia", cars_back_home: "Back to home",
                 city_sofia: "Sofia", city_plovdiv: "Plovdiv", city_varna: "Varna", city_burgas: "Burgas", city_ruse: "Ruse", city_stara_zagora: "Stara Zagora", city_pleven: "Pleven", city_pernik: "Pernik", city_blagoevgrad: "Blagoevgrad", city_veliko_tarnovo: "Veliko Tarnovo", city_kazanlak: "Kazanlak", city_gabrovo: "Gabrovo",
                 city_captain_title: "Captain", city_captain_desc: "Direct contact with the city captain.", city_captain_role: "Captain", city_captain_reimburse_role: "Captain · Reimbursement",
-                nav_sec_intro: "Introduction", nav_sec_map: "Starting points", nav_sec_pay: "Payments", nav_sec_schedule: "Schedules", nav_sec_income: "Income", nav_sec_contacts: "Contacts", nav_mob_pay: "Pay", nav_mob_schedule: "Sched.", nav_mob_income: "Income", nav_mob_contacts: "Contact", nav_mob_car_map: "Map", nav_mob_car_maint: "Maint.", nav_mob_car_sos: "SOS", nav_mob_car_notify: "Notify", app_nav_home: "Home", app_nav_calc: "Pay", app_nav_zones: "Zones", app_nav_cars: "Fleet", theme_dark: "Dark mode", theme_light: "Light mode", fab_ptp: "Accident / SOS", ptp_step_lbl_1: "Check", ptp_step_lbl_2: "Protocol", ptp_step_lbl_3: "Captain", ptp_step_lbl_4: "Parking",
+                nav_sec_intro: "Introduction", nav_sec_map: "Starting points", nav_sec_pay: "Payments", nav_sec_schedule: "Schedules", nav_sec_income: "Income", nav_sec_contacts: "Contacts", nav_mob_pay: "Pay", nav_mob_schedule: "Sched.", nav_mob_income: "Income", nav_mob_contacts: "Contact", nav_mob_car_map: "Map", nav_mob_car_maint: "Maint.", nav_mob_car_sos: "SOS", nav_mob_car_notify: "Notify", app_nav_home: "Home", app_nav_calc: "Pay", app_nav_zones: "Zones", app_nav_cars: "Fleet", theme_dark: "Dark mode", theme_light: "Light mode", fab_ptp: "Accident / SOS", learn_help_aria: "Tutorial", learn_back_btn: "Back to home", learn_section_eyebrow: "Tutorial", learn_section_title: "How to use the portal", learn_badge: "Lesson", learn_card_search_title: "Smart search", learn_card_search_desc: "Type your issue or pick a category — shows where to submit in Scoober.", learn_card_nav_title: "Bottom navigation", learn_card_nav_desc: "4 tabs with one thumb — Home, Pay, Zones, Fleet.", learn_card_fab_title: "Emergency accident button", learn_card_fab_desc: "Where the button is, how it opens the guide, and how to go step by step.", learn_card_calc_title: "Bonus progress", learn_card_calc_desc: "See how close you are to the next tier.", learn_card_theme_title: "Dark mode", learn_card_theme_desc: "Easier on the eyes during night shifts.", learn_btn_prev: "Back", learn_btn_next: "Next", learn_btn_try: "Try now", learn_prompt_title: "Quick 2-minute tour?", learn_prompt_desc: "Learn search, navigation, the emergency accident button and more.", learn_prompt_start: "Start tutorial", learn_prompt_skip: "Skip for now", learn_search_h1: "Two ways: type your problem in your own words, or pick a ready category below.", learn_search_h2: "In the search box, describe briefly — e.g. sick leave, schedule, contract change, company car accident.", learn_search_h3: "Or tap a quick button (Sick leave, Schedule, Pay…) — the search fills in automatically.", learn_search_h4: "A card appears with the exact path in Scoober (or the portal) where you submit your request.", learn_demo_search_ph: "Your issue...", learn_demo_type_lbl: "Type your problem", learn_demo_type_text: "sick leave", learn_demo_pill_lbl: "Or pick a category", learn_demo_pill_sick: "Sick leave", learn_demo_pill_sched: "Schedule", learn_demo_pill_pay: "Pay", learn_demo_pill_leave: "Leave", learn_demo_pill_fill: "schedule", learn_demo_path_title: "Shifts and Schedule Questions", learn_demo_path_m1: "Menu", learn_demo_path_m2: "Profile", learn_demo_path_m3: "Contact form", learn_demo_path_m4: "Schedule", learn_demo_path_note: "Submit your request here in Scoober.", learn_search_s1: "On the home page, in the “Find quickly…” box, type what you need — e.g. \"accident\", \"schedule\" or \"sick leave\".", learn_search_s2: "For company car accidents the portal shows the exact result with path: Fleet → Accidents & SOS.", learn_search_s3: "Tap the Open → button — you'll land in the right place immediately.", learn_nav_s1: "On mobile, 4 tabs at the bottom: Home, Pay, Zones and Fleet — one thumb.", learn_nav_s2: "The active tab glows orange with a background. Switch during your shift without digging through menus.", learn_fab_s1: "The red-orange button is bottom-right, above the bottom navigation — visible on every page.", learn_fab_s2: "One tap opens Fleet → tab 3. Accidents & SOS → the guide scrolls to the start.", learn_fab_s3: "You see 4 steps at the top: Check → Protocol → Captain → Parking. Start at step 1 — assess the scene.", learn_fab_s4: "Tap only the buttons in the guide — choose the honest answer for your situation. After each choice the guide moves you forward.", learn_fab_s5: "If anyone is injured — call 112 immediately, then notify the captain (step 3). Don't skip steps or improvise.", learn_calc_s1: "In the calculator, enter efficiency (orders per hour) — results update instantly.", learn_calc_s2: "The orange bar below BASE / MID / HIGH tiers shows progress to the next bonus level.", learn_theme_s1: "Tap the Moon/Sun icon top-right (next to language) for dark mode.", learn_theme_s2: "Your choice is saved — handy for night shifts and underground parking.", learn_demo_search_text: "accident company", learn_demo_search_result: "Company car accident", learn_demo_search_hint: "Where in portal: Fleet → Accidents & SOS", learn_demo_nav_header: "Takeaway · Portal", learn_demo_fab_anypage: "Any page on the portal", learn_demo_theme_lbl: "Dark mode for night shifts", learn_demo_theme_card: "Sample section", ptp_step_lbl_1: "Check", ptp_step_lbl_2: "Protocol", ptp_step_lbl_3: "Captain", ptp_step_lbl_4: "Parking",
                 hero_badge: "LATEST GUIDE 2026", hero_title: "Everything for your successful start at Takeaway", hero_desc: "Welcome to our portal! Here we have gathered the latest information about the starting points, payment methodology, and direct contacts to key departments.",
                 map_title: "1. Starting Points (Sofia)", map_desc: "Interactive GPS map with the distribution of the official four starting zones in the capital.",
                 map_subtitle: "Key Areas", map_text: "The official starting points are tailored to order density and guarantee a quick start to your working day.",
@@ -3107,21 +4210,22 @@
                 schedule_title: "3. Shift Planning", schedule_subtitle: "SCHEDULES & CORRECTIONS", schedule_important_title: "Submission Deadline", schedule_important_desc: "Every courier must submit their hours for the next week <strong>by Tuesday 23:59 at the latest</strong>.", schedule_edit_title: "Corrections after Tuesday", schedule_edit_desc: "Corrections can be made <strong>until Friday at the latest</strong>, and <strong>only after explicit permission</strong> and contact with the PAS department. Once the schedule is published on Friday, no changes are possible.", schedule_how: "How to submit a schedule:", schedule_step1: "Open the <strong>left menu</strong> in the Scoober app.", schedule_step2: "Select the <strong>Schedule Planning</strong> section.", schedule_step3: "Mark the hours you are available for the new week.",
                 matrix_title: "4. Income and Bonus Scheme", matrix_info_desc: "The bonus is accumulated on a monthly basis. The amounts are gross.", tab_personal: "Personal Car", tab_company: "Company Car", contract_8h: "8-Hour", contract_6h: "6-Hour", contract_4h: "4-Hour", contract_2h: "2-Hour", avg_net_title: "Avg. Net Monthly* (salary plus bonus)", avg_net_title_2: "Avg. Net Monthly* (salary plus bonus)", avg_net_title_3: "Avg. Net Monthly* (salary plus bonus)", avg_net_title_4: "Avg. Net Monthly* (salary plus bonus)",
                 sim_title: "Simulator", sim_desc: "Simulate your salary based on expected performance.", sim_net: "Expected Net", sim_gross: "Gross", sim_orders: "Orders", sim_hours: "Hours", calc_contract_lbl: "Contract", calc_vehicle_lbl: "Vehicle", calc_days_lbl: "Working days in month", calc_month_lbl: "Month", calc_year_lbl: "Year", calc_eff_lbl: "Efficiency (h)", calc_eff_tooltip: "Average number of orders you deliver per 1 hour.", calc_days_tooltip: "Weekdays in the selected month minus official public holidays. Couriers use summarized working time — 20 h/week can be done in fewer days.", calc_days_auto_hint: "{wd} weekdays − {h} holidays = {work} working days", calc_m_1: "January", calc_m_2: "February", calc_m_3: "March", calc_m_4: "April", calc_m_5: "May", calc_m_6: "June", calc_m_7: "July", calc_m_8: "August", calc_m_9: "September", calc_m_10: "October", calc_m_11: "November", calc_m_12: "December", calc_bonus_progress: "Bonus progress", calc_select_params: "Select parameters to calculate", calc_hours_month: "HOURS / MONTH", calc_km_lbl: "KILOMETRES", calc_breakdown_title: "Breakdown (GROSS/NET)", calc_base_salary: "Base salary", calc_bonus_orders: "Order bonus", calc_amortization: "Amortization", calc_total_gross: "Total gross", calc_tax_deduction: "Deduction 22.4%", calc_total_net: "Total net", calc_level_prefix: "LEVEL:", calc_next_level: "NEXT:", calc_max_level: "MAXIMUM", calc_orders_to_next: "{n} more orders to next level", calc_max_level_note: "Maximum level!", calc_fixed_level: "LEVEL: FIXED BONUS", calc_fixed_note: "This city uses a fixed bonus rate.", calc_tier_row: "Level {level} ({count} orders)", calc_net_arrow: " → net",
-                helper_title: "Find what you need quickly", helper_desc: "Not sure who to contact? Type what you need — we'll direct you to <strong>dispatcher chat</strong> or the <strong>contact form</strong> in Scoober. For a <strong>company car accident</strong>, we'll open the portal guide.", helper_quick: "Quick searches (Click)", helper_ph: "E.g. company car accident, sick leave, schedule, dispatcher...", helper_notfound: "We couldn't find an exact match for", helper_try: "Try another word.", helper_path: "Where to click in the app:", helper_portal_path: "Where in the portal:", helper_open_btn: "Open →",
+                helper_title: "Find what you need quickly", helper_desc: "Not sure who to contact? Type what you need — we'll direct you to <strong>dispatcher chat</strong> or the <strong>contact form</strong> in Scoober. For a <strong>company car accident</strong>, we'll open the portal guide.", helper_how_btn: "How it works?", helper_quick: "Quick searches (Click)", helper_ph: "E.g. company car accident, sick leave, schedule, dispatcher...", helper_notfound: "We couldn't find an exact match for", helper_try: "Try another word.", helper_path: "Where to click in the app:", helper_portal_path: "Where in the portal:", helper_open_btn: "Open →",
                 contact_disp_title: "5. Contact Dispatchers", contact_disp_subtitle: "DURING AN ACTIVE SHIFT", contact_how_title: "How to connect:", contact_step1: "Open the <strong>Scoober</strong> app.", contact_step2: "Click on the <strong>chat icon</strong> in the top right corner.", contact_step3: "Clearly describe your issue in the chat.",
                 contact_admin_title: "6. Direct Administration", contact_admin_subtitle: "OUTSIDE ACTIVE SHIFT", contact_admin_important: "<i class='fa-solid fa-envelope text-blue-500 mr-2'></i>Answer within the next working day.", contact_admin_how: "Where is the contact form:", admin_step1: "Open the <strong>left menu</strong> in Scoober.", admin_step2: "Select the <strong>Profile</strong> section.", admin_step3: "Select <strong>Contact Form</strong>.",
                 footer_rights: "© 2026 All rights reserved.", footer_info: "Internal Information Platform", select_contract: "Select...", select_vehicle: "Select...", hours: "h",
                 map_popup_title: "(Starting Point)", map_popup_desc1: "Start your shift inside this circle.", map_popup_desc2: "Zone within Sofia boundaries.",
                 car_hero_badge: "COMPANY CARS 2026", car_hero_title: "Your Company Car", car_hero_desc: "Complete operational handbook: locations, maintenance, refueling, and emergency protocols.",
                 car_tab_map: "Map & Start", car_tab_maint: "Maintenance", car_tab_sos: "Accidents & SOS", car_tab_contacts: "4. Notify",
-                car_notify_title: "Notify Captain", car_notify_intro: "For <strong>leave, sick leave and notice</strong>, notify via the <strong>Шофьор автопарк</strong> platform. For <strong>schedule changes</strong> — follow the separate workflow below.",
-                car_notify_leave_title: "Leave / sick leave / notice", car_notify_leave_desc: "Submit a request in <strong>Шофьор автопарк</strong> using these steps:",
+                car_notify_title: "Notify Captain", car_notify_intro: "For <strong>leave, sick leave and notice</strong>, notify via the <strong>Avto Ikonom</strong> app. For <strong>schedule changes</strong> — follow the separate workflow below.",
+                car_notify_leave_title: "Leave / sick leave / notice", car_notify_leave_desc: "Submit a request in <strong>Avto Ikonom</strong> using these steps:",
                 car_notify_p1: "Tap the large red <strong>+</strong> at the bottom centre — <strong>„Create“</strong>", car_notify_p2: "Select <strong>„Request“</strong>",
                 car_notify_p3: "<strong>Name</strong> — your full name · <strong>Category</strong> — „Other“ · <strong>Price</strong> — 0 · <strong>Partner</strong> — leave empty → continue",
                 car_notify_p4: "<strong>Notes</strong> — describe your case, e.g.: „Hello, I will be on leave 01.07–08.07.2026.“",
                 car_notify_p5: "<strong>Documents</strong> (optional) — photo of sick leave, leave or notice document",
+                car_notify_p6: "After pressing <strong>„Next“</strong>, your inquiry is sent to your captain.",
                 car_notify_sched_title: "Schedule change", car_notify_sched_intro: "If you want to change your schedule with a company car — <strong>mandatory order</strong>:",
-                car_notify_sched_s1: "<strong>Notify the captain</strong> (Hristiyan Borisov) in <strong>Шофьор автопарк</strong> — same steps as above. In notes, state the desired date/shift.",
+                car_notify_sched_s1: "<strong>Notify the captain</strong> (Hristiyan Borisov) in <strong>Avto Ikonom</strong> — same steps as above (see the visual guide). In notes, state the desired date/shift.",
                 car_notify_sched_s2: "<strong>Wait for confirmation</strong> from the captain whether a car is available for the day you want to work.",
                 car_notify_sched_s3: "<strong>After confirmation</strong> — submit a request in Scoober: <strong>Profile → Contact form → Schedule</strong>. State that <strong>the captain confirmed a car is available</strong>.",
                 car_notify_sched_s4: "The schedule manager <strong>approves or declines</strong> based on business needs.",
@@ -3163,7 +4267,7 @@
                 car_protocol_p14: "In remarks write: I am <strong>NOT AT FAULT</strong> / <strong>AT FAULT</strong>.",
                 car_protocol_p15: "Signatures in the white field by both drivers.",
                 car_contact_title: "4. Phone Directory", car_contact_desc: "Fleet contacts. Call or message on Viber.", car_c1_role: "Captain", car_c1_desc: "Reimbursement and car distribution issues. Notify him of any schedule changes.", car_c1_hours: "Mon-Fri | 12:00 - 18:00", car_c2_role: "Captain", car_c2_desc: "Car problems, accidents (PTP), and fleet maintenance.", car_c2_hours: "Mon-Fri | 10:00 - 18:00", car_c3_title: "Tow Truck / Assistance", car_c3_role: "24/7 Service", car_c3_desc: "Call this number only after prior consultation with a Captain.", car_btn_call: "Call Now", car_btn_viber: "Viber", car_cap_hours: "Mon-Fri | 10:00 - 18:00",
-                btn_show_sample: "View sample sheet"
+                btn_show_sample: "View sample sheet", btn_show_car_notify: "View visual guide (Avto Ikonom)", btn_hide_car_notify: "Hide guide"
             }
         };
 
@@ -3172,18 +4276,22 @@
                 { id: "car_ptp", title: "ПТП със служебен автомобил", keywords: ["птп", "катастрофа", "удар", "авария", "сблъсък", "протокол", "дкп", "щета", "булстрад", "служебна", "служебен", "служебна кола", "служебен автомобил", "фирмена кола", "112", "репатрак", "кат"], portalAction: "nav:cars:car-sos:wizard", path: ["Портал", "Служебни коли — София", "Аварии & ПТП"], icon: "fa-car-burst", color: "text-red-600", bg: "bg-red-50", border: "border-red-200", instructions: "<strong>Само за служебни коли (София).</strong> Не се отнася за лично превозно средство. Стъпка по стъпка: оглед, протокол или КАТ, капитан, Булстрад.", actionLabel: "Отвори ПТП наръчник" },
                 { id: "field_issue", title: "Проблем на терен / С поръчка", keywords: ["поръчка", "клиент", "ресторант", "адрес", "грешен", "отказана", "бави", "чакам", "доставка", "терен", "смяната", "адреси", "клиенти", "ресторанти", "диспечер", "диспечери", "чат"], path: ["Scoober Приложение", "Икона Чат (Горе вдясно)", "Поддръжка"], icon: "fa-motorcycle", color: "text-red-500", bg: "bg-red-50", border: "border-red-200", instructions: "За проблеми на терен, грешни адреси или отказани поръчки се свържете <strong>веднага с Диспечер през чата</strong> (иконата горе вдясно)." },
                 { id: "sick_leave", title: "Качване на Болничен лист", keywords: ["болничен", "болен", "лекар", "доктор", "отсъствие", "sick"], path: ["Меню", "Профил", "Формуляр за контакт", "Болничен"], icon: "fa-notes-medical", color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200", instructions: "<strong>Важно:</strong> При прикачване на снимка на болничния лист трябва да се виждат <strong>всичките 4 ъгъла на листа</strong>!" },
-                { id: "leave", title: "Отпуска (Молба, Остатък)", keywords: ["отпуска", "почивка", "дни", "платена", "неплатена", "молба"], path: ["Меню", "Профил", "Формуляр за контакт", "Отпуска"], icon: "fa-plane-departure", color: "text-teal-500", bg: "bg-teal-50", border: "border-teal-200", instructions: "Качване на молби или проверка на оставащи дни. Снимката трябва да обхваща и 4-те ъгъла на листа." },
-                { id: "schedule", title: "Въпроси за смени и Графици", keywords: ["график", "смяна", "забравих", "часове", "промяна", "availability", "планиране"], path: ["Меню", "Профил", "Формуляр за контакт", "График и Планиране"], icon: "fa-calendar-day", color: "text-brand-orange", bg: "bg-brand-orange/10", border: "border-brand-orange/30", instructions: "Подаване на закъснели графици или заявки за корекция." },
+                { id: "leave", title: "Заявка и одобрение на отпуска", phrases: ["молба за отпуска", "заявка за отпуска", "одобрение на отпуска", "качване на отпуска", "платена отпуска", "неплатена отпуска"], keywords: ["отпуска", "почивка", "дни", "платена", "неплатена", "молба", "одобрение", "тикет", "заявка", "имейл", "варна", "офис", "капитан", "остатък"], path: ["Scoober", "Профил", "Формуляр за контакт", "Отпуска"], icon: "fa-plane-departure", color: "text-teal-500", bg: "bg-teal-50", border: "border-teal-200", instructions: "<strong>Нов процес за одобрение на отпуска</strong><br><br><strong>1. Подаване на тикет</strong> — в Scoober по пътя по-горе.<br><strong>2. Описание на заявката</strong> — задължително посочете <strong>точния период</strong> (от кога до кога) и <strong>вида на отпуската</strong> (платена, неплатена или друг вид).<br><strong>3. Обработка</strong> — колега преглежда заявката; в рамките на <strong>1 работен ден</strong> получавате отговор по <strong>имейл</strong> дали е възможно ползването на отпуск в посочения период.<br><strong>4. Финализиране</strong> — <strong>само след потвърждение по имейл</strong>: <strong>София и Варна</strong> — в офиса; <strong>останалите градове</strong> — при вашия капитан. Попълнете <strong>точните дати и дни</strong> в молбата за отпуск, за да бъде валидна.<br><strong>5. Изпращане</strong> — изпратете попълнената молба за отпуска като <strong>отговор в имейла</strong>." },
+                { id: "schedule", title: "Въпроси за смени и Графици", keywords: ["график", "смяна", "забравих", "часове", "availability", "планиране", "корекция график", "промяна график"], path: ["Меню", "Профил", "Формуляр за контакт", "График и Планиране"], icon: "fa-calendar-day", color: "text-brand-orange", bg: "bg-brand-orange/10", border: "border-brand-orange/30", instructions: "Подаване на закъснели графици или заявки за корекция." },
                 { id: "documents", title: "Бележки, IBAN и Документи", keywords: ["сметка", "ибан", "банкова", "iban", "документи", "бележка"], path: ["Меню", "Профил", "Формуляр за контакт", "Документи"], icon: "fa-folder-open", color: "text-indigo-500", bg: "bg-indigo-50", border: "border-indigo-200", instructions: "За промяна на банкова сметка или издаване на служебни бележки." },
+                { id: "notice_resign", title: "Предизвестие / Прекратяване на договор", phrases: ["предизвестие", "прекратяване на договор", "прекратяване на договора", "прекратяване договор", "напускам", "напускане", "оставям", "уволнение", "край на договор"], keywords: ["прекратяване", "прекратя", "resign", "termination", "notice"], path: ["Scoober", "Профил", "Договори", "Прекратяване на договора"], icon: "fa-file-signature", color: "text-rose-600", bg: "bg-rose-50", border: "border-rose-200", instructions: "<strong>Стъпка 1:</strong> Попълни молба за предизвестие <strong>в офиса</strong> или при <strong>капитан</strong> (след негово одобрение).<br><strong>Стъпка 2:</strong> Качи документите в Scoober по пътя по-горе — <strong>Профил → Договори → Прекратяване на договора</strong>." },
+                { id: "contract_change", title: "Промяна на договор", phrases: ["промяна на договор", "промяна на договора", "промяна договор", "промяна договора", "смяна на договор", "смяна договор", "смяна на договора", "нов договор", "промяна на часове", "8 часа", "6 часа", "4 часа", "2 часа"], keywords: ["часов", "contract change", "change contract", "amendment"], path: ["Scoober", "Профил", "Договори", "Промяна на договора"], icon: "fa-file-pen", color: "text-violet-600", bg: "bg-violet-50", border: "border-violet-200", instructions: "При искане за промяна на договор (напр. часове или тип) подай заявка в Scoober: <strong>Профил → Договори → Промяна на договора</strong>." },
                 { id: "salary", title: "Заплата и Бонуси", keywords: ["заплата", "пари", "бонус", "плащане", "фиш", "липсва"], path: ["Меню", "Профил", "Формуляр за контакт", "Заплата"], icon: "fa-money-bill-wave", color: "text-green-600", bg: "bg-green-50", border: "border-green-200", instructions: "Всички въпроси, свързани с фишове, удръжки или бонусна система." }
             ],
             en: [
                 { id: "car_ptp", title: "Accident with company car only", keywords: ["accident", "crash", "collision", "ptp", "protocol", "insurance", "claim", "bulstrad", "company car", "fleet car", "company vehicle", "112", "tow", "police"], portalAction: "nav:cars:car-sos:wizard", path: ["Portal", "Company cars — Sofia", "Accidents & SOS"], icon: "fa-car-burst", color: "text-red-600", bg: "bg-red-50", border: "border-red-200", instructions: "<strong>Company cars only (Sofia).</strong> Does not apply to personal vehicles. Step by step: assessment, protocol or police, captain, Bulstrad.", actionLabel: "Open accident guide" },
                 { id: "field_issue", title: "Field / Order Issue", keywords: ["order", "customer", "restaurant", "address", "wrong", "cancelled", "delay", "waiting", "dispatcher", "chat"], path: ["Scoober App", "Chat Icon (Top Right)", "Support"], icon: "fa-motorcycle", color: "text-red-500", bg: "bg-red-50", border: "border-red-200", instructions: "Contact <strong>dispatchers immediately via chat</strong> (icon in top right corner) for active deliveries." },
                 { id: "sick_leave", title: "Submit Sick Leave", keywords: ["sick", "leave", "doctor", "absence", "hospital"], path: ["Menu", "Profile", "Contact form", "Sick Leave"], icon: "fa-notes-medical", color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200", instructions: "<strong>Important:</strong> Ensure all <strong>4 corners of the document</strong> are completely visible in the image!" },
-                { id: "leave", title: "Annual Leave (Request, Balance)", keywords: ["leave", "vacation", "days", "paid", "unpaid", "request"], path: ["Menu", "Profile", "Contact form", "Leave"], icon: "fa-plane-departure", color: "text-teal-500", bg: "bg-teal-50", border: "border-teal-200", instructions: "Submit leave requests or check remaining days. The image must show all 4 corners of the document." },
-                { id: "schedule", title: "Shifts and Schedule Questions", keywords: ["schedule", "shift", "forgot", "hours", "change", "availability", "planning"], path: ["Menu", "Profile", "Contact form", "Schedule & Planning"], icon: "fa-calendar-day", color: "text-brand-orange", bg: "bg-brand-orange/10", border: "border-brand-orange/30", instructions: "Submit late schedules or correction requests." },
+                { id: "leave", title: "Leave request and approval", phrases: ["leave request", "leave approval", "annual leave request", "paid leave", "unpaid leave", "submit leave"], keywords: ["leave", "vacation", "days", "paid", "unpaid", "request", "approval", "ticket", "email", "varna", "office", "captain", "balance"], path: ["Scoober", "Profile", "Contact form", "Leave"], icon: "fa-plane-departure", color: "text-teal-500", bg: "bg-teal-50", border: "border-teal-200", instructions: "<strong>New leave approval process</strong><br><br><strong>1. Submit a ticket</strong> — in Scoober via the path above.<br><strong>2. Request description</strong> — you must state the <strong>exact period</strong> (from–to) and <strong>type of leave</strong> (paid, unpaid or other).<br><strong>3. Processing</strong> — a colleague reviews your request; within <strong>1 business day</strong> you receive an <strong>email</strong> reply whether leave in that period is possible.<br><strong>4. Finalization</strong> — <strong>only after email confirmation</strong>: <strong>Sofia and Varna</strong> — visit the office; <strong>all other cities</strong> — see your captain. Fill in the <strong>exact dates and days</strong> on the leave application form.<br><strong>5. Submission</strong> — send the completed leave application as a <strong>reply to the email</strong>." },
+                { id: "schedule", title: "Shifts and Schedule Questions", keywords: ["schedule", "shift", "forgot", "hours", "availability", "planning", "schedule change", "shift change"], path: ["Menu", "Profile", "Contact form", "Schedule & Planning"], icon: "fa-calendar-day", color: "text-brand-orange", bg: "bg-brand-orange/10", border: "border-brand-orange/30", instructions: "Submit late schedules or correction requests." },
                 { id: "documents", title: "Notes, IBAN and Documents", keywords: ["account", "iban", "bank", "documents", "note"], path: ["Menu", "Profile", "Contact form", "Documents"], icon: "fa-folder-open", color: "text-indigo-500", bg: "bg-indigo-50", border: "border-indigo-200", instructions: "Change bank account details or request official notes." },
+                { id: "notice_resign", title: "Notice / Contract termination", phrases: ["notice period", "contract termination", "terminate contract", "end contract", "resignation", "resign", "quit job", "leaving job"], keywords: ["termination", "notice"], path: ["Scoober", "Profile", "Contracts", "Contract termination"], icon: "fa-file-signature", color: "text-rose-600", bg: "bg-rose-50", border: "border-rose-200", instructions: "<strong>Step 1:</strong> Submit your notice application <strong>at the office</strong> or with your <strong>captain</strong> (after approval).<br><strong>Step 2:</strong> Upload documents in Scoober via the path above — <strong>Profile → Contracts → Contract termination</strong>." },
+                { id: "contract_change", title: "Contract change", phrases: ["contract change", "change contract", "change my contract", "amend contract", "new contract", "8 hour", "6 hour", "4 hour", "2 hour"], keywords: ["hours", "amendment"], path: ["Scoober", "Profile", "Contracts", "Change contract"], icon: "fa-file-pen", color: "text-violet-600", bg: "bg-violet-50", border: "border-violet-200", instructions: "To request a contract change (e.g. hours or type), submit in Scoober: <strong>Profile → Contracts → Change contract</strong>." },
                 { id: "salary", title: "Salary and Bonuses", keywords: ["salary", "pay", "bonus", "payment", "payslip", "missing"], path: ["Menu", "Profile", "Contact form", "Salary"], icon: "fa-money-bill-wave", color: "text-green-600", bg: "bg-green-50", border: "border-green-200", instructions: "Questions about payslips, deductions or the bonus system." }
             ]
         };
@@ -3191,11 +4299,13 @@
         let helperQuickLinks = {
             bg: [
                 { t: 'птп', l: '🚗 ПТП служебна кола' }, { t: 'болничен', l: '💊 Болничен' }, { t: 'отпуска', l: '✈️ Отпуска' },
-                { t: 'график', l: '📅 График' }, { t: 'клиент', l: '🍔 Проблем на терен' }, { t: 'заплата', l: '💰 Заплата' }, { t: 'диспечер', l: '🎧 Диспечер' }
+                { t: 'график', l: '📅 График' }, { t: 'клиент', l: '🍔 Проблем на терен' }, { t: 'заплата', l: '💰 Заплата' }, { t: 'диспечер', l: '🎧 Диспечер' },
+                { t: 'предизвестие', l: '📋 Предизвестие' }, { t: 'промяна договор', l: '📝 Промяна договор' }
             ],
             en: [
                 { t: 'accident', l: '🚗 Company car accident' }, { t: 'sick', l: '💊 Sick Leave' }, { t: 'leave', l: '✈️ Leave' },
-                { t: 'schedule', l: '📅 Schedule' }, { t: 'order', l: '🍔 Field Issue' }, { t: 'salary', l: '💰 Salary' }, { t: 'dispatcher', l: '🎧 Dispatcher' }
+                { t: 'schedule', l: '📅 Schedule' }, { t: 'order', l: '🍔 Field Issue' }, { t: 'salary', l: '💰 Salary' }, { t: 'dispatcher', l: '🎧 Dispatcher' },
+                { t: 'notice', l: '📋 Notice' }, { t: 'contract change', l: '📝 Contract change' }
             ]
         };
 
@@ -3347,6 +4457,7 @@
             document.getElementById('searchInput').placeholder = translations[lang].helper_ph;
             renderHelperQuickLinks();
             renderCityPickers();
+            renderLearnCards();
             renderPtpStep(ptpCurrentStep);
             if (currentPage === 'home') {
                 const activeSection = document.querySelector('.guide-nav-btn.active')?.getAttribute('data-section');
@@ -3368,6 +4479,15 @@
                     btn.innerHTML = `<i class="fa-solid fa-eye"></i> <span>${translations[lang].btn_show_sample}</span>`;
                 } else {
                     btn.innerHTML = `<i class="fa-solid fa-eye-slash"></i> <span>${lang === 'en' ? 'Hide sample' : 'Скрий примера'}</span>`;
+                }
+            }
+            const notifyContainer = document.getElementById('car-notify-image-container');
+            const notifyBtn = document.getElementById('btn-toggle-car-notify');
+            if (notifyContainer && notifyBtn) {
+                if (notifyContainer.classList.contains('hidden')) {
+                    notifyBtn.innerHTML = `<i class="fa-solid fa-images"></i> <span>${translations[lang].btn_show_car_notify}</span>`;
+                } else {
+                    notifyBtn.innerHTML = `<i class="fa-solid fa-eye-slash"></i> <span>${translations[lang].btn_hide_car_notify}</span>`;
                 }
             }
         }
@@ -3713,23 +4833,79 @@
             }, 180);
         }
 
+        function normalizeHelperQuery(query) {
+            return query.toLowerCase().trim().replace(/\s+/g, ' ');
+        }
+
+        function stemHelperWord(word) {
+            return word.replace(/(та|те|то|и|а|ът|ят|ния|ният|ова|ово)$/i, '');
+        }
+
+        function scoreHelperItem(item, query, queryWords) {
+            let score = 0;
+            const title = item.title.toLowerCase();
+
+            if (item.phrases) {
+                for (const phrase of item.phrases) {
+                    const p = phrase.toLowerCase();
+                    if (query === p) score += 200;
+                    else if (query.includes(p)) score += 120;
+                }
+            }
+
+            if (title === query) score += 80;
+            else if (title.includes(query) && query.length >= 6) score += 50;
+
+            for (const kw of item.keywords) {
+                const k = kw.toLowerCase();
+                if (query === k) score += 35;
+                else if (query.includes(k) && k.length >= 5) score += 18;
+                else if (k.includes(query) && query.length >= 4) score += 12;
+            }
+
+            for (const word of queryWords) {
+                const root = stemHelperWord(word);
+                if (root.length < 3) continue;
+                if (item.phrases?.some((p) => p.toLowerCase().includes(root))) score += 8;
+                if (item.keywords.some((kw) => {
+                    const k = kw.toLowerCase();
+                    return k === root || k.includes(root) || root.includes(k);
+                })) score += 6;
+            }
+
+            return score;
+        }
+
         function performHelperSearch(query) {
             const resultsArea = document.getElementById('resultsArea');
             const t = translations[currentLangCode];
-            const queryWords = query.split(/[\s,!?]+/).filter((w) => w.length >= 3);
-            const results = helperContactData[currentLangCode].filter((item) => {
-                if (item.title.toLowerCase().includes(query) || item.keywords.some((kw) => kw.toLowerCase().includes(query) || query.includes(kw.toLowerCase()))) return true;
-                for (const word of queryWords) {
-                    let root = word.replace(/(та|те|то|и|а|ът|ят|ния|ният)$/i, '');
-                    if (root.length < 3) root = word;
-                    if (item.keywords.some((kw) => kw.toLowerCase().includes(root))) return true;
+            const normalized = normalizeHelperQuery(query);
+            const queryWords = normalized.split(/[\s,!?]+/).filter((w) => w.length >= 3);
+            const items = helperContactData[currentLangCode];
+
+            const scored = items
+                .map((item) => ({ item, score: scoreHelperItem(item, normalized, queryWords) }))
+                .filter((x) => x.score > 0)
+                .sort((a, b) => b.score - a.score);
+
+            let results = scored.map((x) => x.item);
+
+            if (scored.length > 0) {
+                const top = scored[0];
+                const phraseHit = top.item.phrases?.some((p) => normalized.includes(p.toLowerCase()));
+                const strongMatch = top.score >= 100 || phraseHit;
+                const clearWinner = scored.length === 1 || top.score >= scored[1].score + 40;
+                if (strongMatch || (clearWinner && top.score >= 30)) {
+                    results = [top.item];
+                } else if (top.score >= 50 && top.score >= (scored[1]?.score || 0) + 25) {
+                    results = [top.item];
                 }
-                return false;
-            });
+            }
+
             resultsArea.innerHTML = '';
             resultsArea.classList.remove('hidden');
             if (results.length === 0) {
-                resultsArea.innerHTML = `<div class="text-center py-8 bg-gray-50 rounded-2xl border border-gray-200 shadow-inner"><i class="fa-solid fa-face-frown-open text-3xl text-gray-400 mb-3"></i><p class="text-brand-slate font-medium">${t.helper_notfound} "${query}".</p><p class="text-xs text-gray-400 mt-2">${currentLangCode === 'en' ? 'Try: company car accident, sick leave, schedule, dispatcher' : 'Опитай: птп служебна кола, болничен, график, диспечер'}</p></div>`;
+                resultsArea.innerHTML = `<div class="text-center py-8 bg-gray-50 rounded-2xl border border-gray-200 shadow-inner"><i class="fa-solid fa-face-frown-open text-3xl text-gray-400 mb-3"></i><p class="text-brand-slate font-medium">${t.helper_notfound} "${query}".</p><p class="text-xs text-gray-400 mt-2">${currentLangCode === 'en' ? 'Try: company car accident, sick leave, notice, contract change, schedule' : 'Опитай: птп служебна кола, болничен, предизвестие, промяна договор, график'}</p></div>`;
                 return;
             }
             results.forEach((item) => {
@@ -3764,6 +4940,34 @@
             } else {
                 container.classList.add('hidden');
                 btn.innerHTML = `<i class="fa-solid fa-eye"></i> <span>${lang === 'en' ? 'View sample' : 'Виж примерния протокол'}</span>`;
+                btn.classList.replace('bg-gray-600', 'bg-blue-600');
+                btn.classList.replace('hover:bg-gray-700', 'hover:bg-blue-700');
+            }
+        }
+
+        function toggleCarNotifyGuide() {
+            const container = document.getElementById('car-notify-image-container');
+            const btn = document.getElementById('btn-toggle-car-notify');
+            const lang = currentLangCode;
+            const t = translations[lang] || translations.bg;
+            if (!container || !btn) return;
+
+            if (container.classList.contains('hidden')) {
+                if (!container.querySelector('img')) {
+                    const img = document.createElement('img');
+                    img.src = 'avto-ikonom-notify.png';
+                    img.alt = lang === 'en' ? 'Avto Ikonom captain notification guide' : 'Визуален наръчник за уведомяване в Авто Иконом';
+                    img.className = 'w-full h-auto rounded-lg object-contain';
+                    img.loading = 'lazy';
+                    container.appendChild(img);
+                }
+                container.classList.remove('hidden');
+                btn.innerHTML = `<i class="fa-solid fa-eye-slash"></i> <span>${t.btn_hide_car_notify || (lang === 'en' ? 'Hide guide' : 'Скрий наръчника')}</span>`;
+                btn.classList.replace('bg-blue-600', 'bg-gray-600');
+                btn.classList.replace('hover:bg-blue-700', 'hover:bg-gray-700');
+            } else {
+                container.classList.add('hidden');
+                btn.innerHTML = `<i class="fa-solid fa-images"></i> <span>${t.btn_show_car_notify || (lang === 'en' ? 'View visual guide' : 'Виж визуален наръчник')}</span>`;
                 btn.classList.replace('bg-gray-600', 'bg-blue-600');
                 btn.classList.replace('hover:bg-gray-700', 'hover:bg-blue-700');
             }
@@ -4001,6 +5205,7 @@
             document.body.classList.add('splash-revealed');
             updateMobileNavVisibility();
             setTimeout(() => splash.remove(), 800);
+            maybeShowLearnPrompt();
         }
 
         window.onload = function() {
