@@ -81,6 +81,11 @@
             --portal-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
+        .surface-warm {
+            background: #FFF8F3;
+            color: var(--text-primary);
+        }
+
         html { -webkit-tap-highlight-color: transparent; }
         body.portal-body {
             background-color: var(--surface-bg);
@@ -153,11 +158,18 @@
             color-scheme: dark;
             --surface-bg: #121212;
             --surface-card: #1E1E1E;
+            --surface-elevated: #252525;
+            --surface-warm: #2c2418;
+            --surface-cool: #1a2433;
+            --surface-inset: #1a1a1a;
             --text-primary: #F5F5F5;
             --text-secondary: #B0B0B0;
             --text-muted: #888888;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(255, 128, 0, 0.28);
             --portal-shadow-card: 0 4px 12px rgba(0, 0, 0, 0.35);
             --brand-orange-soft: rgba(255, 128, 0, 0.15);
+            --brand-orange-readable: #FFB366;
         }
         html.theme-dark body.portal-body { background-color: var(--surface-bg); color: var(--text-primary); }
         html.theme-dark .portal-section,
@@ -181,6 +193,257 @@
         html.theme-dark .learn-modal-panel,
         html.theme-dark .learn-prompt-card { background: var(--surface-card); }
         html.theme-dark .learn-btn--ghost { background: rgba(255,255,255,0.08); color: var(--text-secondary); }
+
+        /* —— Тъмен режим: разширени корекции за контраст —— */
+        html.theme-dark #page-home > section,
+        html.theme-dark #zones,
+        html.theme-dark #page-learn .portal-section {
+            background: var(--surface-card) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark .portal-search-panel {
+            background: linear-gradient(180deg, #1e1e1e 0%, #1a1a1a 100%) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark .surface-warm,
+        html.theme-dark .bg-\[\#FFF8F3\] {
+            background: linear-gradient(180deg, #2e261c 0%, #231c14 100%) !important;
+            border-color: rgba(255, 128, 0, 0.32) !important;
+            color: var(--text-primary) !important;
+            box-shadow: var(--portal-shadow-card) !important;
+        }
+        html.theme-dark .surface-warm ul,
+        html.theme-dark .surface-warm li,
+        html.theme-dark .surface-warm li span,
+        html.theme-dark .surface-warm .text-brand-dark,
+        html.theme-dark .bg-\[\#FFF8F3\] ul,
+        html.theme-dark .bg-\[\#FFF8F3\] li,
+        html.theme-dark .bg-\[\#FFF8F3\] li span {
+            color: #f0ebe4 !important;
+        }
+        html.theme-dark .surface-warm .text-brand-orange,
+        html.theme-dark .surface-warm .fa-check,
+        html.theme-dark .surface-warm .fa-gift {
+            color: var(--brand-orange-readable) !important;
+            opacity: 1 !important;
+        }
+        html.theme-dark .surface-warm li.bg-brand-orange\/10,
+        html.theme-dark .bg-\[\#FFF8F3\] li.bg-brand-orange\/10 {
+            background: rgba(255, 128, 0, 0.22) !important;
+            border: 1px solid rgba(255, 128, 0, 0.38) !important;
+        }
+        html.theme-dark .surface-warm li.bg-brand-orange\/10 span,
+        html.theme-dark li.bg-brand-orange\/10 span {
+            color: #ffdcc4 !important;
+        }
+        html.theme-dark .surface-warm .border-brand-orange\/10 {
+            border-color: rgba(255, 128, 0, 0.22) !important;
+        }
+        html.theme-dark .bg-blue-50,
+        html.theme-dark .bg-blue-50\/80,
+        html.theme-dark #ptp-protocol-guide {
+            background: var(--surface-cool) !important;
+            border-color: rgba(96, 165, 250, 0.22) !important;
+            color: var(--text-primary) !important;
+        }
+        html.theme-dark .bg-orange-50,
+        html.theme-dark .bg-red-50,
+        html.theme-dark .bg-teal-50,
+        html.theme-dark .bg-green-50,
+        html.theme-dark .bg-indigo-50,
+        html.theme-dark .bg-violet-50,
+        html.theme-dark .bg-rose-50,
+        html.theme-dark .bg-cyan-50,
+        html.theme-dark .bg-yellow-50 {
+            background-color: var(--surface-elevated) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark .bg-brand-orange\/5,
+        html.theme-dark .bg-brand-orange\/10 {
+            background-color: rgba(255, 128, 0, 0.12) !important;
+            border-color: rgba(255, 128, 0, 0.22) !important;
+        }
+        html.theme-dark .bg-gray-100,
+        html.theme-dark .bg-gray-200\/60 {
+            background-color: #2e2e2e !important;
+        }
+        html.theme-dark .bg-blue-100 { background: rgba(37, 99, 235, 0.22) !important; }
+        html.theme-dark .bg-teal-100 { background: rgba(13, 148, 136, 0.22) !important; }
+        html.theme-dark .bg-red-100 { background: rgba(220, 38, 38, 0.22) !important; }
+        html.theme-dark .bg-brand-lightBg,
+        html.theme-dark .car-notify-platform {
+            background: var(--surface-inset) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark .car-notify-block {
+            background: linear-gradient(180deg, #262626 0%, #1e1e1e 100%) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark .bg-gradient-to-b,
+        html.theme-dark .ptp-wizard-hero {
+            background-image: none !important;
+            background-color: var(--surface-card) !important;
+        }
+        html.theme-dark .from-red-50\/90,
+        html.theme-dark .from-orange-50\/50,
+        html.theme-dark .to-white {
+            background: linear-gradient(180deg, #2a1f1a 0%, var(--surface-card) 100%) !important;
+        }
+        html.theme-dark .border-blue-100,
+        html.theme-dark .border-blue-200,
+        html.theme-dark .border-blue-200\/80,
+        html.theme-dark .border-orange-200,
+        html.theme-dark .border-red-200,
+        html.theme-dark .border-teal-200,
+        html.theme-dark .border-teal-300,
+        html.theme-dark .border-brand-orange\/20,
+        html.theme-dark .border-brand-orange\/30 {
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark .text-blue-600 { color: #93c5fd !important; }
+        html.theme-dark .text-blue-700,
+        html.theme-dark .text-blue-800 { color: #bfdbfe !important; }
+        html.theme-dark .text-teal-700 { color: #5eead4 !important; }
+        html.theme-dark .text-gray-400 { color: var(--text-muted) !important; }
+        html.theme-dark .text-gray-500,
+        html.theme-dark .text-gray-600,
+        html.theme-dark .text-gray-700 { color: var(--text-secondary) !important; }
+        html.theme-dark .text-brand-slate strong,
+        html.theme-dark .text-gray-700 strong,
+        html.theme-dark p strong { color: #f0f0f0; }
+        html.theme-dark #vehicle-tabs-wrap {
+            background: var(--surface-inset) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark #tab-personal.bg-white {
+            background: #333 !important;
+            border-color: rgba(255, 128, 0, 0.35) !important;
+            color: var(--brand-orange) !important;
+        }
+        html.theme-dark #tab-company.text-gray-500 { color: var(--text-muted) !important; }
+        html.theme-dark .result-card { color: var(--text-primary); }
+        html.theme-dark .result-card .bg-white\/60 {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark .result-card [class*="bg-white"]:not(.bg-brand-orange) {
+            background: #333 !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark .shadow-inner { box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35) !important; }
+        html.theme-dark .shadow-sm,
+        html.theme-dark .hover\:shadow-md:hover { box-shadow: var(--portal-shadow-card) !important; }
+        html.theme-dark #lang-menu {
+            background: rgba(30, 30, 30, 0.98) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark #lang-menu button:hover { background: rgba(255, 128, 0, 0.12) !important; }
+        html.theme-dark .car-contact-card,
+        html.theme-dark .car-maint-card,
+        html.theme-dark .car-loc-card {
+            background: var(--surface-elevated) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark .ptp-detail-box { color: var(--text-primary) !important; }
+        html.theme-dark .custom-scrollbar::-webkit-scrollbar-track { background: #1a1a1a; }
+        html.theme-dark footer { color: var(--text-secondary); }
+
+        /* Тъмен режим — допълнителни корекции за четимост */
+        html.theme-dark .text-brand-orange { color: var(--brand-orange-readable) !important; }
+        html.theme-dark .guide-nav-btn:not(.active) {
+            background: var(--surface-elevated) !important;
+            color: var(--text-secondary) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark .guide-nav-btn:not(.active) i { color: var(--brand-orange-readable) !important; }
+        html.theme-dark .guide-nav-btn.active,
+        html.theme-dark .guide-nav-btn.active i,
+        html.theme-dark .guide-nav-btn.active span { color: #fff !important; }
+        html.theme-dark #section-schedule .bg-white.p-4,
+        html.theme-dark #section-schedule .flex.items-center.gap-4.bg-white {
+            background: var(--surface-elevated) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark #section-schedule .bg-white.p-4 p,
+        html.theme-dark #section-schedule .bg-white.p-4 span {
+            color: var(--text-primary) !important;
+        }
+        html.theme-dark #section-schedule .bg-blue-50 p,
+        html.theme-dark #section-schedule .bg-orange-50 p,
+        html.theme-dark #section-schedule .bg-blue-50 h5,
+        html.theme-dark #section-schedule .bg-orange-50 h5 {
+            color: var(--text-primary) !important;
+        }
+        html.theme-dark #section-contacts .text-gray-700,
+        html.theme-dark #section-contacts .bg-brand-lightBg p {
+            color: var(--text-secondary) !important;
+        }
+        html.theme-dark #section-contacts .bg-brand-lightBg {
+            background: var(--surface-inset) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark .bg-gray-300 {
+            background: #4a4a4a !important;
+            color: #f5f5f5 !important;
+        }
+        html.theme-dark #contracts-grid > div {
+            background: var(--surface-elevated) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark #contracts-grid .bg-gray-100 {
+            background: #333 !important;
+            color: #e8e8e8 !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark #contracts-grid .text-gray-500,
+        html.theme-dark #contracts-grid .text-gray-700,
+        html.theme-dark #contracts-grid .text-brand-dark {
+            color: var(--text-secondary) !important;
+        }
+        html.theme-dark #contracts-grid .text-brand-orange { color: var(--brand-orange-readable) !important; }
+        html.theme-dark #map-zones-panel,
+        html.theme-dark #map-generic-info,
+        html.theme-dark #section-contacts .p-5.bg-brand-lightBg {
+            background: var(--surface-inset) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark #map-zones-panel li span,
+        html.theme-dark #map-zones-panel h5 { color: var(--text-primary) !important; }
+        html.theme-dark .bg-blue-100.text-blue-700 {
+            background: rgba(37, 99, 235, 0.28) !important;
+            color: #bfdbfe !important;
+            border-color: rgba(96, 165, 250, 0.35) !important;
+        }
+        html.theme-dark .bg-teal-100.text-teal-700 { color: #5eead4 !important; }
+        html.theme-dark select.bg-white,
+        html.theme-dark #common-city-select {
+            background: #2a2a2a !important;
+            color: #f5f5f5 !important;
+            border-color: rgba(255, 128, 0, 0.35) !important;
+        }
+        html.theme-dark .hub-card h3 { color: var(--text-primary) !important; }
+        html.theme-dark .hub-card p { color: var(--text-secondary) !important; }
+        html.theme-dark .portal-subnav { background: var(--surface-card) !important; }
+        html.theme-dark .bg-gray-50.border {
+            background: var(--surface-elevated) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        html.theme-dark .bg-orange-50.border-orange-200 {
+            background: rgba(255, 128, 0, 0.14) !important;
+            border-color: rgba(255, 128, 0, 0.28) !important;
+        }
+        html.theme-dark .bg-orange-50 .text-brand-dark,
+        html.theme-dark .bg-blue-50 .text-brand-dark {
+            color: var(--text-primary) !important;
+        }
+        html.theme-dark .search-input:focus { background: #333 !important; }
+        html.theme-dark #learn-help-btn { color: #93c5fd !important; }
+        html.theme-dark .surface-warm.border-brand-orange\/20,
+        html.theme-dark .surface-warm.border-brand-orange\/30 {
+            border-color: rgba(255, 128, 0, 0.32) !important;
+        }
 
         #top-controls { display: flex; align-items: center; gap: 0.5rem; flex-wrap: nowrap; }
         #theme-toggle {
@@ -1324,6 +1587,26 @@
             border-radius: 1rem; background: linear-gradient(135deg, #2563eb, #60a5fa);
             color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
         }
+        #lang-prompt { z-index: 198; }
+        .lang-prompt-card { max-width: 24rem; }
+        .lang-pick-btn {
+            width: 100%; padding: 0.85rem 1rem; border-radius: 0.9rem;
+            font-size: 0.95rem; font-weight: 800; border: 2px solid transparent;
+            cursor: pointer; transition: all 0.25s ease;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        .lang-pick-btn--bg {
+            background: linear-gradient(135deg, #fff8f3, #fff);
+            border-color: rgba(255, 128, 0, 0.35); color: #1a1a1a;
+        }
+        .lang-pick-btn--bg:hover { border-color: var(--brand-orange); background: rgba(255,128,0,0.08); transform: translateY(-1px); }
+        .lang-pick-btn--en {
+            background: linear-gradient(135deg, #eff6ff, #fff);
+            border-color: rgba(37, 99, 235, 0.35); color: #1e3a8a;
+        }
+        .lang-pick-btn--en:hover { border-color: #2563eb; background: rgba(37,99,235,0.08); transform: translateY(-1px); }
+        html.theme-dark .lang-pick-btn--bg { background: rgba(255,128,0,0.1); color: #f5f5f5; }
+        html.theme-dark .lang-pick-btn--en { background: rgba(37,99,235,0.12); color: #dbeafe; }
 
         /* Телефонен мокап за демота */
         .phone-mock {
@@ -1782,8 +2065,8 @@
         </button>
         <div id="lang-menu" class="absolute right-0 mt-2 w-44 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 hidden transition-all duration-200 overflow-hidden z-50">
             <ul class="py-2 text-sm font-semibold text-brand-dark list-none m-0 p-0">
-                <li><button type="button" onclick="setLang('bg')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">БГ | Български</button></li>
-                <li><button type="button" onclick="setLang('en')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">EN | English</button></li>
+                <li><button type="button" onclick="setLangFromMenu('bg')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">БГ | Български</button></li>
+                <li><button type="button" onclick="setLangFromMenu('en')" class="w-full text-left px-4 py-2.5 hover:bg-brand-orange/10 hover:text-brand-orange transition-colors">EN | English</button></li>
             </ul>
         </div>
         </div>
@@ -1960,7 +2243,7 @@
                     <p data-i18n="pay_desc" class="text-brand-slate text-base sm:text-lg">Възнаграждението се разпределя в два транша всеки месец:</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-[#FFF8F3] p-6 sm:p-8 rounded-2xl border border-brand-orange/20 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="surface-warm p-6 sm:p-8 rounded-2xl border border-brand-orange/20 shadow-sm hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between border-b border-brand-orange/10 pb-3 mb-4">
                             <h5 data-i18n="pay_30_title" class="text-xl sm:text-2xl font-black text-brand-orange">30-то число</h5>
                             <i class="fa-solid fa-sack-dollar text-brand-orange text-2xl opacity-50"></i>
@@ -1970,7 +2253,7 @@
                             <li class="flex items-start gap-2"><i class="fa-solid fa-check text-brand-orange mt-1"></i> <span data-i18n="pay_30_bul2">Амортизация (1-ва половина на текущ месец).</span></li>
                         </ul>
                     </div>
-                    <div class="bg-[#FFF8F3] p-6 sm:p-8 rounded-2xl border border-brand-orange/20 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="surface-warm p-6 sm:p-8 rounded-2xl border border-brand-orange/20 shadow-sm hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between border-b border-brand-orange/10 pb-3 mb-4">
                             <h5 data-i18n="pay_15_title" class="text-xl sm:text-2xl font-black text-brand-orange">15-то число</h5>
                             <i class="fa-solid fa-money-bill-trend-up text-brand-orange text-2xl opacity-50"></i>
@@ -2760,6 +3043,20 @@
         <i class="fa-solid fa-triangle-exclamation"></i>
     </button>
 
+    <!-- Първо посещение: избор на език -->
+    <div id="lang-prompt" class="learn-prompt hidden" role="dialog" aria-labelledby="lang-prompt-title">
+        <div class="learn-modal-backdrop"></div>
+        <div class="learn-prompt-card lang-prompt-card">
+            <div class="learn-prompt-icon" style="background:linear-gradient(135deg,#FF8000,#FFB347)"><i class="fa-solid fa-globe"></i></div>
+            <h2 id="lang-prompt-title" class="text-lg font-black text-brand-dark mb-1">Избери език · Choose language</h2>
+            <p class="text-sm text-brand-slate mb-5 leading-relaxed">Select your preferred language for the portal.<br>Изберете предпочитан език за портала.</p>
+            <div class="flex flex-col gap-2">
+                <button type="button" onclick="choosePortalLang('bg')" class="lang-pick-btn lang-pick-btn--bg"><span>🇧🇬</span> Български</button>
+                <button type="button" onclick="choosePortalLang('en')" class="lang-pick-btn lang-pick-btn--en"><span>🇬🇧</span> English</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Първо посещение: покана за обучение -->
     <div id="learn-prompt" class="learn-prompt hidden" role="dialog" aria-labelledby="learn-prompt-title">
         <div class="learn-modal-backdrop" onclick="dismissLearnPrompt()"></div>
@@ -3131,6 +3428,7 @@
 
         const THEME_STORAGE_KEY = 'takeaway-portal-theme';
         const LEARN_DISMISS_KEY = 'takeaway-learn-dismissed';
+        const LANG_PREF_KEY = 'takeaway-portal-lang';
 
         function getLearnStepMeta(tour, stepIndex) {
             const step = tour.steps[stepIndex];
@@ -3324,12 +3622,38 @@
             switchGlobalPage('learn');
         }
 
+        function getSavedLang() {
+            const saved = localStorage.getItem(LANG_PREF_KEY);
+            return saved === 'en' || saved === 'bg' ? saved : null;
+        }
+
+        function setLangFromMenu(lang) {
+            localStorage.setItem(LANG_PREF_KEY, lang);
+            setLang(lang);
+        }
+
+        function choosePortalLang(lang) {
+            localStorage.setItem(LANG_PREF_KEY, lang);
+            setLang(lang);
+            document.getElementById('lang-prompt')?.classList.add('hidden');
+            maybeShowLearnPrompt();
+        }
+
+        function maybeShowLangPrompt() {
+            if (getSavedLang()) {
+                maybeShowLearnPrompt();
+                return;
+            }
+            setTimeout(() => document.getElementById('lang-prompt')?.classList.remove('hidden'), 400);
+        }
+
         function dismissLearnPrompt() {
             localStorage.setItem(LEARN_DISMISS_KEY, '1');
             document.getElementById('learn-prompt')?.classList.add('hidden');
         }
 
         function maybeShowLearnPrompt() {
+            if (!getSavedLang()) return;
             if (localStorage.getItem(LEARN_DISMISS_KEY)) return;
             setTimeout(() => document.getElementById('learn-prompt')?.classList.remove('hidden'), 600);
         }
@@ -5308,7 +5632,7 @@
             document.body.classList.add('splash-revealed');
             updateMobileNavVisibility();
             setTimeout(() => splash.remove(), 800);
-            maybeShowLearnPrompt();
+            maybeShowLangPrompt();
         }
 
         window.onload = function() {
@@ -5317,7 +5641,7 @@
             initMaps();
             initDesignUX();
             initMobileUX();
-            setLang('bg');
+            setLang(getSavedLang() || 'bg');
             renderHelperQuickLinks();
             renderCityPickers();
             showCityOnMap('София');
