@@ -127,10 +127,7 @@
 
         body.has-app-nav main { padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)); }
         body.has-app-nav.has-fab main { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
-        body.has-app-nav.has-mobile-nav main { padding-bottom: calc(8.75rem + env(safe-area-inset-bottom, 0px)); }
-        body.has-app-nav.has-mobile-nav.has-fab main { padding-bottom: calc(9.25rem + env(safe-area-inset-bottom, 0px)); }
         body.has-app-nav footer { margin-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px)); }
-        body.has-app-nav.has-mobile-nav footer { margin-bottom: calc(8rem + env(safe-area-inset-bottom, 0px)); }
 
         /* FAB — спешен ПТП */
         #ptp-fab {
@@ -148,7 +145,6 @@
         #ptp-fab:hover, #ptp-fab:focus-visible { transform: scale(1.06); box-shadow: 0 8px 28px rgba(255, 128, 0, 0.5); }
         #ptp-fab:active { transform: scale(0.95); }
         body.has-fab #ptp-fab { display: flex; }
-        body.has-app-nav.has-mobile-nav #ptp-fab { bottom: calc(8.85rem + env(safe-area-inset-bottom, 0px)); }
         @media (min-width: 640px) {
             #ptp-fab { bottom: max(1.25rem, env(safe-area-inset-bottom, 0px)); }
         }
@@ -464,6 +460,59 @@
         }
 
         #top-controls { display: flex; align-items: center; gap: 0.5rem; flex-wrap: nowrap; }
+
+        /* Мобилно меню в хедъра — обучение, тема, език */
+        .header-menu-btn {
+            width: 2.5rem; height: 2.5rem; min-height: 2.5rem;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 10px; border: none; background: transparent;
+            color: var(--text-secondary); font-size: 1.05rem; cursor: pointer;
+            -webkit-tap-highlight-color: transparent; flex-shrink: 0;
+        }
+        .header-menu-btn:hover, .header-menu-btn:focus-visible { background: #f3f4f6; color: var(--brand-dark); }
+        .header-menu-dropdown {
+            position: fixed; right: 0.5rem;
+            top: calc(2.65rem + env(safe-area-inset-top, 0px));
+            min-width: 11.5rem; background: #fff;
+            border-radius: 14px; border: 1px solid #e5e7eb;
+            box-shadow: 0 10px 32px rgba(17, 24, 39, 0.14);
+            padding: 0.35rem; z-index: 130;
+        }
+        .welcome-menu-btn {
+            display: none; position: fixed; z-index: 110;
+            top: max(0.5rem, env(safe-area-inset-top));
+            right: max(0.5rem, env(safe-area-inset-right));
+            width: 2.5rem; height: 2.5rem; min-height: 2.5rem;
+            align-items: center; justify-content: center;
+            border-radius: 10px; border: 1px solid #e5e7eb;
+            background: rgba(255,255,255,0.95); color: var(--text-secondary);
+            font-size: 1.05rem; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        body.on-welcome .welcome-menu-btn { display: inline-flex; }
+        html.theme-dark .welcome-menu-btn { background: rgba(30,30,30,0.95); border-color: rgba(255,255,255,0.12); }
+        .header-menu-item {
+            display: flex; align-items: center; gap: 0.65rem; width: 100%;
+            padding: 0.65rem 0.75rem; border: none; background: transparent;
+            border-radius: 10px; font-size: 0.875rem; font-weight: 700;
+            color: var(--text-primary); text-align: left; cursor: pointer;
+        }
+        .header-menu-item:hover, .header-menu-item:focus-visible { background: #f9fafb; }
+        .header-menu-item i { width: 1.1rem; text-align: center; flex-shrink: 0; }
+        .header-menu-item--learn i { color: #2563eb; }
+        .header-menu-item--theme i { color: var(--brand-orange); }
+        .header-menu-item--lang i { color: var(--brand-orange); }
+        .header-menu-divider { height: 1px; background: #f0f0f0; margin: 0.25rem 0.35rem; }
+        .header-menu-lang-row { display: flex; gap: 0.35rem; padding: 0.25rem 0.35rem 0.15rem; }
+        .header-menu-lang-btn {
+            flex: 1; padding: 0.45rem 0.5rem; border-radius: 8px;
+            border: 1px solid #e5e7eb; background: #fff;
+            font-size: 0.75rem; font-weight: 800; cursor: pointer;
+        }
+        .header-menu-lang-btn.active { border-color: var(--brand-orange); background: var(--brand-orange-soft); color: var(--brand-orange); }
+        html.theme-dark .header-menu-dropdown { background: var(--surface-elevated); border-color: rgba(255,255,255,0.1); }
+        html.theme-dark .header-menu-item:hover { background: rgba(255,255,255,0.06); }
+        html.theme-dark .header-menu-divider { background: rgba(255,255,255,0.08); }
+        html.theme-dark .header-menu-lang-btn { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); color: var(--text-primary); }
         #theme-toggle {
             width: 2.75rem; height: 2.75rem; min-height: 2.75rem;
             display: flex; align-items: center; justify-content: center;
@@ -526,10 +575,19 @@
             #guide-section-nav .flex { flex-wrap: wrap; }
         }
         @media (max-width: 639px) {
-            .portal-subnav { top: calc(3rem + env(safe-area-inset-top, 0px)); margin-left: -0.125rem; margin-right: -0.125rem; border-radius: 0 0 12px 12px; }
+            .portal-subnav { top: calc(2.75rem + env(safe-area-inset-top, 0px)); margin: 0 -0.625rem 0.5rem; border-radius: 0 0 12px 12px; padding: 0.35rem 0.5rem; }
             .portal-subnav .flex { gap: 0.35rem !important; }
-            #car-tabs-nav.portal-subnav .flex { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-            #car-tabs-nav.portal-subnav .car-nav-btn { flex: 0 0 auto; white-space: nowrap; min-width: max-content; }
+            .portal-subnav .guide-nav-btn,
+            .portal-subnav .car-nav-btn {
+                min-height: 2.35rem; padding: 0.4rem 0.65rem; font-size: 0.6875rem;
+            }
+            #guide-section-nav .flex,
+            #car-tabs-nav.portal-subnav .flex { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+            #guide-section-nav .flex::-webkit-scrollbar,
+            #car-tabs-nav.portal-subnav .flex::-webkit-scrollbar { display: none; }
+            #car-tabs-nav.portal-subnav .car-nav-btn,
+            #guide-section-nav .guide-nav-btn { flex: 0 0 auto; white-space: nowrap; }
+            #car-tabs-nav.portal-subnav .car-tab-btn-desktop { padding: 0.4rem 0.65rem !important; }
         }
 
         /* Бутони за обаждане и Viber */
@@ -773,6 +831,7 @@
         .guide-nav-btn:not(.active):hover { transform: translateY(-1px); border-color: rgba(255, 122, 0, 0.35); color: var(--portal-orange); }
 
         #main-header .portal-header-inner {
+            position: relative;
             box-shadow: var(--portal-shadow);
             transition: box-shadow 0.3s, transform 0.3s var(--portal-ease);
         }
@@ -1025,7 +1084,7 @@
 
         /* Mobile-first navigation */
         .scroll-mt-sticky { scroll-margin-top: 5.5rem; }
-        @media (max-width: 639px) { .scroll-mt-sticky { scroll-margin-top: 7.25rem; } }
+            @media (max-width: 639px) { .scroll-mt-sticky { scroll-margin-top: 6.5rem; } }
         @media (min-width: 640px) { .scroll-mt-sticky { scroll-margin-top: 9.5rem; } }
 
         .mobile-tab-bar {
@@ -1037,12 +1096,7 @@
             box-shadow: 0 -6px 24px rgba(17, 24, 39, 0.08);
         }
         .mobile-tab-bar.sub-nav-bar {
-            bottom: calc(4.15rem + env(safe-area-inset-bottom, 0px));
-            z-index: 99;
-            border-top: none;
-            border-bottom: 1px solid #e5e7eb;
-            box-shadow: 0 -4px 16px rgba(17, 24, 39, 0.06);
-            padding-bottom: 0.35rem;
+            display: none !important;
         }
         html.theme-dark .mobile-tab-bar {
             background: rgba(26, 26, 28, 0.97);
@@ -1086,23 +1140,30 @@
             html { -webkit-text-size-adjust: 100%; }
             body { overflow-x: hidden; }
 
-            #mobile-location-bar.is-visible {
-                display: block;
-                position: sticky;
-                z-index: 90;
-                top: calc(3.1rem + env(safe-area-inset-top, 0px));
-            }
-            #top-controls { top: max(0.5rem, env(safe-area-inset-top)); right: max(0.5rem, env(safe-area-inset-right)); z-index: 110; }
-            #lang-btn { padding: 0.5rem 0.65rem; font-size: 0.75rem; min-height: 2.5rem; }
-            #lang-menu { max-width: calc(100vw - 1rem); }
-
+            #top-controls { display: none !important; }
             #main-header {
                 top: 0; left: 0; right: 0; max-width: none;
                 padding-top: max(0.25rem, env(safe-area-inset-top));
-                padding-left: 0.5rem; padding-right: 3.75rem;
+                padding-left: 0.5rem; padding-right: 0.5rem;
             }
             #main-header > div { border-radius: 0 0 1rem 1rem; border-top: none; min-height: 2.75rem; }
-            #header-page-title { font-size: 0.8125rem; }
+            #header-page-title { font-size: 0.875rem; font-weight: 800; }
+            #mobile-location-bar { display: none !important; }
+
+            /* Компактна долна навигация — само 4 таба */
+            .app-shell-nav { padding: 0.2rem 0.35rem calc(0.2rem + env(safe-area-inset-bottom, 0px)); }
+            .app-nav-btn { min-height: 2.65rem; font-size: 0.5625rem; gap: 0.1rem; padding: 0.2rem 0.1rem; }
+            .app-nav-btn i { font-size: 1.05rem; }
+            body.has-app-nav main { padding-bottom: calc(3.85rem + env(safe-area-inset-bottom, 0px)) !important; }
+            body.has-app-nav.has-fab main { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)) !important; }
+            body.has-app-nav footer { margin-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px)) !important; }
+            #ptp-fab { bottom: calc(3.95rem + env(safe-area-inset-bottom, 0px)); width: 3.15rem; height: 3.15rem; font-size: 1.2rem; }
+
+            /* Без повтарящи се заглавия — вече са в хедъра */
+            #page-zones [data-i18n="zones_page_title"],
+            #page-cars .car-tab-section > h3,
+            #page-cars .car-section-head h3 { display: none !important; }
+            #section-common-intro [data-i18n="common_title"] { display: none !important; }
 
             main { padding-top: 0.5rem; padding-left: 0.625rem; padding-right: 0.625rem; }
             body:not(.has-app-nav) main { padding-bottom: 1rem; }
@@ -1192,12 +1253,7 @@
 
             /* Служебни коли */
             #page-cars.global-page { gap: 0.5rem; }
-            #page-cars > .flex:first-child { margin-bottom: 0; }
-            #page-cars .cars-back-btn {
-                width: auto !important; min-width: 2.75rem; min-height: 2.75rem;
-                padding: 0.65rem !important; justify-content: center !important;
-            }
-            #page-cars .cars-back-btn span { display: none; }
+            #page-cars > .flex:first-child { display: none; }
             #page-cars .car-tab-section { padding: 0.75rem !important; }
             #page-cars .car-tab-section > h3,
             #page-cars .car-tab-section .car-section-head h3 { font-size: 1rem !important; line-height: 1.25; }
@@ -2347,15 +2403,38 @@
         </div>
     </div>
 
+    <div id="header-menu" class="header-menu-dropdown hidden sm:hidden" role="menu">
+        <button type="button" class="header-menu-item header-menu-item--learn" role="menuitem" onclick="openLearnHub(); closeAllMenus();">
+            <i class="fa-solid fa-graduation-cap"></i> <span data-i18n="learn_help_aria">Обучение</span>
+        </button>
+        <button type="button" id="header-menu-theme" class="header-menu-item header-menu-item--theme" role="menuitem" onclick="toggleTheme(); updateHeaderMenuLabels();">
+            <i class="fa-solid fa-moon"></i> <span id="header-menu-theme-label" data-i18n="theme_dark">Тъмен режим</span>
+        </button>
+        <div class="header-menu-divider"></div>
+        <div class="header-menu-lang-row" role="group" aria-label="Език">
+            <button type="button" class="header-menu-lang-btn active" data-lang="bg" onclick="setLangFromMenu('bg')">БГ</button>
+            <button type="button" class="header-menu-lang-btn" data-lang="en" onclick="setLangFromMenu('en')">EN</button>
+        </div>
+    </div>
+
+    <button type="button" id="welcome-menu-btn" class="welcome-menu-btn sm:hidden" onclick="toggleHeaderMenu()" aria-label="Меню" aria-expanded="false" aria-controls="header-menu">
+        <i class="fa-solid fa-ellipsis"></i>
+    </button>
+
     <header id="main-header" class="sticky top-0 sm:top-4 z-[100] mx-auto px-3 sm:px-4 max-w-2xl w-full transition-all duration-300 hidden">
         <div class="portal-header-inner bg-white/90 backdrop-blur-md rounded-2xl px-3 sm:px-4 py-2.5 shadow-lg border border-gray-200/80 flex items-center gap-2 sm:gap-3">
             <button type="button" onclick="goToWelcome()" class="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-gray-500 hover:text-brand-orange hover:bg-brand-orange/5 transition-all" title="Начало">
                 <i class="fa-solid fa-house"></i>
                 <span class="hidden sm:inline" data-i18n="nav_home">Начало</span>
             </button>
-            <span class="text-gray-200 font-light select-none shrink-0">|</span>
+            <span class="text-gray-200 font-light select-none shrink-0 hidden sm:inline">|</span>
             <p id="header-page-title" class="flex-1 min-w-0 text-sm sm:text-base font-black text-brand-dark truncate text-center">Обща информация</p>
-            <div class="w-9 sm:w-16 shrink-0" aria-hidden="true"></div>
+            <div class="header-actions shrink-0 relative">
+                <button type="button" id="header-menu-btn" class="header-menu-btn sm:hidden" onclick="toggleHeaderMenu()" aria-label="Меню" aria-expanded="false" aria-controls="header-menu">
+                    <i class="fa-solid fa-ellipsis"></i>
+                </button>
+                <div class="hidden sm:block w-16 shrink-0" aria-hidden="true"></div>
+            </div>
         </div>
     </header>
 
@@ -2487,10 +2566,10 @@
             <!-- Навигация по раздели -->
             <nav id="guide-section-nav" class="portal-subnav hidden-subnav sticky top-[4.25rem] z-[90] overflow-x-auto custom-scrollbar">
                 <div class="flex items-center min-w-max gap-1.5 sm:gap-2">
-                    <button type="button" onclick="scrollToGuideSection('section-pay')" class="guide-nav-btn active flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-pay"><i class="fa-solid fa-sack-dollar text-brand-orange"></i><span data-i18n="nav_sec_pay">Плащания</span></button>
-                    <button type="button" onclick="scrollToGuideSection('section-schedule')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-schedule"><i class="fa-solid fa-calendar-days text-brand-orange"></i><span data-i18n="nav_sec_schedule">Графици</span></button>
-                    <button type="button" onclick="scrollToGuideSection('methodology')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="methodology"><i class="fa-solid fa-chart-line text-brand-orange"></i><span data-i18n="nav_sec_income">Доходи</span></button>
-                    <button type="button" onclick="scrollToGuideSection('section-contacts')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-contacts"><i class="fa-solid fa-headset text-brand-orange"></i><span data-i18n="nav_sec_contacts">Контакти</span></button>
+                    <button type="button" onclick="scrollToGuideSection('section-pay')" class="guide-nav-btn active flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-pay"><i class="fa-solid fa-sack-dollar text-brand-orange"></i><span class="hidden sm:inline" data-i18n="nav_sec_pay">Плащания</span><span class="sm:hidden" data-i18n="nav_mob_pay">Плащ.</span></button>
+                    <button type="button" onclick="scrollToGuideSection('section-schedule')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-schedule"><i class="fa-solid fa-calendar-days text-brand-orange"></i><span class="hidden sm:inline" data-i18n="nav_sec_schedule">Графици</span><span class="sm:hidden" data-i18n="nav_mob_schedule">График</span></button>
+                    <button type="button" onclick="scrollToGuideSection('methodology')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="methodology"><i class="fa-solid fa-chart-line text-brand-orange"></i><span class="hidden sm:inline" data-i18n="nav_sec_income">Доходи</span><span class="sm:hidden" data-i18n="nav_mob_income">Доход</span></button>
+                    <button type="button" onclick="scrollToGuideSection('section-contacts')" class="guide-nav-btn flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 bg-white border border-gray-100 whitespace-nowrap transition-all" data-section="section-contacts"><i class="fa-solid fa-headset text-brand-orange"></i><span class="hidden sm:inline" data-i18n="nav_sec_contacts">Контакти</span><span class="sm:hidden" data-i18n="nav_mob_contacts">Контакт</span></button>
                 </div>
             </nav>
 
@@ -2852,11 +2931,11 @@
 
             <nav id="car-tabs-nav" class="portal-subnav hidden-subnav bg-white rounded-2xl p-2 shadow-sm border border-gray-200">
                 <div class="flex items-center gap-2">
-                    <button id="btn-car-first" data-car-tab="car-first" onclick="openCarTab('car-first')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all shadow-sm bg-brand-orange text-white"><i class="fa-solid fa-flag-checkered"></i> <span data-i18n="car_tab_first">Първа смяна</span></button>
-                    <button id="btn-car-map" data-car-tab="car-map" onclick="openCarTab('car-map')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all bg-white text-gray-500 hover:bg-gray-50 hover:text-brand-dark"><i class="fa-solid fa-map-location-dot"></i> <span data-i18n="car_tab_map">Карта & Старт</span></button>
-                    <button id="btn-car-maint" data-car-tab="car-maint" onclick="openCarTab('car-maint')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all bg-white text-gray-500 hover:bg-gray-50 hover:text-brand-dark"><i class="fa-solid fa-wrench"></i> <span data-i18n="car_tab_maint">Поддръжка</span></button>
-                    <button id="btn-car-sos" data-car-tab="car-sos" onclick="openCarTab('car-sos')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all bg-white text-gray-500 hover:bg-gray-50 hover:text-brand-dark"><i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="car_tab_sos">Аварии & ПТП</span></button>
-                    <button id="btn-car-contacts" data-car-tab="car-contacts" onclick="openCarTab('car-contacts')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all bg-white text-gray-500 hover:bg-gray-50 hover:text-brand-dark"><i class="fa-solid fa-bell"></i> <span data-i18n="car_tab_contacts">Уведомяване</span></button>
+                    <button id="btn-car-first" data-car-tab="car-first" onclick="openCarTab('car-first')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all shadow-sm bg-brand-orange text-white"><i class="fa-solid fa-flag-checkered"></i> <span class="hidden sm:inline" data-i18n="car_tab_first">Първа смяна</span><span class="sm:hidden" data-i18n="nav_mob_car_first">1-ва смяна</span></button>
+                    <button id="btn-car-map" data-car-tab="car-map" onclick="openCarTab('car-map')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all bg-white text-gray-500 hover:bg-gray-50 hover:text-brand-dark"><i class="fa-solid fa-map-location-dot"></i> <span class="hidden sm:inline" data-i18n="car_tab_map">Карта & Старт</span><span class="sm:hidden" data-i18n="nav_mob_car_map">Карта</span></button>
+                    <button id="btn-car-maint" data-car-tab="car-maint" onclick="openCarTab('car-maint')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all bg-white text-gray-500 hover:bg-gray-50 hover:text-brand-dark"><i class="fa-solid fa-wrench"></i> <span class="hidden sm:inline" data-i18n="car_tab_maint">Поддръжка</span><span class="sm:hidden" data-i18n="nav_mob_car_maint">Поддр.</span></button>
+                    <button id="btn-car-sos" data-car-tab="car-sos" onclick="openCarTab('car-sos')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all bg-white text-gray-500 hover:bg-gray-50 hover:text-brand-dark"><i class="fa-solid fa-triangle-exclamation"></i> <span class="hidden sm:inline" data-i18n="car_tab_sos">Аварии & ПТП</span><span class="sm:hidden" data-i18n="nav_mob_car_sos">ПТП</span></button>
+                    <button id="btn-car-contacts" data-car-tab="car-contacts" onclick="openCarTab('car-contacts')" class="car-nav-btn car-tab-btn-desktop flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all bg-white text-gray-500 hover:bg-gray-50 hover:text-brand-dark"><i class="fa-solid fa-bell"></i> <span class="hidden sm:inline" data-i18n="car_tab_contacts">Уведомяване</span><span class="sm:hidden" data-i18n="nav_mob_car_notify">Увед.</span></button>
                 </div>
             </nav>
 
@@ -4118,6 +4197,7 @@
         function setLangFromMenu(lang) {
             localStorage.setItem(LANG_PREF_KEY, lang);
             setLang(lang);
+            closeAllMenus();
         }
 
         function choosePortalLang(lang) {
@@ -4151,6 +4231,7 @@
             localStorage.setItem(THEME_STORAGE_KEY, isDark ? 'dark' : 'light');
             applyThemeMeta(isDark);
             updateThemeToggleIcon(isDark);
+            updateHeaderMenuLabels();
         }
 
         function initTheme() {
@@ -4159,6 +4240,7 @@
             document.documentElement.classList.toggle('theme-dark', preferDark);
             applyThemeMeta(preferDark);
             updateThemeToggleIcon(preferDark);
+            updateHeaderMenuLabels();
         }
 
         function applyThemeMeta(isDark) {
@@ -4548,12 +4630,9 @@
 
         function updateHeaderForPage() {
             const onWelcome = currentPage === 'welcome';
+            document.body.classList.toggle('on-welcome', onWelcome);
             document.getElementById('main-header')?.classList.toggle('hidden', onWelcome);
-            const titleEl = document.getElementById('header-page-title');
-            if (titleEl && !onWelcome) {
-                const titles = PAGE_TITLES[currentLangCode] || PAGE_TITLES.bg;
-                titleEl.textContent = titles[currentPage] || titles.home;
-            }
+            updateHeaderTitle();
             updateMobileNavVisibility();
         }
 
@@ -4600,14 +4679,82 @@
             if (header && !header.classList.contains('hidden')) {
                 offset += header.offsetHeight;
             }
-            if (!isMobileView()) {
-                const topNav = document.getElementById('guide-section-nav');
-                if (topNav && currentPage === 'home') offset += topNav.offsetHeight + 8;
+            if (isMobileView()) {
+                const subnav = currentPage === 'home' ? document.getElementById('guide-section-nav')
+                    : currentPage === 'cars' ? document.getElementById('car-tabs-nav') : null;
+                if (subnav && !subnav.classList.contains('hidden-subnav')) {
+                    offset += subnav.offsetHeight + 4;
+                }
             } else {
-                const locBar = document.getElementById('mobile-location-bar');
-                if (locBar?.classList.contains('is-visible')) offset += locBar.offsetHeight;
+                const topNav = document.getElementById('guide-section-nav');
+                if (topNav && currentPage === 'home' && !topNav.classList.contains('hidden-subnav')) {
+                    offset += topNav.offsetHeight + 8;
+                }
             }
             return offset;
+        }
+
+        function updateHeaderTitle(sectionId, carTab) {
+            const titleEl = document.getElementById('header-page-title');
+            if (!titleEl || currentPage === 'welcome') return;
+            const t = PAGE_TITLES[currentLangCode] || PAGE_TITLES.bg;
+            const tr = translations[currentLangCode] || translations.bg;
+            const mobile = isMobileView();
+            let title = t[currentPage] || t.home;
+
+            if (currentPage === 'home') {
+                const sec = sectionId || document.querySelector('.guide-nav-btn.active')?.getAttribute('data-section');
+                if (mobile && sec && sec !== 'section-common-intro') {
+                    const keys = {
+                        'section-pay': 'nav_sec_pay',
+                        'section-schedule': 'nav_sec_schedule',
+                        'methodology': 'nav_sec_income',
+                        'section-contacts': 'nav_sec_contacts'
+                    };
+                    title = tr[keys[sec]] || GUIDE_SECTION_LABELS[sec] || title;
+                } else if (!mobile) {
+                    title = t.home;
+                }
+            } else if (currentPage === 'cars') {
+                const tab = carTab || getActiveCarTab();
+                title = mobile ? getCarTabLabel(tab) : t.cars;
+            } else if (currentPage === 'zones') {
+                title = mobile ? (currentLangCode === 'en' ? 'Starting zones' : 'Стартови зони') : t.zones;
+            } else if (currentPage === 'calculator') {
+                title = mobile ? t.calculator : `${t.calculator} · ${getCityLabel(currentCityName)}`;
+            } else if (currentPage === 'learn') {
+                title = t.learn;
+            }
+
+            titleEl.textContent = title;
+        }
+
+        function updateHeaderMenuLabels() {
+            const tr = translations[currentLangCode] || translations.bg;
+            const dark = document.documentElement.classList.contains('theme-dark');
+            const label = document.getElementById('header-menu-theme-label');
+            const icon = document.querySelector('#header-menu-theme i');
+            if (label) label.textContent = dark ? (tr.theme_light || 'Светъл режим') : (tr.theme_dark || 'Тъмен режим');
+            if (icon) icon.className = dark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            document.querySelectorAll('.header-menu-lang-btn').forEach((btn) => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLangCode);
+            });
+        }
+
+        function toggleHeaderMenu() {
+            const menu = document.getElementById('header-menu');
+            const btn = document.getElementById('header-menu-btn');
+            const welcomeBtn = document.getElementById('welcome-menu-btn');
+            if (!menu) return;
+            const willOpen = menu.classList.contains('hidden');
+            closeAllMenus();
+            if (willOpen) {
+                updateHeaderMenuLabels();
+                menu.classList.remove('hidden');
+                btn?.setAttribute('aria-expanded', 'true');
+                welcomeBtn?.setAttribute('aria-expanded', 'true');
+                document.getElementById('menu-backdrop')?.classList.add('visible');
+            }
         }
 
         function setGuideNavActive(sectionId) {
@@ -4615,7 +4762,7 @@
             document.querySelectorAll('.guide-nav-btn').forEach((btn) => {
                 btn.classList.toggle('active', btn.getAttribute('data-section') === navSection);
             });
-            updateMobileLocationBar(sectionId);
+            updateHeaderTitle(sectionId);
         }
 
         function setCarNavActive(tabName) {
@@ -4632,27 +4779,7 @@
                     btn.classList.toggle('hover:text-brand-dark', !isActive);
                 }
             });
-            updateMobileLocationBar(null, tabName);
-        }
-
-        function updateMobileLocationBar(sectionId, carTab) {
-            const bar = document.getElementById('mobile-location-bar');
-            const text = document.getElementById('mobile-location-text');
-            if (!bar || !text) return;
-            const titles = PAGE_TITLES[currentLangCode] || PAGE_TITLES.bg;
-            if (currentPage === 'home' && sectionId) {
-                const label = GUIDE_SECTION_LABELS[sectionId] || titles.home;
-                text.textContent = `${titles.home} · ${label}`;
-            } else if (currentPage === 'cars' && carTab) {
-                const label = getCarTabLabel(carTab);
-                text.textContent = `${titles.cars} · ${label}`;
-            } else if (currentPage === 'zones') {
-                text.textContent = titles.zones;
-            } else if (currentPage === 'calculator') {
-                text.textContent = `${titles.calculator} · ${getCityLabel(currentCityName)}`;
-            } else if (currentPage === 'learn') {
-                text.textContent = titles.learn;
-            }
+            updateHeaderTitle(null, tabName);
         }
 
         function setAppNavActive(pageId) {
@@ -4692,49 +4819,29 @@
             const onGuide = currentPage === 'home';
             const onCars = currentPage === 'cars';
             const mobile = isMobileView();
-            const showGuideMob = mobile && onGuide;
-            const showCarMob = mobile && onCars;
-            const hasSubNav = showGuideMob || showCarMob;
 
             document.body.classList.toggle('has-app-nav', mobile);
             document.body.classList.toggle('has-fab', !document.body.classList.contains('splash-active'));
-            document.body.classList.toggle('has-mobile-nav', hasSubNav);
+            document.body.classList.toggle('has-mobile-nav', false);
             document.getElementById('app-bottom-nav')?.classList.toggle('hidden', !mobile);
             setAppNavActive(currentPage);
 
-            const guideNav = document.getElementById('guide-section-nav');
-            if (guideNav) {
-                guideNav.classList.toggle('hidden-subnav', !onGuide || mobile);
-            }
-            const carTabs = document.getElementById('car-tabs-nav');
-            if (carTabs) {
-                carTabs.classList.toggle('hidden-subnav', !onCars || mobile);
-            }
+            document.getElementById('guide-section-nav')?.classList.toggle('hidden-subnav', !onGuide);
+            document.getElementById('car-tabs-nav')?.classList.toggle('hidden-subnav', !onCars);
 
-            const guideMob = document.getElementById('guide-mobile-nav');
-            if (guideMob) {
-                guideMob.classList.toggle('hidden', !showGuideMob);
-                guideMob.setAttribute('aria-hidden', showGuideMob ? 'false' : 'true');
-            }
-            const carMob = document.getElementById('car-mobile-nav');
-            if (carMob) {
-                carMob.classList.toggle('hidden', !showCarMob);
-            }
+            document.getElementById('guide-mobile-nav')?.classList.add('hidden');
+            document.getElementById('car-mobile-nav')?.classList.add('hidden');
+            document.getElementById('mobile-location-bar')?.classList.remove('is-visible');
 
-            const locBar = document.getElementById('mobile-location-bar');
-            if (locBar) {
-                const showLoc = mobile && (onGuide || onCars || currentPage === 'zones' || currentPage === 'calculator');
-                locBar.classList.toggle('is-visible', showLoc);
-                if (onGuide) updateMobileLocationBar(GUIDE_SECTIONS[1]);
-                if (onCars) updateMobileLocationBar(null, getActiveCarTab());
-                if (currentPage === 'zones') updateMobileLocationBar();
-                if (currentPage === 'calculator') updateMobileLocationBar();
-            }
+            updateHeaderTitle();
         }
 
         function closeAllMenus() {
             document.getElementById('city-menu')?.classList.add('hidden');
             document.getElementById('lang-menu')?.classList.add('hidden');
+            document.getElementById('header-menu')?.classList.add('hidden');
+            document.getElementById('header-menu-btn')?.setAttribute('aria-expanded', 'false');
+            document.getElementById('welcome-menu-btn')?.setAttribute('aria-expanded', 'false');
             document.getElementById('menu-backdrop')?.classList.remove('visible');
         }
 
@@ -5380,8 +5487,20 @@
             const langBtn = document.getElementById('lang-btn');
             const langMenu = document.getElementById('lang-menu');
             const topControls = document.getElementById('top-controls');
+            const headerActions = document.querySelector('.header-actions');
+            const welcomeBtn = document.getElementById('welcome-menu-btn');
+            const headerMenu = document.getElementById('header-menu');
             if (langBtn && langMenu && topControls && !topControls.contains(e.target)) {
                 langMenu.classList.add('hidden');
+            }
+            if (headerMenu && !headerMenu.contains(e.target)
+                && !(headerActions && headerActions.contains(e.target))
+                && !(welcomeBtn && welcomeBtn.contains(e.target))) {
+                headerMenu.classList.add('hidden');
+                document.getElementById('header-menu-btn')?.setAttribute('aria-expanded', 'false');
+                welcomeBtn?.setAttribute('aria-expanded', 'false');
+                if (!document.getElementById('city-menu')?.classList.contains('hidden')) return;
+                document.getElementById('menu-backdrop')?.classList.remove('visible');
             }
         });
 
@@ -5422,13 +5541,14 @@
             renderPtpStep(ptpCurrentStep);
             if (currentPage === 'home') {
                 const activeSection = document.querySelector('.guide-nav-btn.active')?.getAttribute('data-section');
-                if (activeSection) updateMobileLocationBar(activeSection);
+                if (activeSection) updateHeaderTitle(activeSection);
             } else if (currentPage === 'cars') {
                 const activeCarTab = document.querySelector('.car-nav-btn.active')?.getAttribute('data-car-tab');
-                if (activeCarTab) updateMobileLocationBar(null, activeCarTab);
-            } else if (currentPage === 'zones' || currentPage === 'calculator') {
-                updateMobileLocationBar();
+                if (activeCarTab) updateHeaderTitle(null, activeCarTab);
+            } else {
+                updateHeaderTitle();
             }
+            updateHeaderMenuLabels();
             const searchVal = document.getElementById('searchInput').value.trim();
             if(searchVal !== "") performHelperSearch(searchVal.toLowerCase());
             
